@@ -24,13 +24,13 @@ train_data:
     feat_path: ./data/features/part0_train.bin
     meta_path: ./data/labels/part0_train.meta
     proposal_folders:
-        - ./data/cluster_proposals/part0_train/hnsw_k_80_th_0.7_step_0.05_minsz_3_maxsz_300_iter0/proposals/
-        - ./data/cluster_proposals/part0_train/hnsw_k_80_th_0.75_step_0.05_minsz_3_maxsz_300_iter0/proposals/
+        - ./data/cluster_proposals/part0_train/faiss_k_80_th_0.7_step_0.05_minsz_3_maxsz_300_iter0/proposals/
+        - ./data/cluster_proposals/part0_train/faiss_k_80_th_0.75_step_0.05_minsz_3_maxsz_300_iter0/proposals/
 
 test_data:
     wo_weight: False
     feat_path: ./data/features/part1_test.bin
     meta_path: ./data/labels/part1_test.meta
     proposal_folders:
-        - ./data/cluster_proposals/part1_test/hnsw_k_80_th_0.7_step_0.05_minsz_3_maxsz_300_iter0/proposals/
-        - ./data/cluster_proposals/part1_test/hnsw_k_80_th_0.75_step_0.05_minsz_3_maxsz_300_iter0/proposals/
+        - ./data/cluster_proposals/part1_test/faiss_k_80_th_0.7_step_0.05_minsz_3_maxsz_300_iter0/proposals/
+        - ./data/cluster_proposals/part1_test/faiss_k_80_th_0.75_step_0.05_minsz_3_maxsz_300_iter0/proposals/

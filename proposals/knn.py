@@ -117,7 +117,7 @@ class knn_hnsw(knn):
 
 class knn_faiss(knn):
 
-    def __init__(self, feats, k, index_path='', verbose=True):
+    def __init__(self, feats, k, index_path='', index_key='', nprobe=128, verbose=True):
         import faiss
         self.verbose = verbose
         with Timer('[faiss] build index', verbose):
@@ -126,7 +126,23 @@ class knn_faiss(knn):
                 index = faiss.read_index(index_path)
             else:
                 feats = feats.astype('float32')
-                index = faiss.IndexFlatIP(feats.shape[1])
+                size, dim = feats.shape
+                index = faiss.IndexFlatIP(dim)
+                if index_key != '':
+                    assert index_key.find('HNSW') < 0, 'HNSW returns distances insted of sims'
+                    metric = faiss.METRIC_INNER_PRODUCT
+                    nlist = min(4096, 8 * round(math.sqrt(size)))
+                    if index_key == 'IVF':
+                        quantizer = index
+                        index = faiss.IndexIVFFlat(quantizer, dim, nlist, metric)
+                    else:
+                        index = faiss.index_factory(dim, index_key, metric)
+                    if index_key.find('Flat') < 0:
+                        assert not index.is_trained
+                    index.train(feats)
+                    index.nprobe = min(nprobe, nlist)
+                    assert index.is_trained
+                    print('nlist: {}, nprobe: {}'.format(nlist, nprobe))
                 index.add(feats)
                 if index_path != '':
                     print('[faiss] save index to {}'.format(index_path))
@@ -145,17 +161,24 @@ class knn_faiss(knn):
 
 
 if __name__ == '__main__':
-    from utils.misc import normalize
+    from utils import l2norm
 
     k = 30
     d = 256
-    nfeat = 1000
-    np.random.seed(1234)
-    feats = np.random.random((nfeat, d)).astype('float32')
+    nfeat = 10000
+    np.random.seed(42)
 
-    feats = normalize(feats)
+    feats = np.random.random((nfeat, d)).astype('float32')
+    feats = l2norm(feats)
 
     index1 = knn_hnsw(feats, k)
     index2 = knn_faiss(feats, k)
+    index3 = knn_faiss(feats, k, index_key='Flat')
+    index4 = knn_faiss(feats, k, index_key='IVF')
+    index5 = knn_faiss(feats, k, index_key='IVF100,PQ32')
+
     print(index1.knns[0])
     print(index2.knns[0])
+    print(index3.knns[0])
+    print(index4.knns[0])
+    print(index5.knns[0])
