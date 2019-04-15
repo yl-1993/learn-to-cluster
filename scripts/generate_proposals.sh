@@ -27,4 +27,4 @@ PYTHONPATH=. python proposals/generate_proposals.py \
 PYTHONPATH=. python evaluation/evaluate.py \
     --method 'pairwise' \
     --gt_labels $prefix/labels/$name.meta \
-    --pred_labels $oprefix/$name/hnsw_k_$knn\_th_$th\_step_$step\_minsz_$minsz\_maxsz_$maxsz\_iter0/pred_labels.txt
+    --pred_labels $oprefix/$name/$method\_k_$knn\_th_$th\_step_$step\_minsz_$minsz\_maxsz_$maxsz\_iter0/pred_labels.txt
