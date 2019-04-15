@@ -31,8 +31,12 @@ class GraphConv(nn.Module):
             self.bias.data.uniform_(-stdv, stdv)
 
     def forward(self, x, adj, D=None):
-        xw = torch.matmul(x, self.weight)
-        output = torch.bmm(adj, xw)
+        if x.dim() == 3:
+            xw = torch.matmul(x, self.weight)
+            output = torch.bmm(adj, xw)
+        elif x.dim() == 2:
+            xw = torch.mm(x, self.weight)
+            output = torch.spmm(adj, xw)
         if D is not None:
             output = output * 1. / D
         return output
