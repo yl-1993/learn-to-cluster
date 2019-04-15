@@ -7,20 +7,20 @@
 ## Requirements
 * Python >= 3.6
 * PyTorch >= 0.4.0
-* faiss
-* mmcv
+* [faiss](https://github.com/facebookresearch/faiss)
+* [mmcv](https://github.com/open-mmlab/mmcv)
 
 
 ## Setup and get data
 
-1. Set up environment
+Install dependencies
 ```bash
 conda install pytorch=0.4.1 cuda90 -c pytorch
 conda install faiss-cpu -c pytorch
 pip install -r requirements.txt
 ```
 
-2. Dowload data
+Dowload data from
 [Google Drive](https://drive.google.com/open?id=1o_Eo3_Ac4k7L9J5vixIvcAgafVSxvVYl) or
 [BaiduYun](https://pan.baidu.com/s/1tcLeL60Na1eIYF0iWUXn3g) (passwd: dtq4)
 ```
