@@ -31,6 +31,10 @@ def parse_args():
     return args
 
 
+def filter_clusters(clusters, min_size):
+    return [c for c in clusters if len(c) >= min_size]
+
+
 def save_proposals(clusters, knns, ofolder, force=False):
     for lb, nodes in enumerate(tqdm(clusters)):
         nodes = set(nodes)
@@ -90,11 +94,7 @@ def generate_proposals(oprefix, feats, feat_dim=256, knn_method='hnsw',
         os.makedirs(ofolder)
     if not os.path.isfile(ofn_pred_labels) or is_rebuild:
         with Timer('build super vertices'):
-            all_clusters = super_vertex(knns, k, th_knn, th_step, max_size)
-            clusters = []
-            for c in all_clusters:
-                if len(c) >= min_size:
-                    clusters.append(c)
+            clusters = super_vertex(knns, k, th_knn, th_step, max_size)
         with Timer('dump clustering to {}'.format(ofn_pred_labels)):
             labels = clusters2labels(clusters)
             write_meta(ofn_pred_labels, labels)
@@ -102,6 +102,7 @@ def generate_proposals(oprefix, feats, feat_dim=256, knn_method='hnsw',
         print('read clusters from {}'.format(ofn_pred_labels))
         lb2idxs, _ = read_meta(ofn_pred_labels)
         clusters = labels2clusters(lb2idxs)
+    clusters = filter_clusters(clusters, min_size)
 
     # output cluster proposals
     if is_save_proposals:

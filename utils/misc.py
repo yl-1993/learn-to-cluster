@@ -187,12 +187,10 @@ def labels2clusters(lb2idxs):
 
 
 def clusters2labels(clusters):
-    lb = 0
     idx2lb = {}
-    for cluster in clusters:
+    for lb, cluster in enumerate(clusters):
         for v in cluster:
             idx2lb[v] = lb
-        lb += 1
     return idx2lb
 
 
