@@ -22,7 +22,7 @@ pip install -r requirements.txt
 
 2. Dowload data
 [Google Drive](https://drive.google.com/open?id=1o_Eo3_Ac4k7L9J5vixIvcAgafVSxvVYl) or
-[BaiduYun](https://pan.baidu.com/s/1tcLeL60Na1eIYF0iWUXn3g)(passwd: dtq4)
+[BaiduYun](https://pan.baidu.com/s/1tcLeL60Na1eIYF0iWUXn3g) (passwd: dtq4)
 ```
 data
   ├── features
@@ -72,6 +72,8 @@ sh scripts/evaluate.sh [gt_label] [pred_label]
 | ------ |:---------:|:------:|:-------:|
 | CDP    | 80.12     | 70.41  | 74.95   |
 | GCN-D (0.7, 0.75) | 95.41 | 67.79 | 79.26 |
+| GCN-D (0.65, 0.7, 0.75) | 94.64 | 71.53 | 81.48 |
+| GCN-D (0.6, 0.65, 0.7, 0.75) | 94.60 | 72.52 | 82.10 |
 
 
 ## Citation
