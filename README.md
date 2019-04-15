@@ -44,6 +44,15 @@ cd learn-to-cluster
 ln -s xxx/data data
 ```
 
+1. Pipleline
+```bash
+sh scripts/pipeline.sh
+```
+
+## Step-by-step
+
+The `scripts/pipeline.sh` can be decomposed into following steps:
+
 1. Cluster Proposals
 generate multi-scale proposals with different `k`, `threshold` or `maxsz`.
 ```bash
@@ -70,7 +79,7 @@ sh scripts/evaluate.sh [gt_label] [pred_label]
 
 | Method | Precision | Recall | F-score |
 | ------ |:---------:|:------:|:-------:|
-| CDP    | 80.12     | 70.41  | 74.95   |
+| CDP    | 80.19     | 70.47  | 75.02   |
 | GCN-D (0.7, 0.75) | 95.41 | 67.79 | 79.26 |
 | GCN-D (0.65, 0.7, 0.75) | 94.64 | 71.53 | 81.48 |
 | GCN-D (0.6, 0.65, 0.7, 0.75) | 94.60 | 72.52 | 82.10 |
