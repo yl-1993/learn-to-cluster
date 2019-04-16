@@ -15,7 +15,7 @@ if __name__ == '__main__':
     parser.add_argument('--cluster_path', nargs='+')
     parser.add_argument('--th_pos', default=-1, type=float)
     parser.add_argument('--th_iou', default=1, type=float)
-    parser.add_argument('--fn_meta', type=str, required=True)
+    parser.add_argument('--gt_labels', type=str, required=True)
     parser.add_argument('--output_name', default='', type=str)
     parser.add_argument('--output_folder', default='./data/results/gcn_ub/', type=str)
     parser.add_argument('--force', action='store_true')
@@ -36,11 +36,12 @@ if __name__ == '__main__':
         exit()
 
     # read label
-    lb2idxs, idx2lb = read_meta(args.fn_meta)
+    lb2idxs, idx2lb = read_meta(args.gt_labels)
     tot_inst_num = len(idx2lb)
 
     clusters = []
     for path in args.cluster_path:
+        path = path.replace('\\', '')
         if path.endswith('.npz'):
             clusters.extend(load_data(path))
         elif path.endswith('.txt'):
