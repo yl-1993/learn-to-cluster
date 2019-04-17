@@ -15,13 +15,14 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Generate Proposals')
     parser.add_argument("--name", type=str, default='part1_test', help="image features")
     parser.add_argument("--prefix", type=str, default='./data', help="prefix of dataset")
-    parser.add_argument("--oprefix", type=str, default='./data/cluster_proposals', help="prefix of saving super vertx")
+    parser.add_argument("--oprefix", type=str, default='./data/cluster_proposals',
+                        help="prefix of saving super vertx")
     parser.add_argument("--dim", type=int, default=256, help="dimension of feature")
-    parser.add_argument("--no_normalize", action='store_true', help="whether to normalize feature")
+    parser.add_argument("--no_normalize", action='store_true', help="normalize feature by default")
     parser.add_argument('--knn', default=80, type=int)
     parser.add_argument('--th_knn', default=0.7, type=float)
     parser.add_argument('--th_step', default=0.05, type=float)
-    parser.add_argument('--knn_method', default='hnsw', choices=['faiss', 'hnsw'])
+    parser.add_argument('--knn_method', default='faiss', choices=['faiss', 'hnsw'])
     parser.add_argument('--max_size', default=300, type=int)
     parser.add_argument('--min_size', default=3, type=int)
     parser.add_argument('--is_rebuild', action='store_true')
@@ -88,7 +89,8 @@ def generate_proposals(oprefix, feats, feat_dim=256, knn_method='hnsw',
         knns = load_data(knn_fn)
 
     # obtain cluster proposals
-    ofolder = oprefix + '_th_{}_step_{}_minsz_{}_maxsz_{}_iter0'.format(th_knn, th_step, min_size, max_size)
+    ofolder = oprefix + '_th_{}_step_{}_minsz_{}_maxsz_{}_iter0'.\
+                format(th_knn, th_step, min_size, max_size)
     ofn_pred_labels = os.path.join(ofolder, 'pred_labels.txt')
     if not os.path.exists(ofolder):
         os.makedirs(ofolder)
@@ -116,7 +118,8 @@ def generate_proposals(oprefix, feats, feat_dim=256, knn_method='hnsw',
 if __name__ == '__main__':
     args = parse_args()
 
-    ds = BasicDataset(name=args.name, prefix=args.prefix, dim=args.dim, normalize=not args.no_normalize)
+    ds = BasicDataset(name=args.name, prefix=args.prefix,
+                dim=args.dim, normalize=not args.no_normalize)
     ds.info()
 
     generate_proposals(os.path.join(args.oprefix, args.name), ds.features, args.dim,
