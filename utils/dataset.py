@@ -16,18 +16,19 @@ class BasicDataset():
         if not os.path.exists(prefix):
             raise FileNotFoundError('folder({}) does not exist.'.format(prefix))
         self.prefix = prefix
-        self.feat_path = os.path.join(prefix, 'features', name+'.bin')
         self.label_path = os.path.join(prefix, 'labels', name+'.meta')
-        self.features = read_probs(self.feat_path, self.inst_num, dim, self.dtype, verbose=verbose)
-        if self.normalize:
-            self.features = l2norm(self.features)
         if os.path.isfile(self.label_path):
             self.lb2idxs, self.idx2lb = read_meta(self.label_path, verbose=verbose)
             self.inst_num = len(self.idx2lb)
             self.cls_num = len(self.lb2idxs)
         else:
             print('meta file not found: {}.\ninit `lb2idxs` and `idx2lb` as None.'.format(self.label_path))
-            self.lb2idxs, self.idx2lb, self.inst_num, self.cls_num = [None for _ in range(4)]
+            self.lb2idxs, self.idx2lb = None, None
+            self.inst_num, self.cls_num = -1, -1
+        self.feat_path = os.path.join(prefix, 'features', name+'.bin')
+        self.features = read_probs(self.feat_path, self.inst_num, dim, self.dtype, verbose=verbose)
+        if self.normalize:
+            self.features = l2norm(self.features)
 
     def info(self):
         print("name:{}{}{}\ninst_num:{}\ncls_num:{}\ndim:{}\nfeat_path:{}\nnormalization:{}{}{}\ndtype:{}".\
