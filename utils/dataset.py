@@ -11,19 +11,23 @@ class BasicDataset():
     def __init__(self, name, prefix='data', dim=256, normalize=True, verbose=True):
         self.name = name
         self.dtype=np.float32
+        self.dim = dim
         self.normalize = normalize
         if not os.path.exists(prefix):
             raise FileNotFoundError('folder({}) does not exist.'.format(prefix))
         self.prefix = prefix
         self.feat_path = os.path.join(prefix, 'features', name+'.bin')
         self.label_path = os.path.join(prefix, 'labels', name+'.meta')
-        self.lb2idxs, self.idx2lb = read_meta(self.label_path, verbose=verbose)
-        self.dim = dim
-        self.inst_num = len(self.idx2lb)
-        self.cls_num = len(self.lb2idxs)
         self.features = read_probs(self.feat_path, self.inst_num, dim, self.dtype, verbose=verbose)
         if self.normalize:
             self.features = l2norm(self.features)
+        if os.path.isfile(self.label_path):
+            self.lb2idxs, self.idx2lb = read_meta(self.label_path, verbose=verbose)
+            self.inst_num = len(self.idx2lb)
+            self.cls_num = len(self.lb2idxs)
+        else:
+            print('meta file not found: {}.\ninit `lb2idxs` and `idx2lb` as None.'.format(self.label_path))
+            self.lb2idxs, self.idx2lb, self.inst_num, self.cls_num = [None for _ in range(4)]
 
     def info(self):
         print("name:{}{}{}\ninst_num:{}\ncls_num:{}\ndim:{}\nfeat_path:{}\nnormalization:{}{}{}\ndtype:{}".\
