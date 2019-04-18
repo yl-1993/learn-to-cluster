@@ -22,7 +22,7 @@ pip install -r requirements.txt
 
 Download 1 part testing data from
 [Google Drive](https://drive.google.com/open?id=1o_Eo3_Ac4k7L9J5vixIvcAgafVSxvVYl) or
-[BaiduYun](https://pan.baidu.com/s/1tcLeL60Na1eIYF0iWUXn3g) (passwd: dtq4)
+[BaiduYun](https://pan.baidu.com/s/1tcLeL60Na1eIYF0iWUXn3g) (passwd: dtq4).
 
 ```
 data
@@ -36,8 +36,10 @@ data
     ├── pretrained_gcn_d.pth.tar # 213598e70ddbc50f5e3661a6191a8be1   
 ```
 
-Download all benchmarks data (including above one) from
-[OneDrive](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155095455_link_cuhk_edu_hk/Ef588F6OV4ZMqqN85Nf-Pv8BcDzSo7DgSG042TA2E4-4CQ?e=ev2Wfl)
+Download entire benchmarks data (including above one) from
+[GoogleDrive](https://drive.google.com/file/d/10boLBiYq-6wKC_N_71unlMyNrimRjpVa/view?usp=sharing) or
+[OneDrive](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155095455_link_cuhk_edu_hk/Ef588F6OV4ZMqqN85Nf-Pv8BcDzSo7DgSG042TA2E4-4CQ?e=ev2Wfl).
+
 The folder structure is the same as the data above.
 
 ## Pipeline
@@ -102,9 +104,7 @@ You can control the number of proposals to strike a balance between time and per
 ## Benchmarks
 
 `1, 3, 5, 7, 9` denotes different scales of clustering.
-Details can be found in [Face Clustering Benchmarks]()
-
-If you scale to large setting (>= 5), `IVF` is recommended to build the knn index.
+Details can be found in [Face Clustering Benchmarks](https://github.com/yl-1993/learn-to-cluster/wiki/Face-Clustering-Benchmarks).
 
 | Methods | 1 | 3 | 5 | 7 | 9 |
 | ------- |:-:|:-:|:-:|:-:|:-:|
