@@ -11,6 +11,7 @@ method=faiss
 step=0.05
 minsz=3
 maxsz=300
+metric=pairwise
 
 
 export PYTHONPATH=.
@@ -33,7 +34,7 @@ do
 
     # sinle evaluation
     python evaluation/evaluate.py \
-        --method 'pairwise' \
+        --metric $metric \
         --gt_labels $gt_labels \
         --pred_labels $oprefix/$name/$method\_k_$knn\_th_$th\_step_$step\_minsz_$minsz\_maxsz_$maxsz\_iter0/pred_labels.txt
 done
@@ -57,6 +58,6 @@ python ./post_process/deoverlap.py \
 
 # final evaluation
 python evaluation/evaluate.py \
-    --method 'pairwise' \
+    --metric $metric \
     --gt_labels $gt_labels \
     --pred_labels $work_dir/pretrained_gcn_th_iou_1.0_pos_-1.0_pred_label.txt
