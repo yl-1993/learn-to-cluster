@@ -24,7 +24,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Evaluate Cluster')
     parser.add_argument('--gt_labels', type=str, required=True)
     parser.add_argument('--pred_labels', type=str, required=True)
-    parser.add_argument('--metirc', default='pairwise', choices=['pairwise', 'bcubed'])
+    parser.add_argument('--metric', default='pairwise', choices=['pairwise', 'bcubed'])
     args = parser.parse_args()
 
     gt_labels, gt_lb_set = _read_meta(args.gt_labels)
@@ -33,14 +33,14 @@ if __name__ == '__main__':
     print('#inst: gt({}) vs pred({})'.format(len(gt_labels), len(pred_labels)))
     print('#cls: gt({}) vs pred({})'.format(len(gt_lb_set), len(pred_lb_set)))
 
-    if args.metirc == 'bcubed':
+    if args.metric == 'bcubed':
         func = bcubed
-    elif args.metirc == 'pairwise':
+    elif args.metric == 'pairwise':
         func = pairwise
     else:
-        raise KeyError('Unsupported evaluation metirc', args.metirc)
+        raise KeyError('Unsupported evaluation metric', args.metric)
 
-    with Timer('evaluate with {}'.format(args.metirc)):
+    with Timer('evaluate with {}'.format(args.metric)):
         ave_pre, ave_rec, fscore = func(gt_labels, pred_labels)
     print('ave_pre: {:.4f}, ave_rec: {:.4f}, fscore: {:.4f}'.\
             format(ave_pre, ave_rec, fscore))

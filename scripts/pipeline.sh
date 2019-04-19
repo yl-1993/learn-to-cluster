@@ -32,7 +32,7 @@ do
         --max_size $maxsz \
         --is_save_proposals
 
-    # sinle evaluation
+    # single evaluation
     python evaluation/evaluate.py \
         --metric $metric \
         --gt_labels $gt_labels \
@@ -40,7 +40,7 @@ do
 done
 
 
-# test cluder det
+# test cluster det
 python dsgcn/test_cluster_det.py \
     --config dsgcn/configs/cfg_0.7_0.75.yaml \
     --work_dir $work_dir \
