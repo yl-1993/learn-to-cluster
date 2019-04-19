@@ -30,7 +30,7 @@ th_pos=-1
 th_iou=1
 
 # generate gcn upper bound
-python tools/gcn_upper_bound.py \
+python tools/dsgcn_upper_bound.py \
     --output_name $oname \
     --output_folder $ofolder \
     --force \
