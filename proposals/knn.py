@@ -6,27 +6,89 @@ import math
 import argparse
 import numpy as np
 import multiprocessing as mp
-from utils import Timer, mkdir_if_no_exists
+from utils import load_data, dump_data, mkdir_if_no_exists, Timer
 
 
 def knns_recall(ners, idx2lb, lb2idxs):
-    import time
-    start = time.time()
-    rs = []
-    cnt = 0
-    for idx, (n, _) in enumerate(ners):
-        lb = idx2lb[idx]
-        idxs = lb2idxs[lb]
-        n = list(n)
-        if len(n) == 1:
-            cnt += 1
-        s = set(idxs) & set(n)
-        rs += [1. * len(s) / len(idxs)]
-    print('there are {} / {} = {:.3f} isolated anchors.'\
-            .format(cnt, len(ners), 1. * cnt / len(ners)))
-    print('compute recall consumes: {} s'.format(time.time() - start))
-    recall = np.mean(rs)
+    with Timer('compute recall'):
+        recs = []
+        cnt = 0
+        for idx, (n, _) in enumerate(ners):
+            lb = idx2lb[idx]
+            idxs = lb2idxs[lb]
+            n = list(n)
+            if len(n) == 1:
+                cnt += 1
+            s = set(idxs) & set(n)
+            recs += [1. * len(s) / len(idxs)]
+        print('there are {} / {} = {:.3f} isolated anchors.'\
+                .format(cnt, len(ners), 1. * cnt / len(ners)))
+    recall = np.mean(recs)
     return recall
+
+
+def filter_knns(knns, k, th):
+    pairs = []
+    scores = []
+    n = len(knns)
+    ners = np.zeros([n, k], dtype=np.int32) - 1
+    simi = np.zeros([n, k]) - 1
+    for i, (ner, dist) in enumerate(knns):
+        assert len(ner) == len(dist)
+        ners[i, :len(ner)] = ner
+        simi[i, :len(ner)] = 1. - dist
+    anchor = np.tile(np.arange(n).reshape(n, 1), (1, k))
+
+    # filter
+    selidx = np.where((simi >= th) & (ners != -1) & (ners != anchor))
+    pairs = np.hstack((anchor[selidx].reshape(-1, 1), ners[selidx].reshape(-1, 1)))
+    scores = simi[selidx]
+
+    # keep uniq pairs
+    pairs = np.sort(pairs, axis=1)
+    pairs, unique_idx = np.unique(pairs, return_index=True, axis=0)
+    scores = scores[unique_idx]
+    return pairs, scores
+
+
+def knns2spmat(knns, k, th_sim=0.7):
+    # convert knns to  symmetric sparse matrix
+    from scipy.sparse import csr_matrix
+    n = len(knns)
+    row, col, data = [], [], []
+    for row_i, knn in enumerate(knns):
+        nbrs, dists = knn
+        for nbr, dist in zip(nbrs, dists):
+            if 1 - dist < th_sim or nbr == -1:
+                continue
+            row.append(row_i)
+            col.append(nbr)
+            data.append(dist)
+    assert len(row) == len(col) == len(data)
+    spmat = csr_matrix((data, (row, col)), shape=(n, n))
+    return spmat
+
+
+def build_knns(knn_prefix, feats, knn_method, k, is_rebuild=False):
+    knn_prefix = os.path.join(knn_prefix, '{}_k_{}'.format(knn_method, k))
+    knn_path = knn_prefix + '.npz'
+    if not os.path.isfile(knn_path) or is_rebuild:
+        index_path = knn_prefix + '.index'
+        with Timer('build index'):
+            if knn_method == 'hnsw':
+                index = knn_hnsw(feats, k, index_path)
+            elif knn_method == 'faiss':
+                index = knn_faiss(feats, k, index_path)
+            else:
+                raise KeyError('Unsupported method({}). \
+                        Only support hnsw and faiss currently'.format(knn_method))
+            knns = index.get_knns()
+        with Timer('dump knns to {}'.format(knn_path)):
+            dump_data(knn_path, knns, force=True)
+    else:
+        print('read knn from {}'.format(knn_path))
+        knns = load_data(knn_path)
+    return knns
 
 
 class knn():

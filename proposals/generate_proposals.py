@@ -6,9 +6,9 @@ import argparse
 import numpy as np
 from tqdm import tqdm
 
-from utils import (dump_data, load_data, read_meta, write_meta,
+from utils import (dump_data, read_meta, write_meta,
                     labels2clusters, clusters2labels, BasicDataset, Timer)
-from proposals import super_vertex
+from proposals import super_vertex, build_knns
 
 
 def parse_args():
@@ -60,33 +60,14 @@ def save_proposals(clusters, knns, ofolder, force=False):
         dump_data(opath_edge, data=edges, force=force)
 
 
-def generate_proposals(oprefix, feats, feat_dim=256, knn_method='hnsw',
+def generate_proposals(oprefix, knn_prefix, feats, feat_dim=256, knn_method='faiss',
                         k=80, th_knn=0.6, th_step=0.05, min_size=3, max_size=300,
                         is_rebuild=False, is_save_proposals=False):
     print('k={}, th_knn={}, th_step={}, max_size={}, is_rebuild={}'.\
             format(k, th_knn, th_step, max_size, is_rebuild))
 
-    ## knn retrieval
-    oprefix = os.path.join(oprefix, '{}_k_{}'.format(knn_method, k))
-    knn_fn = oprefix + '.npz'
-    if not os.path.isfile(knn_fn) or is_rebuild:
-        index_fn = oprefix + '.index'
-        with Timer('build index'):
-            if knn_method == 'hnsw':
-                from proposals import knn_hnsw
-                index = knn_hnsw(feats, k, index_fn)
-            elif knn_method == 'faiss':
-                from proposals import knn_faiss
-                index = knn_faiss(feats, k, index_fn)
-            else:
-                raise KeyError('Unsupported method({}). \
-                        Only support hnsw and faiss currently'.format(knn_method))
-            knns = index.get_knns()
-        with Timer('dump knns to {}'.format(knn_fn)):
-            dump_data(knn_fn, knns, force=True)
-    else:
-        print('read knn from {}'.format(knn_fn))
-        knns = load_data(knn_fn)
+    # build knns
+    knns = build_knns(knn_prefix, feats, knn_method, k, is_rebuild)
 
     # obtain cluster proposals
     ofolder = oprefix + '_th_{}_step_{}_minsz_{}_maxsz_{}_iter0'.\
@@ -122,7 +103,10 @@ if __name__ == '__main__':
                 dim=args.dim, normalize=not args.no_normalize)
     ds.info()
 
-    generate_proposals(os.path.join(args.oprefix, args.name), ds.features, args.dim,
-                        args.knn_method, k=args.knn, th_knn=args.th_knn, th_step=args.th_step,
-                        min_size=args.min_size, max_size=args.max_size,
-                        is_rebuild=args.is_rebuild, is_save_proposals=args.is_save_proposals)
+    generate_proposals(os.path.join(args.oprefix, args.name),
+                        os.path.join(args.prefix, 'knns'),
+                        ds.features, args.dim, args.knn_method,
+                        args.knn, args.th_knn, args.th_step,
+                        args.min_size, args.max_size,
+                        is_rebuild=args.is_rebuild,
+                        is_save_proposals=args.is_save_proposals)
