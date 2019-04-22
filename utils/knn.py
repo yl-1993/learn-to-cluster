@@ -8,6 +8,9 @@ import numpy as np
 import multiprocessing as mp
 from utils import load_data, dump_data, mkdir_if_no_exists, Timer
 
+__all__ =  ['knn_brute_force', 'knn_hnsw', 'knn_faiss',
+            'knns2spmat', 'build_knns', 'filter_knns']
+
 
 def knns_recall(ners, idx2lb, lb2idxs):
     with Timer('compute recall'):

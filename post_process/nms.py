@@ -3,7 +3,7 @@
 
 import time
 
-from proposals.iou import compute_iou
+from proposals import compute_iou
 
 
 def nms(clusters, th=1.):

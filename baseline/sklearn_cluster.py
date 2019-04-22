@@ -5,7 +5,7 @@ import os
 import sklearn.cluster as cluster
 import multiprocessing as mp
 
-from proposals import knns2spmat, build_knns
+from utils import knns2spmat, build_knns
 
 
 def kmeans(feat, n_clusters, **kwargs):

@@ -3,7 +3,7 @@
 
 import numpy as np
 from proposals.graph import graph_clustering_dynamic_th
-from proposals import filter_knns
+from utils import filter_knns
 
 
 def super_vertex(knns, k, th, th_step, max_sz):

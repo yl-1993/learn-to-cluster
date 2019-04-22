@@ -6,9 +6,9 @@ import argparse
 import numpy as np
 from tqdm import tqdm
 
-from utils import (dump_data, read_meta, write_meta,
+from utils import (dump_data, read_meta, write_meta, build_knns,
                     labels2clusters, clusters2labels, BasicDataset, Timer)
-from proposals import super_vertex, build_knns
+from proposals import super_vertex
 
 
 def parse_args():
