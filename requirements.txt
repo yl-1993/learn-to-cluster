@@ -3,3 +3,4 @@ tqdm
 nmslib
 python-igraph
 cairocffi
+fastcluster

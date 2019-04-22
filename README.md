@@ -92,6 +92,10 @@ sh scripts/gcn_upper_bound.sh
 
 | Method | Precision | Recall | F-score |
 | ------ |:---------:|:------:|:-------:|
+| Approx Rank Order (knn=80, th=0) | 99.77 | 7.2 | 13.42 |
+| MiniBatchKmeans (ncluster=5000, bs=100) | 45.48 | 80.98 | 58.25 |
+| KNN DBSCAN (knn=80, th=0.7, eps=0.7, min=40) | 62.38 | 50.66 | 55.92 |
+| FastHAC (dist=0.7, single) | 96.8 | 50.58 | 66.44 |
 | CDP (th=0.7)      | 80.19 | 70.47 | 75.02 |
 | GCN-D (0.7, 0.75) | 95.41 | 67.79 | 79.26 |
 | GCN-D (0.65, 0.7, 0.75) | 94.64 | 71.53 | 81.48 |
