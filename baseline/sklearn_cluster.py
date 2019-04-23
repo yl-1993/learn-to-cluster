@@ -56,8 +56,9 @@ def dbscan(feat, eps, min_samples, **kwargs):
     return db.labels_
 
 
-def knn_dbscan(feats, eps, min_samples, prefix, knn_method, knn, th_sim, **kwargs):
-    knn_prefix = os.path.join(prefix, 'knns')
+def knn_dbscan(feats, eps, min_samples, prefix, name,
+                knn_method, knn, th_sim, **kwargs):
+    knn_prefix = os.path.join(prefix, 'knns', name)
     knns = build_knns(knn_prefix, feats, knn_method, knn)
     sparse_affinity = knns2spmat(knns, knn, th_sim)
     db = cluster.DBSCAN(eps=eps, min_samples=min_samples,

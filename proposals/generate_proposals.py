@@ -104,7 +104,7 @@ if __name__ == '__main__':
     ds.info()
 
     generate_proposals(os.path.join(args.oprefix, args.name),
-                        os.path.join(args.prefix, 'knns'),
+                        os.path.join(args.prefix, 'knns', args.name),
                         ds.features, args.dim, args.knn_method,
                         args.knn, args.th_knn, args.th_step,
                         args.min_size, args.max_size,
