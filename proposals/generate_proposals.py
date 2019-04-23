@@ -70,8 +70,9 @@ def generate_proposals(oprefix, knn_prefix, feats, feat_dim=256, knn_method='fai
     knns = build_knns(knn_prefix, feats, knn_method, k, is_rebuild)
 
     # obtain cluster proposals
-    ofolder = oprefix + '_th_{}_step_{}_minsz_{}_maxsz_{}_iter0'.\
-                format(th_knn, th_step, min_size, max_size)
+    ofolder = os.path.join(oprefix,
+            '{}_k_{}_th_{}_step_{}_minsz_{}_maxsz_{}_iter0'.\
+            format(knn_method, k, th_knn, th_step, min_size, max_size))
     ofn_pred_labels = os.path.join(ofolder, 'pred_labels.txt')
     if not os.path.exists(ofolder):
         os.makedirs(ofolder)
