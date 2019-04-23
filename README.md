@@ -21,24 +21,32 @@ pip install -r requirements.txt
 ```
 
 Download 1 part testing data from
-[Google Drive](https://drive.google.com/open?id=1o_Eo3_Ac4k7L9J5vixIvcAgafVSxvVYl) or
-[BaiduYun](https://pan.baidu.com/s/1tcLeL60Na1eIYF0iWUXn3g) (passwd: dtq4).
+[Google Drive](https://drive.google.com/file/d/1npu8Ma9BZDp4Z18ARkitwP0OozAy__aG/view?usp=sharing) or
+[BaiduYun](https://pan.baidu.com/s/1LFuUCCw8aH27BH5IHDexEw) (passwd: yhhe).
 
 ```
 data
   ├── features
-    ├── part0_train.bin          # acbbc780948e7bfaaee093ef9fce2ccb
-    ├── part1_test.bin           # ced42d80046d75ead82ae5c2cdfba621
+    ├── part0_train.bin            # acbbc780948e7bfaaee093ef9fce2ccb
+    ├── part1_test.bin             # ced42d80046d75ead82ae5c2cdfba621
   ├── labels
-    ├── part0_train.meta         # 8573, 576494
-    ├── part1_test.meta          # 8573, 584013
+    ├── part0_train.meta           # 8573, 576494
+    ├── part1_test.meta            # 8573, 584013
+  ├── knns
+    ├── part0_train/faiss_k_80.npz # 5e4f6c06daf8d29c9b940a851f28a925
+    ├── part1_test/faiss_k_80.npz  # d4a7f95b09f80b0167d893f2ca0f5be5
   ├── pretrained_models
-    ├── pretrained_gcn_d.pth.tar # 213598e70ddbc50f5e3661a6191a8be1   
+    ├── pretrained_gcn_d.pth.tar   # 213598e70ddbc50f5e3661a6191a8be1
 ```
 
 Download entire benchmarks data (including above one) from
 [GoogleDrive](https://drive.google.com/file/d/10boLBiYq-6wKC_N_71unlMyNrimRjpVa/view?usp=sharing) or
 [OneDrive](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155095455_link_cuhk_edu_hk/Ef588F6OV4ZMqqN85Nf-Pv8BcDzSo7DgSG042TA2E4-4CQ?e=ev2Wfl).
+
+[Optional] Download precomputed knns from
+[OneDrive](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155095455_link_cuhk_edu_hk/ES_cbfT-m_hEqSTdmBSySEIBGN664NsSamq3-9C4b7yQow?e=qMA36g)
+and move it to `data` folder.
+It can save a lot of time to search knn, especially in the large setting.
 
 The folder structure is the same as the data above.
 
