@@ -76,7 +76,7 @@ python evaluation/evaluate.py \
 
 ## fast_hierarchy
 method=fast_hierarchy
-dist=0.7
+dist=0.72
 hmethod=single
 pred_labels=$oprefix/$method\_dist_$dist\_hmethod_$hmethod/pred_labels.txt
 python tools/baseline_cluster.py \
