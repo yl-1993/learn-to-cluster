@@ -11,7 +11,7 @@ batch_size_per_gpu: 1
 
 base_lr: 0.01
 lr_mults: [0.1, 0.1, 0.1]
-lr_steps: [3000, 24000, 27000]
+lr_steps: [15000, 24000, 27000]
 max_iter: 30000
 
 momentum: 0.9
