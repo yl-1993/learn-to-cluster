@@ -1,5 +1,6 @@
 # Graph Toolbox.
 # By Xiaohang Zhan (xiaohangzhan@outlook.com)
+# Refer [CDP](https://github.com/XiaohangZhan/cdp/) for more details.
 
 import numpy as np
 
