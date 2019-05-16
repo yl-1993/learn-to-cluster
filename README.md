@@ -42,17 +42,23 @@ data
 Download entire benchmarks data (including above one) from
 [GoogleDrive](https://drive.google.com/file/d/10boLBiYq-6wKC_N_71unlMyNrimRjpVa/view?usp=sharing) or
 [OneDrive](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155095455_link_cuhk_edu_hk/Ef588F6OV4ZMqqN85Nf-Pv8BcDzSo7DgSG042TA2E4-4CQ?e=ev2Wfl).
+The folder structure is the same as the data above.
 
 *[Optional]* Download precomputed knns from
 [OneDrive](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155095455_link_cuhk_edu_hk/ES_cbfT-m_hEqSTdmBSySEIBGN664NsSamq3-9C4b7yQow?e=qMA36g)
 and move it to `data` folder.
 It can save a lot of time to search knn, especially in the large setting.
+
 *[Optional]* Download the splitted image list from
 [GoogleDrive](https://drive.google.com/file/d/1kurPWh6dm3dWQOLqUAeE-fxHrdnjaULB/view?usp=sharing) or
 [OneDrive](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155095455_link_cuhk_edu_hk/ET7lHxOXSjtDiMsgqzLK9LgBi_QW0WVzgZdv2UBzE1Bgzg?e=jZ7kCS).
 You can train your own feature extractor with the list.
 
-The folder structure is the same as the data above.
+*[Optional]* Download YTBFace data from
+[GoogleDrive](https://drive.google.com/file/d/1hg3PQTOwyduLVyfgJ7qrN52o9QE35XM4/view?usp=sharing) or
+[OneDrive](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155095455_link_cuhk_edu_hk/EU7mfU9F6C9AtZ8SV7kM0yAB0MLx9rzh4nD4kT5_AHXGxg?e=O6Fik9).
+
+
 
 ## Pipeline
 
