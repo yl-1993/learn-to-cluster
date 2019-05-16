@@ -5,6 +5,7 @@ from __future__ import division
 
 import numpy as np
 from scipy import sparse as sp
+from sklearn.metrics.cluster import contingency_matrix
 
 
 def _check(gt_labels, pred_labels):
@@ -31,32 +32,6 @@ def _get_lb2idxs(labels):
 
 def _compute_fscore(pre, rec):
     return 2. * pre * rec / (pre + rec)
-
-
-def contingency_matrix(gt_labels, pred_labels, eps=None, sparse=False):
-    if eps is not None and sparse:
-        raise ValueError("Cannot set 'eps' when sparse=True")
-
-    classes, class_idx = np.unique(gt_labels, return_inverse=True)
-    clusters, cluster_idx = np.unique(pred_labels, return_inverse=True)
-    n_classes = classes.shape[0]
-    n_clusters = clusters.shape[0]
-    # Using coo_matrix to accelerate simple histogram calculation,
-    # i.e. bins are consecutive integers
-    # Currently, coo_matrix is faster than histogram2d for simple cases
-    contingency = sp.coo_matrix((np.ones(class_idx.shape[0]),
-                                 (class_idx, cluster_idx)),
-                                shape=(n_classes, n_clusters),
-                                dtype=np.int)
-    if sparse:
-        contingency = contingency.tocsr()
-        contingency.sum_duplicates()
-    else:
-        contingency = contingency.toarray()
-        if eps is not None:
-            # don't use += as contingency is integer
-            contingency = contingency + eps
-    return contingency
 
 
 def fowlkes_mallows_score(gt_labels, pred_labels, sparse=True):
