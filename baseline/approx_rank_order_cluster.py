@@ -10,6 +10,10 @@ from functools import partial
 """
 paper: https://arxiv.org/pdf/1604.00989.pdf
 original code https://github.com/varun-suresh/Clustering
+To run approx_rank_order:
+    1. pip install pyflann
+    2. 2to3 -w path/site-packages/pyflann/
+Refer [No module named 'index'](https://github.com/primetang/pyflann/issues/1) for more details.
 """
 
 __all__ = ['approx_rank_order']

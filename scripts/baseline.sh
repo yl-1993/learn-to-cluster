@@ -10,23 +10,28 @@ metric=pairwise
 export PYTHONPATH=.
 
 ## approx_rank_order
-method=approx_rank_order
-knn=80
-th_sim=0.0
-pred_labels=$oprefix/$method\_k_$knn\_th_$th_sim/pred_labels.txt
-python tools/baseline_cluster.py \
-    --prefix $prefix \
-    --oprefix $oprefix \
-    --name $name \
-    --dim $dim \
-    --method $method \
-    --knn $knn \
-    --th_sim $th_sim
-# eval
-python evaluation/evaluate.py \
-    --metric $metric \
-    --gt_labels $gt_labels \
-    --pred_labels $pred_labels
+## To run approx_rank_order:
+## 1. uncomment second line in `baseline/__init__.py`
+## 2. follow the instructions in `baseline/approx_rank_order_cluster.py` to install `pyflann`
+## 3. uncomment the lines below and run
+
+# method=approx_rank_order
+# knn=80
+# th_sim=0.0
+# pred_labels=$oprefix/$method\_k_$knn\_th_$th_sim/pred_labels.txt
+# python tools/baseline_cluster.py \
+#     --prefix $prefix \
+#     --oprefix $oprefix \
+#     --name $name \
+#     --dim $dim \
+#     --method $method \
+#     --knn $knn \
+#     --th_sim $th_sim
+# # eval
+# python evaluation/evaluate.py \
+#     --metric $metric \
+#     --gt_labels $gt_labels \
+#     --pred_labels $pred_labels
 
 
 ## knn_dbscan
