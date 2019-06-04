@@ -32,8 +32,12 @@ def parse_args():
     return args
 
 
-def filter_clusters(clusters, min_size):
-    return [c for c in clusters if len(c) >= min_size]
+def filter_clusters(clusters, min_size=None, max_size=None):
+    if min_size is not None:
+        clusters = [c for c in clusters if len(c) >= min_size]
+    if max_size is not None:
+        clusters = [c for c in clusters if len(c) <= max_size]
+    return clusters
 
 
 def save_proposals(clusters, knns, ofolder, force=False):
@@ -71,7 +75,7 @@ def generate_proposals(oprefix, knn_prefix, feats, feat_dim=256, knn_method='fai
 
     # obtain cluster proposals
     ofolder = os.path.join(oprefix,
-            '{}_k_{}_th_{}_step_{}_minsz_{}_maxsz_{}_iter0'.\
+            '{}_k_{}_th_{}_step_{}_minsz_{}_maxsz_{}_iter_0'.\
             format(knn_method, k, th_knn, th_step, min_size, max_size))
     ofn_pred_labels = os.path.join(ofolder, 'pred_labels.txt')
     if not os.path.exists(ofolder):

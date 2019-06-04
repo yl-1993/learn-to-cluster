@@ -74,6 +74,7 @@ def knns2spmat(knns, k, th_sim=0.7):
 
 def build_knns(knn_prefix, feats, knn_method, k, is_rebuild=False):
     knn_prefix = os.path.join(knn_prefix, '{}_k_{}'.format(knn_method, k))
+    mkdir_if_no_exists(knn_prefix)
     knn_path = knn_prefix + '.npz'
     if not os.path.isfile(knn_path) or is_rebuild:
         index_path = knn_prefix + '.index'

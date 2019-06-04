@@ -36,7 +36,7 @@ do
     python evaluation/evaluate.py \
         --metric $metric \
         --gt_labels $gt_labels \
-        --pred_labels $oprefix/$name/$method\_k_$knn\_th_$th\_step_$step\_minsz_$minsz\_maxsz_$maxsz\_iter0/pred_labels.txt
+        --pred_labels $oprefix/$name/$method\_k_$knn\_th_$th\_step_$step\_minsz_$minsz\_maxsz_$maxsz\_iter_0/pred_labels.txt
 done
 
 

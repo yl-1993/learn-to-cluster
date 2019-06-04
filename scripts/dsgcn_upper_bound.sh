@@ -14,7 +14,7 @@ maxsz=300
 gt_labels=$prefix/labels/$name.meta
 for th in 0.7 0.75;
 do
-    cluster_path="$cluster_path $oprefix/$name/$method\_k_$knn\_th_$th\_step_$step\_minsz_$minsz\_maxsz_$maxsz\_iter0/pred_labels.txt"
+    cluster_path="$cluster_path $oprefix/$name/$method\_k_$knn\_th_$th\_step_$step\_minsz_$minsz\_maxsz_$maxsz\_iter_0/pred_labels.txt"
 done
 
 # uncomment following lines to pass args through command line
@@ -39,6 +39,6 @@ python tools/dsgcn_upper_bound.py \
 
 # evaluate
 python evaluation/evaluate.py \
-    --method 'pairwise' \
+    --metric 'pairwise' \
     --gt_labels $gt_labels \
     --pred_labels $ofolder/$oname\_th_iou_$th_iou\_pos_$th_pos\_pred_labels.txt
