@@ -3,7 +3,7 @@ from .cluster_det_processor import ClusterDetProcessor
 from .build_dataloader import build_dataloader
 
 
-__factory = {
+__factory__ = {
      'det': ClusterDetProcessor,
 }
 
@@ -13,6 +13,6 @@ def build_dataset(cfg):
 
 
 def build_processor(name):
-    if name not in __factory:
+    if name not in __factory__:
         raise KeyError("Unknown processor:", name)
-    return __factory[name]
+    return __factory__[name]
