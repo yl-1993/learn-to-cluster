@@ -70,7 +70,7 @@ class GCN(nn.Module):
         output is (bs ,2)
     """
 
-    def __init__(self, block, planes, feature_dim, featureless, num_classes=1, dropout=0.0, reduce_method='max'):
+    def __init__(self, block, planes, feature_dim, featureless, num_classes=1, dropout=0.0, reduce_method='max', stage='dev'):
         if featureless:
             self.inplanes = 1
         else:
@@ -83,6 +83,12 @@ class GCN(nn.Module):
         assert dropout >= 0 and dropout < 1
         self.layers = self._make_layer(block, planes, dropout)
         self.classifier = nn.Linear(self.inplanes, num_classes)
+        if stage == 'dev':
+            self.loss = torch.nn.MSELoss()
+        elif stage == 'seg':
+            self.loss = torch.nn.NLLLoss()
+        else:
+            raise KeyError('Unknown stage: {}'.format(stage))
 
     def _make_layer(self, block, planes, dropout=0.0):
         layers = nn.ModuleList([])
@@ -91,7 +97,7 @@ class GCN(nn.Module):
             self.inplanes = plane
         return layers
 
-    def forward(self, x, adj):
+    def extract(self, x, adj):
         bs = x.size(0)
         adj.detach_()
         D = adj.sum(dim=2, keepdim=True)
@@ -120,6 +126,14 @@ class GCN(nn.Module):
             else:
                 x = x.view(bs, -1)
         return x
+
+    def forward(self, data, return_loss=False):
+        x = self.extract(data[0], data[1])
+        if return_loss:
+            loss = self.loss(x.view(-1), data[2])
+            return x, loss
+        else:
+            return x
 
 
 def dsgcn(feature_dim, hidden_dims=[], featureless=True, \

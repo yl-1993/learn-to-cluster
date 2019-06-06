@@ -19,8 +19,6 @@ def test_cluster_det(model, cfg, logger):
     dataset = build_dataset(cfg.test_data)
     processor = build_processor(cfg.stage)
 
-    mseloss = torch.nn.MSELoss()
-
     losses = []
     output_probs = []
 
@@ -38,16 +36,14 @@ def test_cluster_det(model, cfg, logger):
             model.cuda()
 
         model.eval()
-        for i, (x, adj, label) in enumerate(data_loader):
+        for i, data in enumerate(data_loader):
             with torch.no_grad():
-                if cfg.cuda:
-                    label = label.cuda(non_blocking=True)
-                output = model(x, adj).view(-1)
-                loss = mseloss(output, label).item()
-                losses += [loss]
+                output, loss = model(data, return_loss=True)
+                losses += [loss.item()]
                 if i % cfg.print_freq == 0:
                     logger.info('[Test] Iter {}/{}: Loss {:.4f}'.format(i, len(data_loader), loss))
                 if cfg.save_output:
+                    output = output.view(-1)
                     prob = output.data.cpu().numpy()
                     output_probs.append(prob)
     else:
