@@ -105,6 +105,23 @@ It yields the performance when accuracy of GCN is 100%.
 sh scripts/gcn_upper_bound.sh
 ```
 
+## Train
+We follow the apis of [mmdet](https://github.com/open-mmlab/mmdetection/tree/master/mmdet/apis) to construct our training and testing.
+Checkout `dsgcn/train_cluster_det.py` and [mmdet](https://github.com/open-mmlab/mmdetection/) for more details.
+
+1. Generate proposals on part0_train
+Modify `name` to `part0_train` and generate proposals.
+```bash
+sh scripts/generate_proposals.sh
+```
+
+2. Train cluster detection (gcn-d)
+Edit `dsgcn/configs/cfg_train_0.7_0.75.yaml` to use approriate proposals.
+Generally, more proposals, better performance.
+```bash
+sh scripts/train_cluster_det.sh
+```
+
 
 ## Results on part1_test
 
