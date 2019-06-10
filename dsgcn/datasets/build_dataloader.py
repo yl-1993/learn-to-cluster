@@ -17,16 +17,25 @@ def collate_graphs(batch):
         max_size = max(sizes)
         dim = feat[0].shape[1]
         lb = torch.from_numpy(np.array(lb))
+        # pad to [X, 0]
         pad_feat = [
                 F.pad(torch.from_numpy(f),
                 (0, 0, 0, max_size - s),
                 value=0)
                 for f, s in zip(feat, sizes)]
+        # pad to [[A, 0], [0, 0]]
         pad_adj = [
                 F.pad(torch.from_numpy(a),
                 (0, max_size - s, 0, max_size - s),
                 value=0)
                 for a, s in zip(adj, sizes)]
+        # pad to [[A, 0], [0, I]]
+        pad_adj = [a +
+                F.pad(torch.eye(max_size - s),
+                (s, 0, s, 0),
+                value=0)
+                if s < max_size else a
+                for a, s in zip(pad_adj, sizes)]
         pad_feat = default_collate(pad_feat)
         pad_adj = default_collate(pad_adj)
         return pad_feat, pad_adj, lb
