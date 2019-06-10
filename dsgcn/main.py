@@ -10,7 +10,7 @@ from utils import (create_logger, set_random_seed,
                     rm_suffix, mkdir_if_no_exists)
 
 from dsgcn.models import build_model
-from dsgcn import build_op
+from dsgcn import build_handler
 
 
 def parse_args():
@@ -20,9 +20,11 @@ def parse_args():
     parser.add_argument('--stage', choices=['det', 'seg'], default='det')
     parser.add_argument('--phase', choices=['test', 'train'], default='test')
     parser.add_argument('--work_dir', help='the dir to save logs and models')
-    parser.add_argument('--load_from', help='the checkpoint file to load from')
+    parser.add_argument('--load_from', default=None, help='the checkpoint file to load from')
+    parser.add_argument('--resume_from', default=None, help='the checkpoint file to resume from')
     parser.add_argument('--gpus', type=int, default=1,
             help='number of gpus(only applicable to non-distributed training)')
+    parser.add_argument('--distributed', action='store_true', default=False)
     parser.add_argument('--save_output', action='store_true', default=False)
     parser.add_argument('--no_cuda', action='store_true', default=False)
     args = parser.parse_args()
@@ -53,10 +55,12 @@ def main():
     mkdir_if_no_exists(cfg.work_dir, is_folder=True)
     if not hasattr(cfg, 'stage'):
         cfg.stage = args.stage
-    if args.load_from is not None:
-        cfg.load_from = args.load_from
+
+    cfg.load_from = args.load_from
+    cfg.resume_from = args.resume_from
 
     cfg.gpus = args.gpus
+    cfg.distributed = args.distributed
     cfg.save_output = args.save_output
 
     logger = create_logger()
@@ -67,9 +71,9 @@ def main():
         set_random_seed(args.seed)
 
     model = build_model(cfg.model['type'], **cfg.model['kwargs'])
-    op = build_op(args.phase, args.stage)
+    handler = build_handler(args.phase, args.stage)
 
-    op(model, cfg, logger)
+    handler(model, cfg, logger)
 
 
 if __name__ == '__main__':
