@@ -28,7 +28,6 @@ def test_cluster_det(model, cfg, logger):
                 processor,
                 cfg.batch_size_per_gpu,
                 cfg.workers_per_gpu,
-                cfg.gpus,
                 train=False)
 
         model = MMDataParallel(model, device_ids=range(cfg.gpus))
@@ -40,7 +39,7 @@ def test_cluster_det(model, cfg, logger):
             with torch.no_grad():
                 output, loss = model(data, return_loss=True)
                 losses += [loss.item()]
-                if i % cfg.print_freq == 0:
+                if i % cfg.log_config.interval == 0:
                     logger.info('[Test] Iter {}/{}: Loss {:.4f}'.format(i, len(data_loader), loss))
                 if cfg.save_output:
                     output = output.view(-1)
@@ -60,4 +59,5 @@ def test_cluster_det(model, cfg, logger):
             'proposal_folders': cfg.test_data.proposal_folders,
         }
         print('dump output to {}'.format(opath))
+        output_probs = np.concatenate(output_probs).ravel()
         np.savez_compressed(opath, data=output_probs, meta=meta)
