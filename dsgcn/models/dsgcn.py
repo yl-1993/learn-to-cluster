@@ -5,7 +5,6 @@ import math
 import torch
 import torch.nn as nn
 from torch.nn.parameter import Parameter
-from torch.autograd import Variable
 import torch.nn.functional as F
 
 __all__ = ['dsgcn']
@@ -66,11 +65,12 @@ class BasicBlock(nn.Module):
 
 
 class GCN(nn.Module):
-    """ input is (bs ,N, D), for featureless, D=1
-        output is (bs ,2)
+    """ input is (bs, N, D), for featureless, D=1
+        output is (bs, 2)
     """
 
-    def __init__(self, block, planes, feature_dim, featureless, num_classes=1, dropout=0.0, reduce_method='max', stage='dev'):
+    def __init__(self, block, planes, feature_dim, featureless,
+            num_classes=1, dropout=0.0, reduce_method='max', stage='dev'):
         if featureless:
             self.inplanes = 1
         else:
@@ -102,6 +102,7 @@ class GCN(nn.Module):
         adj.detach_()
         D = adj.sum(dim=2, keepdim=True)
         D.detach_()
+        assert (D > 0).all(), "D should larger than 0, otherwise gradient will be NaN."
         for layer in self.layers:
             x = layer(x, adj, D)
         # use global op to reduce N
