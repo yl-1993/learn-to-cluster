@@ -1,0 +1,28 @@
+model:
+    type: dsgcn
+    kwargs:
+        feature_dim: 256
+        featureless: False
+        reduce_method: max
+        hidden_dims: [512, 64]
+
+workers_per_gpu: 1
+batch_size_per_gpu: 32
+
+log_level: 'INFO'
+log_config:
+    interval: 100
+
+train_data:
+    feat_path: ./data/features/part0_train.bin
+    meta_path: ./data/labels/part0_train.meta
+    proposal_folders:
+        - ./data/cluster_proposals/part0_train/faiss_k_80_th_0.7_step_0.05_minsz_3_maxsz_300_iter_0/proposals/
+
+test_data:
+    wo_weight: False
+    feat_path: ./data/features/part1_test.bin
+    meta_path: ./data/labels/part1_test.meta
+    proposal_folders:
+        - ./data/cluster_proposals/part1_test/faiss_k_80_th_0.7_step_0.05_minsz_3_maxsz_300_iter_0/proposals/
+        - ./data/cluster_proposals/part1_test/faiss_k_80_th_0.75_step_0.05_minsz_3_maxsz_300_iter_0/proposals/

@@ -43,15 +43,13 @@ class ClusterDetProcessor(object):
         size = len(node)
         adj = np.eye(size)
         for e in edge:
+            w = 1.
             if len(e) == 2:
                 e1, e2 = e
-                w = 1
             elif len(e) == 3:
                 e1, e2, dist = e
-                if self.dataset.wo_weight:
-                    w = 1
-                else:
-                    w = 1 - dist
+                if not self.dataset.wo_weight:
+                    w = 1. - dist
             else:
                 raise ValueError('Unknown length of e: {}'.format(e))
             v1 = abs2rel[e1]

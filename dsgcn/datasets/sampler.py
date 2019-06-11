@@ -2,47 +2,39 @@ import math
 import numpy as np
 import torch
 from torch.utils.data.sampler import Sampler
+from torch.utils.data.distributed import DistributedSampler as _DistributedSampler
 
 
-__all__ = ["DistGivenIterationSampler", "DistSequentialSampler"]
+__all__ = ["DistributedSampler", "DistributedSequentialSampler"]
 
 
-class DistGivenIterationSampler(Sampler):
-    def __init__(self, dataset, total_iter, batch_size, world_size, rank):
-        self.dsize = dataset.size
-        self.total_size = total_iter * batch_size
-        self.call = 0
+class DistributedSampler(_DistributedSampler):
+
+    def __init__(self, dataset, num_replicas=None, rank=None, shuffle=True):
+        super().__init__(dataset, num_replicas=num_replicas, rank=rank)
+        self.shuffle = shuffle
 
     def __iter__(self):
-        if self.call == 0:
-            self.call = 1
-            self.indices = self.gen_all_iter_indices()
-            return iter(self.indices)
+        # deterministically shuffle based on epoch
+        if self.shuffle:
+            g = torch.Generator()
+            g.manual_seed(self.epoch)
+            indices = torch.randperm(len(self.dataset), generator=g).tolist()
         else:
-            raise RuntimeError("this sampler is designed to be called only once!!")
+            indices = torch.arange(len(self.dataset)).tolist()
 
-    def gen_all_iter_indices(self, rank):
-        # each process shuffle independently
-        np.random.seed(rank)
-
-        indices = np.arange(len(self.dataset))
-        indices = indices[:self.total_size]
-        num_repeat = (self.total_size - 1) // indices.shape[0] + 1
-        indices = np.tile(indices, num_repeat)
-        indices = indices[:self.total_size]
-
-        for beg in range(0, self.total_size, self.dsize):
-            end = min(beg + self.dsize, self.total_size)
-            np.random.shuffle(indices[beg:end])
-
+        # add extra samples to make it evenly divisible
+        indices += indices[:(self.total_size - len(indices))]
         assert len(indices) == self.total_size
-        return indices
 
-    def __len__(self):
-        return self.total_size
+        # subsample
+        indices = indices[self.rank:self.total_size:self.num_replicas]
+        assert len(indices) == self.num_samples
+
+        return iter(indices)
 
 
-class DistSequentialSampler(Sampler):
+class DistributedSequentialSampler(Sampler):
     def __init__(self, dataset, world_size, rank):
         assert rank >= 0
         assert dataset.size >= world_size, '{} vs {}'.format(dataset.size, world_size)
