@@ -7,10 +7,10 @@ model:
         hidden_dims: [512, 64]
 
 workers_per_gpu: 1
-batch_size_per_gpu: 1
-iter_size: 16
+batch_size_per_gpu: 32
+iter_size: 1
 
-total_epochs: 10
+total_epochs: 16
 
 optimizer:
     type: SGD
@@ -22,7 +22,7 @@ optimizer_config:
 
 lr_config:
     policy: 'step'
-    step: [5, 8, 9]
+    step: [8, 12, 15]
 
 checkpoint_config:
     interval: 1
@@ -35,8 +35,8 @@ log_config:
         - type: 'TextLoggerHook'
 
 workflow:
-    - !!python/tuple ['train_iter_size', 1]
-    # - !!python/tuple ['train', 1]
+    # - !!python/tuple ['train_iter_size', 1]
+    - !!python/tuple ['train', 1]
 
 train_data:
     feat_path: ./data/features/part0_train.bin
