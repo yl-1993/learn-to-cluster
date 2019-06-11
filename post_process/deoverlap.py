@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     assert args.pred_score.endswith('.npz')
     if args.output_name == '':
-        pos = args.pred_score.rfind('_')
+        pos = args.pred_score.rfind('.npz')
         pred_label_fn = args.pred_score[:pos] + '_th_iou_{}_pos_{}_pred_label.txt'.format(args.th_iou, args.th_pos)
     else:
         pred_label_fn = args.output_name

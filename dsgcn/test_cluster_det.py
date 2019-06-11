@@ -53,7 +53,7 @@ def test_cluster_det(model, cfg, logger):
 
     if cfg.save_output:
         fn = os.path.basename(cfg.load_from)
-        opath = os.path.join(cfg.work_dir, fn[:fn.rfind('.pth.tar')] + '.npz')
+        opath = os.path.join(cfg.work_dir, fn[:fn.rfind('.pth')] + '.npz')
         meta = {
             'tot_inst_num': len(dataset.idx2lb),
             'proposal_folders': cfg.test_data.proposal_folders,
