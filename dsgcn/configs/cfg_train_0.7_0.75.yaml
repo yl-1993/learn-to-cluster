@@ -10,7 +10,7 @@ workers_per_gpu: 1
 batch_size_per_gpu: 32
 iter_size: 1
 
-total_epochs: 16
+total_epochs: 30
 
 optimizer:
     type: SGD
@@ -22,7 +22,7 @@ optimizer_config:
 
 lr_config:
     policy: 'step'
-    step: [8, 12, 15]
+    step: [15, 24, 28]
 
 checkpoint_config:
     interval: 1
