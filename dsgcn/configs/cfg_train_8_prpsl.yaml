@@ -1,4 +1,4 @@
-# ave_pre: 0.9628, ave_rec: 0.6729, fscore: 0.7921
+# ave_pre: 0.9627, ave_rec: 0.6735, fscore: 0.7925
 model:
     type: dsgcn
     kwargs:
@@ -11,7 +11,7 @@ workers_per_gpu: 1
 batch_size_per_gpu: 32
 iter_size: 1
 
-total_epochs: 50
+total_epochs: 70
 
 optimizer:
     type: SGD
@@ -23,7 +23,7 @@ optimizer_config:
 
 lr_config:
     policy: 'step'
-    step: [25, 40, 46]
+    step: [35, 56, 65]
 
 checkpoint_config:
     interval: 1
