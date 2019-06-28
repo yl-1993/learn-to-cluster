@@ -3,6 +3,8 @@
 ## Paper
 [Learning to Cluster Faces on an Affinity Graph](https://arxiv.org/abs/1904.02749), CVPR 2019 (**Oral**) [[Project Page](http://yanglei.me/project/ltc)]
 
+![pipeline](http://yanglei.me/project/ltc/imgs/pipeline.png)
+
 
 ## Requirements
 * Python >= 3.6
