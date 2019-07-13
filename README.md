@@ -26,6 +26,11 @@ Download 1 part testing data from
 [Google Drive](https://drive.google.com/file/d/1npu8Ma9BZDp4Z18ARkitwP0OozAy__aG/view?usp=sharing) or
 [BaiduYun](https://pan.baidu.com/s/1LFuUCCw8aH27BH5IHDexEw) (passwd: yhhe).
 
+or with scripts below:
+```bash
+python tools/download_data.py
+```
+
 ```
 data
   ├── features

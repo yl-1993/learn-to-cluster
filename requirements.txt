@@ -2,7 +2,7 @@ mmcv
 tqdm
 gdown
 nmslib
-tarfile
+Cython
 easydict
 python-igraph
 cairocffi
