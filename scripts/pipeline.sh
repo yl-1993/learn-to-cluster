@@ -2,7 +2,7 @@ prefix=./data
 name=part1_test
 
 oprefix=$prefix/cluster_proposals
-work_dir=$prefix/work_dir/cfg_0.7_0.75
+work_dir=$prefix/work_dir/cfg_test_0.7_0.75
 gt_labels=$prefix/labels/$name.meta
 
 dim=256
@@ -41,8 +41,10 @@ done
 
 
 # test cluster det
-python dsgcn/test_cluster_det.py \
-    --config dsgcn/configs/cfg_0.7_0.75.yaml \
+python dsgcn/main.py \
+    --stage det \
+    --phase test \
+    --config dsgcn/configs/cfg_test_0.7_0.75.yaml \
     --work_dir $work_dir \
     --load_from data/pretrained_models/pretrained_gcn_d.pth.tar \
     --save_output
@@ -60,4 +62,4 @@ python ./post_process/deoverlap.py \
 python evaluation/evaluate.py \
     --metric $metric \
     --gt_labels $gt_labels \
-    --pred_labels $work_dir/pretrained_gcn_th_iou_1.0_pos_-1.0_pred_label.txt
+    --pred_labels $work_dir/pretrained_gcn_d_th_iou_1.0_pos_-1.0_pred_label.txt
