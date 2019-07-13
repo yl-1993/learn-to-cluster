@@ -1,6 +1,9 @@
 mmcv
 tqdm
+gdown
 nmslib
+tarfile
+easydict
 python-igraph
 cairocffi
 fastcluster
