@@ -32,7 +32,7 @@ if __name__ == '__main__':
     print('th_pos={}, th_iou={}, pred_score={}, pred_label_fn={}'.\
             format(args.th_pos, args.th_iou, args.pred_score, pred_label_fn))
 
-    d = np.load(args.pred_score)
+    d = np.load(args.pred_score, allow_pickle=True)
     probs = d['data']
     meta = d['meta'].item()
     proposal_folders = meta['proposal_folders']
