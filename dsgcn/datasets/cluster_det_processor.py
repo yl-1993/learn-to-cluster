@@ -24,7 +24,7 @@ class ClusterDetProcessor(object):
         edge = load_data(fn_edge)
         assert len(node) > 1, '#node of {}: {}'.format(fn_node, len(node))
         # take majority as label of the graph
-        if self.dataset.idx2lb and self.data.lb2idxs:
+        if not self.dataset.ignore_meta:
             lb2cnt = {}
             for idx in node:
                 if idx not in self.dataset.idx2lb:
