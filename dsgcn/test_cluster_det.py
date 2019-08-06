@@ -40,7 +40,10 @@ def test_cluster_det(model, cfg, logger):
                 output, loss = model(data, return_loss=True)
                 losses += [loss.item()]
                 if i % cfg.log_config.interval == 0:
-                    logger.info('[Test] Iter {}/{}: Loss {:.4f}'.format(i, len(data_loader), loss))
+                    if dataset.ignore_meta:
+                        logger.info('[Test] Iter {}/{}'.format(i, len(data_loader)))
+                    else:
+                        logger.info('[Test] Iter {}/{}: Loss {:.4f}'.format(i, len(data_loader), loss))
                 if cfg.save_output:
                     output = output.view(-1)
                     prob = output.data.cpu().numpy()
@@ -48,14 +51,15 @@ def test_cluster_det(model, cfg, logger):
     else:
         raise NotImplementedError
 
-    avg_loss = sum(losses) / len(losses)
-    logger.info('[Test] Overall Loss {:.4f}'.format(avg_loss))
+    if not dataset.ignore_meta:
+        avg_loss = sum(losses) / len(losses)
+        logger.info('[Test] Overall Loss {:.4f}'.format(avg_loss))
 
     if cfg.save_output:
         fn = os.path.basename(cfg.load_from)
         opath = os.path.join(cfg.work_dir, fn[:fn.rfind('.pth')] + '.npz')
         meta = {
-            'tot_inst_num': len(dataset.idx2lb),
+            'tot_inst_num': dataset.inst_num,
             'proposal_folders': cfg.test_data.proposal_folders,
         }
         print('dump output to {}'.format(opath))

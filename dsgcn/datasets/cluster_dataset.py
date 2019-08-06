@@ -9,7 +9,7 @@ class ClusterDataset(object):
 
     def __init__(self, cfg, is_test=False):
         feat_path = cfg['feat_path']
-        meta_path = cfg['meta_path']
+        meta_path = cfg.get('meta_path', None)
         proposal_folders = cfg['proposal_folders']
 
         self.feature_dim = cfg['feature_dim']
@@ -32,14 +32,23 @@ class ClusterDataset(object):
         fn_edge_pattern = '*_edge.npz'
 
         with Timer('read meta and feature'):
-            self.lb2idxs, self.idx2lb = read_meta(meta_path)
-            inst_num = len(self.idx2lb)
-            if not self.featureless:
-                features = read_probs(feat_path, inst_num, self.feature_dim)
-                self.features = l2norm(features)
+            if meta_path is not None:
+                self.lb2idxs, self.idx2lb = read_meta(meta_path)
+                self.inst_num = len(self.idx2lb)
+                self.ignore_meta = False
             else:
+                self.lb2idxs, self.idx2lb = None, None
+                self.inst_num = -1
+                self.ignore_meta = True
+            if not self.featureless:
+                features = read_probs(feat_path, self.inst_num, self.feature_dim)
+                self.features = l2norm(features)
+                if self.inst_num == -1:
+                    self.inst_num = features.shape[0]
+            else:
+                assert self.inst_num > 0
                 self.feature_dim = 1
-                self.features = np.ones(inst_num).reshape(-1, 1)
+                self.features = np.ones(self.inst_num).reshape(-1, 1)
 
         with Timer('read proposal list'):
             self.lst = []
