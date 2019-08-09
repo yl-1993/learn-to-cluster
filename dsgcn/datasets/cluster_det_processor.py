@@ -24,17 +24,20 @@ class ClusterDetProcessor(object):
         edge = load_data(fn_edge)
         assert len(node) > 1, '#node of {}: {}'.format(fn_node, len(node))
         # take majority as label of the graph
-        lb2cnt = {}
-        for idx in node:
-            if idx not in self.dataset.idx2lb:
-                continue
-            lb = self.dataset.idx2lb[idx]
-            if lb not in lb2cnt:
-                lb2cnt[lb] = 0
-            lb2cnt[lb] += 1
-        gt_lb, _ = get_majority(lb2cnt)
-        gt_node = self.dataset.lb2idxs[gt_lb]
-        iou = compute_iou(node, gt_node)
+        if not self.dataset.ignore_meta:
+            lb2cnt = {}
+            for idx in node:
+                if idx not in self.dataset.idx2lb:
+                    continue
+                lb = self.dataset.idx2lb[idx]
+                if lb not in lb2cnt:
+                    lb2cnt[lb] = 0
+                lb2cnt[lb] += 1
+            gt_lb, _ = get_majority(lb2cnt)
+            gt_node = self.dataset.lb2idxs[gt_lb]
+            iou = compute_iou(node, gt_node)
+        else:
+            iou = -1.
         # compute adj
         node = list(node)
         abs2rel = {}
