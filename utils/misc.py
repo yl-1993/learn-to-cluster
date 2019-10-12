@@ -113,6 +113,11 @@ def write_meta(ofn, idx2lb, inst_num=None):
     print('#inst: {}, #class: {}'.format(inst_num, cls_num))
 
 
+def write_feat(ofn, features):
+    print('save features to', ofn)
+    features.tofile(ofn)
+
+
 def dump2npz(ofn, data, force=False):
     if os.path.exists(ofn) and not force:
         return
