@@ -8,8 +8,10 @@ import numpy as np
 import multiprocessing as mp
 from utils import load_data, dump_data, mkdir_if_no_exists, Timer
 
-__all__ =  ['knn_brute_force', 'knn_hnsw', 'knn_faiss',
-            'knns2spmat', 'build_knns', 'filter_knns']
+__all__ = [
+    'knn_brute_force', 'knn_hnsw', 'knn_faiss', 'knns2spmat', 'build_knns',
+    'filter_knns'
+]
 
 
 def knns_recall(ners, idx2lb, lb2idxs):
@@ -44,7 +46,8 @@ def filter_knns(knns, k, th):
 
     # filter
     selidx = np.where((simi >= th) & (ners != -1) & (ners != anchor))
-    pairs = np.hstack((anchor[selidx].reshape(-1, 1), ners[selidx].reshape(-1, 1)))
+    pairs = np.hstack((anchor[selidx].reshape(-1,
+                                              1), ners[selidx].reshape(-1, 1)))
     scores = simi[selidx]
 
     # keep uniq pairs
@@ -85,7 +88,8 @@ def build_knns(knn_prefix, feats, knn_method, k, is_rebuild=False):
                 index = knn_faiss(feats, k, index_path)
             else:
                 raise KeyError('Unsupported method({}). \
-                        Only support hnsw and faiss currently'.format(knn_method))
+                        Only support hnsw and faiss currently'.format(
+                    knn_method))
             knns = index.get_knns()
         with Timer('dump knns to {}'.format(knn_path)):
             dump_data(knn_path, knns, force=True)
@@ -96,7 +100,6 @@ def build_knns(knn_prefix, feats, knn_method, k, is_rebuild=False):
 
 
 class knn():
-
     def __init__(self, feats, k, index_path='', verbose=True):
         pass
 
@@ -125,7 +128,8 @@ class knn():
             tot = len(self.knns)
             if nproc > 1:
                 pool = mp.Pool(nproc)
-                th_knns = list(tqdm(pool.imap(self.filter_by_th, range(tot)), total=tot))
+                th_knns = list(
+                    tqdm(pool.imap(self.filter_by_th, range(tot)), total=tot))
                 pool.close()
             else:
                 th_knns = [self.filter_by_th(i) for i in range(tot)]
@@ -133,7 +137,6 @@ class knn():
 
 
 class knn_brute_force(knn):
-
     def __init__(self, feats, k, index_path='', verbose=True):
         self.verbose = verbose
         with Timer('[brute force] build index', verbose):
@@ -148,7 +151,6 @@ class knn_brute_force(knn):
 
 
 class knn_hnsw(knn):
-
     def __init__(self, feats, k, index_path='', verbose=True):
         import nmslib
         self.verbose = verbose
@@ -166,7 +168,11 @@ class knn_hnsw(knn):
                 index.loadIndex(index_path)
             else:
                 index.addDataPointBatch(feats)
-                index.createIndex({'post': 2, 'indexThreadQty': 1}, print_progress=verbose)
+                index.createIndex({
+                    'post': 2,
+                    'indexThreadQty': 1
+                },
+                                  print_progress=verbose)
                 if index_path:
                     print('[hnsw] save index to {}'.format(index_path))
                     mkdir_if_no_exists(index_path)
@@ -182,8 +188,13 @@ class knn_hnsw(knn):
 
 
 class knn_faiss(knn):
-
-    def __init__(self, feats, k, index_path='', index_key='', nprobe=128, verbose=True):
+    def __init__(self,
+                 feats,
+                 k,
+                 index_path='',
+                 index_key='',
+                 nprobe=128,
+                 verbose=True):
         import faiss
         self.verbose = verbose
         with Timer('[faiss] build index', verbose):
@@ -195,12 +206,14 @@ class knn_faiss(knn):
                 size, dim = feats.shape
                 index = faiss.IndexFlatIP(dim)
                 if index_key != '':
-                    assert index_key.find('HNSW') < 0, 'HNSW returns distances insted of sims'
+                    assert index_key.find(
+                        'HNSW') < 0, 'HNSW returns distances insted of sims'
                     metric = faiss.METRIC_INNER_PRODUCT
                     nlist = min(4096, 8 * round(math.sqrt(size)))
                     if index_key == 'IVF':
                         quantizer = index
-                        index = faiss.IndexIVFFlat(quantizer, dim, nlist, metric)
+                        index = faiss.IndexIVFFlat(quantizer, dim, nlist,
+                                                   metric)
                     else:
                         index = faiss.index_factory(dim, index_key, metric)
                     if index_key.find('Flat') < 0:

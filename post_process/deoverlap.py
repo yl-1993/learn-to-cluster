@@ -10,7 +10,6 @@ from tqdm import tqdm
 from utils import load_data, write_meta
 from post_process import nms
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Super-vertex Deoverlap')
     parser.add_argument('--pred_score', type=str)
@@ -25,7 +24,9 @@ if __name__ == '__main__':
     assert args.pred_score.endswith('.npz')
     if args.output_name == '':
         pos = args.pred_score.rfind('.npz')
-        pred_label_fn = args.pred_score[:pos] + '_th_iou_{}_pos_{}_pred_label.txt'.format(args.th_iou, args.th_pos)
+        pred_label_fn = args.pred_score[:
+                                        pos] + '_th_iou_{}_pos_{}_pred_label.txt'.format(
+                                            args.th_iou, args.th_pos)
     else:
         pred_label_fn = args.output_name
 
@@ -38,12 +39,14 @@ if __name__ == '__main__':
     proposal_folders = meta['proposal_folders']
     tot_inst_num = meta['tot_inst_num']
 
-    print('avg_score(mean: {:.2f}, max: {:.2f}, min: {:.2f})'.format(probs.mean(), probs.max(), probs.min()))
+    print('avg_score(mean: {:.2f}, max: {:.2f}, min: {:.2f})'.format(
+        probs.mean(), probs.max(), probs.min()))
 
     proposals = []
     fn_node_pattern = '*_node.npz'
     for proposal_folder in proposal_folders:
-        fn_clusters = sorted(glob.glob(os.path.join(proposal_folder, fn_node_pattern)))
+        fn_clusters = sorted(
+            glob.glob(os.path.join(proposal_folder, fn_node_pattern)))
         proposals.extend([fn_node for fn_node in fn_clusters])
     assert len(proposals) == len(probs)
 
@@ -52,7 +55,7 @@ if __name__ == '__main__':
         if prob < args.th_pos:
             continue
         pos_lst.append([idx, prob])
-    pos_lst = sorted(pos_lst, key=lambda x:x[1], reverse=True)
+    pos_lst = sorted(pos_lst, key=lambda x: x[1], reverse=True)
 
     # get all clusters
     clusters = []
@@ -70,7 +73,8 @@ if __name__ == '__main__':
     inst_num = len(idx2lb)
     cls_num = len(set(idx2lb.values()))
 
-    print('#inst: {}, #class: {}, #multi-label: {}'.format(inst_num, cls_num, multi_lb_num))
+    print('#inst: {}, #class: {}, #multi-label: {}'.format(
+        inst_num, cls_num, multi_lb_num))
     print('#inst-coverage: {:.2f}'.format(1. * inst_num / tot_inst_num))
 
     # save to file

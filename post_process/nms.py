@@ -18,7 +18,7 @@ def nms(clusters, th=1.):
                 start_idx += 1
                 continue
             cluster = clusters[start_idx]
-            for j in range(start_idx+1, tot_size):
+            for j in range(start_idx + 1, tot_size):
                 if j in suppressed:
                     continue
                 if compute_iou(cluster, clusters[j]) > th:

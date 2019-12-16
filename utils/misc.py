@@ -22,17 +22,19 @@ class TextColors:
 
 
 class Timer():
-     def __init__(self, name='task', verbose=True):
+    def __init__(self, name='task', verbose=True):
         self.name = name
         self.verbose = verbose
 
-     def __enter__(self):
+    def __enter__(self):
         self.start = time.time()
         return self
 
-     def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb):
         if self.verbose:
-            print('[Time] {} consumes {:.4f} s'.format(self.name, time.time() - self.start))
+            print('[Time] {} consumes {:.4f} s'.format(
+                self.name,
+                time.time() - self.start))
         return exc_type is None
 
 
@@ -138,8 +140,8 @@ def dump2json(ofn, data, force=False):
         elif isinstance(obj, set) or isinstance(obj, np.ndarray):
             return list(obj)
         else:
-            raise TypeError(
-            "Unserializable object {} of type {}".format(obj, type(obj)))
+            raise TypeError("Unserializable object {} of type {}".format(
+                obj, type(obj)))
 
     with open(ofn, 'w') as of:
         json.dump(data, of, default=default)

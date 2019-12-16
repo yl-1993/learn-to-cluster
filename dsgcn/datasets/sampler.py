@@ -4,12 +4,10 @@ import torch
 from torch.utils.data.sampler import Sampler
 from torch.utils.data.distributed import DistributedSampler as _DistributedSampler
 
-
 __all__ = ["DistributedSampler", "DistributedSequentialSampler"]
 
 
 class DistributedSampler(_DistributedSampler):
-
     def __init__(self, dataset, num_replicas=None, rank=None, shuffle=True):
         super().__init__(dataset, num_replicas=num_replicas, rank=rank)
         self.shuffle = shuffle
@@ -37,7 +35,8 @@ class DistributedSampler(_DistributedSampler):
 class DistributedSequentialSampler(Sampler):
     def __init__(self, dataset, world_size, rank):
         assert rank >= 0
-        assert dataset.size >= world_size, '{} vs {}'.format(dataset.size, world_size)
+        assert dataset.size >= world_size, '{} vs {}'.format(
+            dataset.size, world_size)
         sub_num = int(math.ceil(1. * dataset.size / world_size))
         # add extra samples to make it evenly divisible
         tot_num = sub_num * world_size

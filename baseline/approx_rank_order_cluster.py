@@ -6,7 +6,6 @@ import numpy as np
 from time import time
 from multiprocessing import Pool
 from functools import partial
-
 """
 paper: https://arxiv.org/pdf/1604.00989.pdf
 original code https://github.com/varun-suresh/Clustering
@@ -26,11 +25,10 @@ def build_index(dataset, n_neighbors):
     # Initialize FLANN
     pyflann.set_distance_type(distance_type='euclidean')
     flann = pyflann.FLANN()
-    params = flann.build_index(dataset,
-                               algorithm='kdtree',
-                               trees=4)
+    params = flann.build_index(dataset, algorithm='kdtree', trees=4)
     #print params
-    nearest_neighbors, dists = flann.nn_index(dataset, n_neighbors,
+    nearest_neighbors, dists = flann.nn_index(dataset,
+                                              n_neighbors,
                                               checks=params['checks'])
 
     return nearest_neighbors, dists
@@ -54,13 +52,13 @@ def calculate_symmetric_dist_row(nearest_neighbors, nn_lookup, row_no):
     dist_row = np.zeros([1, nearest_neighbors.shape[1]])
     f1 = nn_lookup[row_no]
     for idx, neighbor in enumerate(f1[1:]):
-        Oi = idx+1
+        Oi = idx + 1
         co_neighbor = True
         try:
             row = nn_lookup[neighbor]
             Oj = np.where(row == row_no)[0][0] + 1
         except IndexError:
-            Oj = nearest_neighbors.shape[1]+1
+            Oj = nearest_neighbors.shape[1] + 1
             co_neighbor = False
         # dij
         f11 = set(f1[0:Oi])
@@ -74,7 +72,7 @@ def calculate_symmetric_dist_row(nearest_neighbors, nn_lookup, row_no):
         if not co_neighbor:
             dist_row[0, Oi] = 9999.0
         else:
-            dist_row[0, Oi] = float(dij + dji)/min(Oi, Oj)
+            dist_row[0, Oi] = float(dij + dji) / min(Oi, Oj)
 
     return dist_row
 
@@ -87,7 +85,8 @@ def calculate_symmetric_dist(app_nearest_neighbors):
     nn_lookup = create_neighbor_lookup(app_nearest_neighbors)
     d = np.zeros(app_nearest_neighbors.shape)
     p = Pool(processes=4)
-    func = partial(calculate_symmetric_dist_row, app_nearest_neighbors, nn_lookup)
+    func = partial(calculate_symmetric_dist_row, app_nearest_neighbors,
+                   nn_lookup)
     results = p.map(func, range(app_nearest_neighbors.shape[0]))
     for row_no, row_val in enumerate(results):
         d[row_no, :] = row_val
@@ -107,9 +106,8 @@ def aro_clustering(app_nearest_neighbors, distance_matrix, thresh):
     nodes = set(list(np.arange(0, distance_matrix.shape[0])))
     # print 'Nodes initial : {}'.format(nodes)
     # tc = time()
-    plausible_neighbors = create_plausible_neighbor_lookup(app_nearest_neighbors,
-                                                            distance_matrix,
-                                                            thresh)
+    plausible_neighbors = create_plausible_neighbor_lookup(
+        app_nearest_neighbors, distance_matrix, thresh)
     # print('Time to create plausible_neighbors lookup : {}'.format(time() - tc))
     # ctime = time()
     while nodes:
@@ -141,8 +139,7 @@ def aro_clustering(app_nearest_neighbors, distance_matrix, thresh):
     return clusters
 
 
-def create_plausible_neighbor_lookup(app_nearest_neighbors,
-                                     distance_matrix,
+def create_plausible_neighbor_lookup(app_nearest_neighbors, distance_matrix,
                                      thresh):
     """
     Create a dictionary where the keys are the row numbers(face numbers) and
@@ -151,10 +148,9 @@ def create_plausible_neighbor_lookup(app_nearest_neighbors,
     n_vectors = app_nearest_neighbors.shape[0]
     plausible_neighbors = {}
     for i in range(n_vectors):
-        plausible_neighbors[i] = set(list(app_nearest_neighbors[i,
-                                     np.where(
-                                            distance_matrix[i, :] <= thresh)]
-                                             [0]))
+        plausible_neighbors[i] = set(
+            list(app_nearest_neighbors[
+                i, np.where(distance_matrix[i, :] <= thresh)][0]))
     return plausible_neighbors
 
 
@@ -166,7 +162,8 @@ def approx_rank_order(feat, knn, th_sim, **kwargs):
     """
     app_nearest_neighbors, _ = build_index(feat, n_neighbors=knn)
     distance_matrix = calculate_symmetric_dist(app_nearest_neighbors)
-    clusters = aro_clustering(app_nearest_neighbors, distance_matrix, 1. - th_sim)
+    clusters = aro_clustering(app_nearest_neighbors, distance_matrix,
+                              1. - th_sim)
     labels_ = -1 * np.ones((feat.shape[0]), dtype=np.int)
     for lb, c in enumerate(clusters):
         idxs = np.array([int(x) for x in list(c)])

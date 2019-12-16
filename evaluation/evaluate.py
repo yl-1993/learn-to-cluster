@@ -24,7 +24,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Evaluate Cluster')
     parser.add_argument('--gt_labels', type=str, required=True)
     parser.add_argument('--pred_labels', type=str, required=True)
-    parser.add_argument('--metric', default='pairwise', choices=['pairwise', 'bcubed'])
+    parser.add_argument('--metric',
+                        default='pairwise',
+                        choices=['pairwise', 'bcubed'])
     args = parser.parse_args()
 
     gt_labels, gt_lb_set = _read_meta(args.gt_labels)

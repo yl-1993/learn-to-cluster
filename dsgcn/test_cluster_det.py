@@ -23,12 +23,11 @@ def test_cluster_det(model, cfg, logger):
     output_probs = []
 
     if cfg.gpus == 1:
-        data_loader = build_dataloader(
-                dataset,
-                processor,
-                cfg.batch_size_per_gpu,
-                cfg.workers_per_gpu,
-                train=False)
+        data_loader = build_dataloader(dataset,
+                                       processor,
+                                       cfg.batch_size_per_gpu,
+                                       cfg.workers_per_gpu,
+                                       train=False)
 
         model = MMDataParallel(model, device_ids=range(cfg.gpus))
         if cfg.cuda:
@@ -41,9 +40,11 @@ def test_cluster_det(model, cfg, logger):
                 losses += [loss.item()]
                 if i % cfg.log_config.interval == 0:
                     if dataset.ignore_meta:
-                        logger.info('[Test] Iter {}/{}'.format(i, len(data_loader)))
+                        logger.info('[Test] Iter {}/{}'.format(
+                            i, len(data_loader)))
                     else:
-                        logger.info('[Test] Iter {}/{}: Loss {:.4f}'.format(i, len(data_loader), loss))
+                        logger.info('[Test] Iter {}/{}: Loss {:.4f}'.format(
+                            i, len(data_loader), loss))
                 if cfg.save_output:
                     output = output.view(-1)
                     prob = output.data.cpu().numpy()

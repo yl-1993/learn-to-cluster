@@ -28,7 +28,7 @@ def compute_avg_size(lst):
 def coverage(s, size):
     if not isinstance(s, set):
         raise TypeError('s should be set type')
-    return 1.*len(s) / size
+    return 1. * len(s) / size
 
 
 def inst2cls(inst_sets, idx2lb):
@@ -80,7 +80,7 @@ def analyze_clusters(clusters, idx2lb, lb2idxs, th_pos, th_neg):
     iops = np.array(iops)
     iogs = np.array(iogs)
     num_nodes = np.array(num_nodes)
-    return  num_nodes, ious, iops, iogs, pos_set, neg_set, pos_idx_set, neg_idx_set
+    return num_nodes, ious, iops, iogs, pos_set, neg_set, pos_idx_set, neg_idx_set
 
 
 def mse_error(arr, n):
@@ -99,15 +99,18 @@ def stat_cluster(clusters, idx2lb, lb2idxs, inst_num, cls_num, th_pos, th_neg):
     pos_num_nodes = num_nodes[np.where(ious > th_pos)]
     if len(pos_num_nodes) > 0:
         avg_node_size = compute_avg_size(pos_num_nodes)
-        print('#pos_avg_node: {}, #max_node: {}, #min_node: {}'.format(int(avg_node_size), pos_num_nodes.max(), pos_num_nodes.min()))
+        print('#pos_avg_node: {}, #max_node: {}, #min_node: {}'.format(
+            int(avg_node_size), pos_num_nodes.max(), pos_num_nodes.min()))
     neg_num_nodes = num_nodes[np.where(ious < th_pos)]
     if len(neg_num_nodes) > 0:
         avg_node_size = compute_avg_size(neg_num_nodes)
-        print('#neg_avg_node: {}, #max_node: {}, #min_node: {}'.format(int(avg_node_size), neg_num_nodes.max(), neg_num_nodes.min()))
+        print('#neg_avg_node: {}, #max_node: {}, #min_node: {}'.format(
+            int(avg_node_size), neg_num_nodes.max(), neg_num_nodes.min()))
 
     pos_g_labels = np.where(ious > th_pos)[0]
     neg_g_labels = np.where(ious < th_neg)[0]
-    print('#tot: {}, #pos: {}, #neg: {}'.format(len(ious), pos_g_labels.size, neg_g_labels.size))
+    print('#tot: {}, #pos: {}, #neg: {}'.format(len(ious), pos_g_labels.size,
+                                                neg_g_labels.size))
 
     err0 = mse_error(ious, 0)
     err1 = mse_error(ious, 1)
@@ -116,9 +119,13 @@ def stat_cluster(clusters, idx2lb, lb2idxs, inst_num, cls_num, th_pos, th_neg):
     pos_c = coverage(pos_idx_set, inst_num)
     neg_c = coverage(neg_idx_set, inst_num)
     all_c = coverage(pos_idx_set | neg_idx_set, inst_num)
-    print('[instance-level] pos coverage: {:.2f}, neg coverage: {:.2f}, all coverage: {:.2f}'.format(pos_c, neg_c, all_c))
+    print(
+        '[instance-level] pos coverage: {:.2f}, neg coverage: {:.2f}, all coverage: {:.2f}'
+        .format(pos_c, neg_c, all_c))
 
     pos_c = coverage(pos_set, cls_num)
     neg_c = coverage(neg_set, cls_num)
     all_c = coverage(pos_set | neg_set, cls_num)
-    print('[class-level] pos coverage: {:.2f}, neg coverage: {:.2f}, all coverage: {:.2f}'.format(pos_c, neg_c, all_c))
+    print(
+        '[class-level] pos coverage: {:.2f}, neg coverage: {:.2f}, all coverage: {:.2f}'
+        .format(pos_c, neg_c, all_c))

@@ -1,10 +1,9 @@
 from .test_cluster_det import test_cluster_det
 from .train_cluster_det import train_cluster_det
 
-
 __factory__ = {
-     'test_det': test_cluster_det,
-     'train_det': train_cluster_det,
+    'test_det': test_cluster_det,
+    'train_det': train_cluster_det,
 }
 
 

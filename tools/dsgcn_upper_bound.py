@@ -9,7 +9,6 @@ from utils import load_data, read_meta, write_meta, labels2clusters
 from proposals import get_majority, compute_iou
 from post_process import nms
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='GCN Upper Bound')
     parser.add_argument('--cluster_path', nargs='+')
@@ -17,7 +16,9 @@ if __name__ == '__main__':
     parser.add_argument('--th_iou', default=1, type=float)
     parser.add_argument('--gt_labels', type=str, required=True)
     parser.add_argument('--output_name', default='', type=str)
-    parser.add_argument('--output_folder', default='./data/results/gcn_ub/', type=str)
+    parser.add_argument('--output_folder',
+                        default='./data/results/gcn_ub/',
+                        type=str)
     parser.add_argument('--force', action='store_true')
     args = parser.parse_args()
 
@@ -32,7 +33,8 @@ if __name__ == '__main__':
                         format(cluster_name, args.th_iou, args.th_pos))
 
     if os.path.exists(pred_label_fn) and not args.force:
-        print('{} has already existed. Please set force=True to overwrite.'.format(pred_label_fn))
+        print('{} has already existed. Please set force=True to overwrite.'.
+              format(pred_label_fn))
         exit()
 
     # read label
@@ -76,14 +78,15 @@ if __name__ == '__main__':
     # rank by iou
     pos_g_labels = np.where(ious > args.th_pos)[0]
     clusters = [[clusters[i], ious[i]] for i in pos_g_labels]
-    clusters = sorted(clusters, key=lambda x:x[1], reverse=True)
+    clusters = sorted(clusters, key=lambda x: x[1], reverse=True)
     clusters = [n for n, _ in clusters]
 
     inst_num = len(idx2lb)
     pos_idx_set = set()
     for c in clusters:
         pos_idx_set |= set(c)
-    print('inst-coverage before nms: {}'.format(1. * len(pos_idx_set) / inst_num))
+    print('inst-coverage before nms: {}'.format(1. * len(pos_idx_set) /
+                                                inst_num))
 
     # nms
     idx2lb, _ = nms(clusters, args.th_iou)
