@@ -44,11 +44,16 @@ def parse_args():
     parser.add_argument('--distance', default=0.7, type=float)
     parser.add_argument('--min_samples', default=10, type=int)
     parser.add_argument('--hmethod', default='single', type=str)
+    parser.add_argument('--radius', default=0.1, type=float)
+    parser.add_argument('--min_conn', default=1, type=int)
+    parser.add_argument('--bw', default=1, type=float)
+    parser.add_argument('--min_bin_freq', default=1, type=int)
     parser.add_argument('--knn', default=80, type=int)
     parser.add_argument('--th_sim', default=0.7, type=float)
     parser.add_argument('--knn_method',
                         default='faiss',
-                        choices=['faiss', 'hnsw'])
+                        choices=['faiss', 'faiss_gpu', 'hnsw'])
+    parser.add_argument('--num_process', default=1, type=int)
     parser.add_argument('--force', action='store_true')
     args = parser.parse_args()
 
@@ -57,31 +62,45 @@ def parse_args():
 
 def get_output_path(args, ofn='pred_labels.txt'):
     method2name = {
-        'approx_rank_order':
+        'aro':
+        'k_{}_th_{}'.format(args.knn, args.th_sim),
+        'knn_aro':
         'k_{}_th_{}'.format(args.knn, args.th_sim),
         'dbscan':
         'eps_{}_min_{}'.format(args.eps, args.min_samples),
         'knn_dbscan':
         'eps_{}_min_{}_k_{}_th_{}'.format(args.eps, args.min_samples, args.knn,
                                           args.th_sim),
+        'our_dbscan':
+        'min_{}_k_{}_th_{}'.format(args.min_samples, args.knn, args.th_sim),
         'hdbscan':
         'min_{}'.format(args.min_samples),
         'fast_hierarchy':
         'dist_{}_hmethod_{}'.format(args.distance, args.hmethod),
         'hierarchy':
         'n_{}_k_{}'.format(args.n_clusters, args.knn),
+        'knn_hierarchy':
+        'n_{}_k_{}_th_{}'.format(args.n_clusters, args.knn, args.th_sim),
         'mini_batch_kmeans':
         'n_{}_bs_{}'.format(args.n_clusters, args.batch_size),
         'kmeans':
         'n_{}'.format(args.n_clusters),
         'spectral':
         'n_{}'.format(args.n_clusters),
+        'knn_spectral':
+        'n_{}_k_{}_th_{}'.format(args.n_clusters, args.knn, args.th_sim),
+        'densepeak':
+        'k_{}_th_{}_r_{}_m_{}'.format(args.knn, args.th_sim, args.radius,
+                                      args.min_conn),
+        'meanshift':
+        'bw_{}_bin_{}'.format(args.bw, args.min_bin_freq),
     }
 
     if args.method in method2name:
-        name = '{}_{}'.format(args.method, method2name[args.method])
+        name = '{}_{}_{}'.format(args.name, args.method,
+                                 method2name[args.method])
     else:
-        name = args.method
+        name = '{}_{}'.format(args.name, args.method)
 
     opath = os.path.join(args.oprefix, name, ofn)
     if os.path.exists(opath) and not args.force:
