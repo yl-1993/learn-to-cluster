@@ -18,7 +18,7 @@
 Install dependencies
 ```bash
 conda install pytorch=0.4.1 cuda90 -c pytorch
-conda install faiss-cpu -c pytorch
+conda install faiss-gpu -c pytorch
 pip install -r requirements.txt
 ```
 
