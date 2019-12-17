@@ -1,21 +1,25 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import pyflann
+import os
 import numpy as np
-from time import time
-from multiprocessing import Pool
 from functools import partial
+from tqdm import tqdm
+
+from utils import build_knns, knns2ordered_nbrs, Timer
 """
 paper: https://arxiv.org/pdf/1604.00989.pdf
 original code https://github.com/varun-suresh/Clustering
-To run approx_rank_order:
-    1. pip install pyflann
-    2. 2to3 -w path/site-packages/pyflann/
+
+To run `aro`:
+1. pip install pyflann
+2. 2to3 -w path/site-packages/pyflann/
 Refer [No module named 'index'](https://github.com/primetang/pyflann/issues/1) for more details.
+
+For `knn_aro`, we replace the pyflann with more advanced knn searching methods.
 """
 
-__all__ = ['approx_rank_order']
+__all__ = ['aro', 'knn_aro']
 
 
 def build_index(dataset, n_neighbors):
@@ -23,33 +27,32 @@ def build_index(dataset, n_neighbors):
     Takes a dataset, returns the "n" nearest neighbors
     """
     # Initialize FLANN
+    import pyflann
     pyflann.set_distance_type(distance_type='euclidean')
     flann = pyflann.FLANN()
     params = flann.build_index(dataset, algorithm='kdtree', trees=4)
     #print params
-    nearest_neighbors, dists = flann.nn_index(dataset,
-                                              n_neighbors,
-                                              checks=params['checks'])
+    nbrs, dists = flann.nn_index(dataset, n_neighbors, checks=params['checks'])
 
-    return nearest_neighbors, dists
+    return nbrs, dists
 
 
-def create_neighbor_lookup(nearest_neighbors):
+def create_neighbor_lookup(nbrs):
     """
     Key is the reference face, values are the neighbors.
     """
     nn_lookup = {}
-    for i in range(nearest_neighbors.shape[0]):
-        nn_lookup[i] = nearest_neighbors[i, :]
+    for i in range(nbrs.shape[0]):
+        nn_lookup[i] = nbrs[i, :]
     return nn_lookup
 
 
-def calculate_symmetric_dist_row(nearest_neighbors, nn_lookup, row_no):
+def calculate_symmetric_dist_row(nbrs, nn_lookup, row_no):
     """
     This function calculates the symmetric distances for one row in the
     matrix.
     """
-    dist_row = np.zeros([1, nearest_neighbors.shape[1]])
+    dist_row = np.zeros([1, nbrs.shape[1]])
     f1 = nn_lookup[row_no]
     for idx, neighbor in enumerate(f1[1:]):
         Oi = idx + 1
@@ -58,7 +61,7 @@ def calculate_symmetric_dist_row(nearest_neighbors, nn_lookup, row_no):
             row = nn_lookup[neighbor]
             Oj = np.where(row == row_no)[0][0] + 1
         except IndexError:
-            Oj = nearest_neighbors.shape[1] + 1
+            Oj = nbrs.shape[1] + 1
             co_neighbor = False
         # dij
         f11 = set(f1[0:Oi])
@@ -77,25 +80,36 @@ def calculate_symmetric_dist_row(nearest_neighbors, nn_lookup, row_no):
     return dist_row
 
 
-def calculate_symmetric_dist(app_nearest_neighbors):
+def calculate_symmetric_dist(nbrs, num_process):
     """
     This function calculates the symmetric distance matrix.
     """
-    # dist_calc_time = time()
-    nn_lookup = create_neighbor_lookup(app_nearest_neighbors)
-    d = np.zeros(app_nearest_neighbors.shape)
-    p = Pool(processes=4)
-    func = partial(calculate_symmetric_dist_row, app_nearest_neighbors,
-                   nn_lookup)
-    results = p.map(func, range(app_nearest_neighbors.shape[0]))
-    for row_no, row_val in enumerate(results):
-        d[row_no, :] = row_val
-    # d_time = time()-dist_calc_time
-    # print('Distance calculation time : {}'.format(d_time))
+    d = np.zeros(nbrs.shape)
+    if num_process > 1:
+        from multiprocessing import Pool
+        p = Pool(processes=num_process)
+        num = nbrs.shape[0]
+        batch_size = 2000000
+        batch_num = int(num / batch_size) + 1
+        results = []
+        for i in range(batch_num):
+            start = i * batch_size
+            end = min(num, (i + 1) * batch_size)
+            sub_nbrs = nbrs[start:end]
+            nn_lookup = create_neighbor_lookup(sub_nbrs)
+            func = partial(calculate_symmetric_dist_row, sub_nbrs, nn_lookup)
+            results += p.map(func, range(sub_nbrs.shape[0]))
+        for row_no, row_val in enumerate(results):
+            d[row_no, :] = row_val
+    else:
+        nn_lookup = create_neighbor_lookup(nbrs)
+        for row_no in tqdm(range(nbrs.shape[0])):
+            row_val = calculate_symmetric_dist_row(nbrs, nn_lookup, row_no)
+            d[row_no, :] = row_val
     return d
 
 
-def aro_clustering(app_nearest_neighbors, distance_matrix, thresh):
+def aro_clustering(nbrs, dists, thresh):
     '''
     Approximate rank-order clustering. Takes in the nearest neighbors matrix
     and outputs clusters - list of lists.
@@ -103,13 +117,8 @@ def aro_clustering(app_nearest_neighbors, distance_matrix, thresh):
     # Clustering
     clusters = []
     # Start with the first face
-    nodes = set(list(np.arange(0, distance_matrix.shape[0])))
-    # print 'Nodes initial : {}'.format(nodes)
-    # tc = time()
-    plausible_neighbors = create_plausible_neighbor_lookup(
-        app_nearest_neighbors, distance_matrix, thresh)
-    # print('Time to create plausible_neighbors lookup : {}'.format(time() - tc))
-    # ctime = time()
+    nodes = set(list(np.arange(0, dists.shape[0])))
+    plausible_neighbors = create_plausible_neighbor_lookup(nbrs, dists, thresh)
     while nodes:
         # Get a node
         n = nodes.pop()
@@ -135,37 +144,51 @@ def aro_clustering(app_nearest_neighbors, distance_matrix, thresh):
             queue.extend(neighbors)
         # Add the group to the list of groups
         clusters.append(group)
-    # print('Clustering Time : {}'.format(time() - ctime))
     return clusters
 
 
-def create_plausible_neighbor_lookup(app_nearest_neighbors, distance_matrix,
-                                     thresh):
+def create_plausible_neighbor_lookup(nbrs, dists, thresh):
     """
     Create a dictionary where the keys are the row numbers(face numbers) and
     the values are the plausible neighbors.
     """
-    n_vectors = app_nearest_neighbors.shape[0]
+    n_vectors = nbrs.shape[0]
     plausible_neighbors = {}
     for i in range(n_vectors):
         plausible_neighbors[i] = set(
-            list(app_nearest_neighbors[
-                i, np.where(distance_matrix[i, :] <= thresh)][0]))
+            list(nbrs[i, np.where(dists[i, :] <= thresh)][0]))
     return plausible_neighbors
 
 
-def approx_rank_order(feat, knn, th_sim, **kwargs):
+def clusters2labels(clusters, num):
+    labels_ = -1 * np.ones((num), dtype=np.int)
+    for lb, c in enumerate(clusters):
+        idxs = np.array([int(x) for x in list(c)])
+        labels_[idxs] = lb
+    return labels_
+
+
+def aro(feats, knn, th_sim, num_process, **kwargs):
     """
     Master function. Takes the descriptor matrix and returns clusters.
     n_neighbors are the number of nearest neighbors considered and thresh
     is the clustering distance threshold
     """
-    app_nearest_neighbors, _ = build_index(feat, n_neighbors=knn)
-    distance_matrix = calculate_symmetric_dist(app_nearest_neighbors)
-    clusters = aro_clustering(app_nearest_neighbors, distance_matrix,
-                              1. - th_sim)
-    labels_ = -1 * np.ones((feat.shape[0]), dtype=np.int)
-    for lb, c in enumerate(clusters):
-        idxs = np.array([int(x) for x in list(c)])
-        labels_[idxs] = lb
+    with Timer('[aro] search knn with pyflann'):
+        nbrs, _ = build_index(feats, n_neighbors=knn)
+    dists = calculate_symmetric_dist(nbrs, num_process)
+    print('symmetric dist:', dists.max(), dists.min(), dists.mean())
+    clusters = aro_clustering(nbrs, dists, 1. - th_sim)
+    labels_ = clusters2labels(clusters, feats.shape[0])
+    return labels_
+
+
+def knn_aro(feats, prefix, name, knn_method, knn, th_sim, num_process,
+            **kwargs):
+    knn_prefix = os.path.join(prefix, 'knns', name)
+    knns = build_knns(knn_prefix, feats, knn_method, knn)
+    _, nbrs = knns2ordered_nbrs(knns, sort=False)
+    dists = calculate_symmetric_dist(nbrs, num_process)
+    clusters = aro_clustering(nbrs, dists, 1. - th_sim)
+    labels_ = clusters2labels(clusters, feats.shape[0])
     return labels_
