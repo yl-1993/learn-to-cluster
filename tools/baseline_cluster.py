@@ -87,6 +87,8 @@ def get_output_path(args, ofn='pred_labels.txt'):
         'n_{}'.format(args.n_clusters),
         'spectral':
         'n_{}'.format(args.n_clusters),
+        'dask_spectral':
+        'n_{}'.format(args.n_clusters),
         'knn_spectral':
         'n_{}_k_{}_th_{}'.format(args.n_clusters, args.knn, args.th_sim),
         'densepeak':

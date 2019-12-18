@@ -30,6 +30,14 @@ def spectral(feat, n_clusters, **kwargs):
     return spectral.labels_
 
 
+def dask_spectral(feat, n_clusters, **kwargs):
+    from dask_ml.cluster import SpectralClustering
+    spectral = SpectralClustering(n_clusters=n_clusters,
+                                  affinity='rbf',
+                                  random_state=0).fit(feat)
+    return spectral.labels_.compute()
+
+
 def hierarchy(feat, n_clusters, knn, **kwargs):
     from sklearn.neighbors import kneighbors_graph
     knn_graph = kneighbors_graph(feat, knn, include_self=False)
