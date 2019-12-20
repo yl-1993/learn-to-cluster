@@ -26,7 +26,7 @@ class Data(object):
 def connected_components(nodes, edges):
     result = []
     nodes = set(nodes)
-    node2ners = {n:set() for n in nodes}
+    node2ners = {n: set() for n in nodes}
     for n1, n2, _ in edges:
         node2ners[n1].add(n2)
         node2ners[n2].add(n1)
@@ -61,7 +61,11 @@ def connected_components_constraint(nodes, max_sz, score_dict=None, th=None):
         while queue:
             n = queue.pop(0)
             if th is not None:
-                neighbors = {l for l in n.links if score_dict[tuple(sorted([n.name, l.name]))] >= th}
+                neighbors = {
+                    l
+                    for l in n.links
+                    if score_dict[tuple(sorted([n.name, l.name]))] >= th
+                }
             else:
                 neighbors = n.links
             neighbors.difference_update(group)
@@ -73,7 +77,7 @@ def connected_components_constraint(nodes, max_sz, score_dict=None, th=None):
                 valid = False
                 remain.update(group)
                 break
-        if valid: # if this group is smaller than or equal to `max_sz`, finalize it.
+        if valid:  # if this group is smaller than or equal to `max_sz`, finalize it.
             result.append(group)
     return result, remain
 
@@ -83,12 +87,12 @@ def graph_clustering_dynamic_th(edges, score, max_sz, step=0.05, max_iter=100):
     th = score.min()
 
     # construct graph
-    score_dict = {} # score lookup table
-    for i,e in enumerate(edges):
+    score_dict = {}  # score lookup table
+    for i, e in enumerate(edges):
         score_dict[e[0], e[1]] = score[i]
 
     nodes = np.sort(np.unique(edges.flatten()))
-    mapping = -1 * np.ones((nodes.max()+1), dtype=np.int)
+    mapping = -1 * np.ones((nodes.max() + 1), dtype=np.int)
     mapping[nodes] = np.arange(nodes.shape[0])
     link_idx = mapping[edges]
     vertex = [Data(n) for n in nodes]
@@ -103,11 +107,13 @@ def graph_clustering_dynamic_th(edges, score, max_sz, step=0.05, max_iter=100):
     Iter = 0
     while remain:
         th = th + (1 - th) * step
-        comps, remain = connected_components_constraint(remain, max_sz, score_dict, th)
+        comps, remain = connected_components_constraint(
+            remain, max_sz, score_dict, th)
         components.extend(comps)
         Iter += 1
         if Iter >= max_iter:
-            print("\t Force stopping at: th {}, remain {}".format(th, len(remain)))
+            print("\t Force stopping at: th {}, remain {}".format(
+                th, len(remain)))
             components.append(remain)
             remain = {}
 

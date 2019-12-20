@@ -21,8 +21,7 @@ def batch_processor(model, data, train_mode):
     _, loss = model(data, return_loss=True)
     log_vars = parse_losses(loss)
 
-    outputs = dict(
-        loss=loss, log_vars=log_vars, num_samples=len(data[-1]))
+    outputs = dict(loss=loss, log_vars=log_vars, num_samples=len(data[-1]))
 
     return outputs
 
@@ -34,13 +33,12 @@ def train_cluster_det(model, cfg, logger):
     dataset = build_dataset(cfg.train_data)
     processor = build_processor(cfg.stage)
     data_loaders = [
-        build_dataloader(
-            dataset,
-            processor,
-            cfg.batch_size_per_gpu,
-            cfg.workers_per_gpu,
-            train=True,
-            shuffle=True)
+        build_dataloader(dataset,
+                         processor,
+                         cfg.batch_size_per_gpu,
+                         cfg.workers_per_gpu,
+                         train=True,
+                         shuffle=True)
     ]
 
     # train
@@ -59,8 +57,8 @@ def build_optimizer(model, optimizer_cfg):
     optimizer_cfg = optimizer_cfg.copy()
     paramwise_options = optimizer_cfg.pop('paramwise_options', None)
     assert paramwise_options is None
-    return obj_from_dict(
-        optimizer_cfg, torch.optim, dict(params=model.parameters()))
+    return obj_from_dict(optimizer_cfg, torch.optim,
+                         dict(params=model.parameters()))
 
 
 def _dist_train(model, data_loaders, cfg):
@@ -90,8 +88,12 @@ def _single_train(model, data_loaders, cfg):
     model = MMDataParallel(model, device_ids=range(cfg.gpus)).cuda()
     # build runner
     optimizer = build_optimizer(model, cfg.optimizer)
-    runner = Runner(model, batch_processor, optimizer, cfg.work_dir,
-                    cfg.log_level, iter_size=cfg.iter_size)
+    runner = Runner(model,
+                    batch_processor,
+                    optimizer,
+                    cfg.work_dir,
+                    cfg.log_level,
+                    iter_size=cfg.iter_size)
     runner.register_training_hooks(cfg.lr_config, cfg.optimizer_config,
                                    cfg.checkpoint_config, cfg.log_config)
 

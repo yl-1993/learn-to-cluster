@@ -10,9 +10,7 @@ step=0.05
 minsz=3
 maxsz=300
 iter=0
-metric=pairwise
 
-gt_labels=$prefix/labels/$name.meta
 sv_labels=$oprefix/$name/$method\_k_$knn\_th_$th\_step_$step\_minsz_$minsz\_maxsz_$maxsz\_iter_$iter/pred_labels.txt
 sv_knn_prefix=$prefix/knns/$name/
 

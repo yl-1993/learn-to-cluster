@@ -8,7 +8,6 @@ from torch.nn.parameter import Parameter
 import torch.nn.functional as F
 
 __all__ = ['dsgcn']
-
 '''
 Original implementation can be referred to:
     - GCN: https://github.com/tkipf/pygcn
@@ -17,7 +16,6 @@ Original implementation can be referred to:
 
 
 class GraphConv(nn.Module):
-
     def __init__(self, in_features, out_features, bias=False):
         super(GraphConv, self).__init__()
         self.in_features = in_features
@@ -76,8 +74,14 @@ class GNN(nn.Module):
         seg output is (bs, N, num_classes)
     """
 
-    def __init__(self, planes, feature_dim, featureless,
-            num_classes=1, dropout=0.0, reduce_method='max', stage='dev'):
+    def __init__(self,
+                 planes,
+                 feature_dim,
+                 featureless,
+                 num_classes=1,
+                 dropout=0.0,
+                 reduce_method='max',
+                 stage='dev'):
         assert feature_dim > 0
         assert dropout >= 0 and dropout < 1
         if featureless:
@@ -104,7 +108,7 @@ class GNN(nn.Module):
         elif self.reduce_method == 'max':
             return torch.max(x, dim=1)[0]
         elif self.reduce_method == 'no_pool':
-            return x # wo global pooling
+            return x  # wo global pooling
         else:
             raise KeyError('Unkown reduce method', self.reduce_method)
 
@@ -118,12 +122,16 @@ class GNN(nn.Module):
 
 
 class GCN(GNN):
-
-    def __init__(self, planes, feature_dim, featureless,
-            num_classes=1, dropout=0.0, reduce_method='max', stage='dev'):
-        super().__init__(
-                planes, feature_dim, featureless,
-                num_classes, dropout, reduce_method, stage)
+    def __init__(self,
+                 planes,
+                 feature_dim,
+                 featureless,
+                 num_classes=1,
+                 dropout=0.0,
+                 reduce_method='max',
+                 stage='dev'):
+        super().__init__(planes, feature_dim, featureless, num_classes,
+                         dropout, reduce_method, stage)
 
         self.layers = self._make_layer(BasicBlock, planes, dropout)
         self.classifier = nn.Linear(self.inplanes, num_classes)
@@ -140,7 +148,9 @@ class GCN(GNN):
         adj.detach_()
         D = adj.sum(dim=2, keepdim=True)
         D.detach_()
-        assert (D > 0).all(), "D should larger than 0, otherwise gradient will be NaN."
+        assert (
+            D >
+            0).all(), "D should larger than 0, otherwise gradient will be NaN."
         for layer in self.layers:
             x = layer(x, adj, D)
         x = self.pool(x)
@@ -157,12 +167,16 @@ class GCN(GNN):
 
 
 class SGC(GNN):
-
-    def __init__(self, planes, feature_dim, featureless,
-            num_classes=1, dropout=0.0, reduce_method='max', stage='dev'):
-        super().__init__(
-                planes, feature_dim, featureless,
-                num_classes, dropout, reduce_method, stage)
+    def __init__(self,
+                 planes,
+                 feature_dim,
+                 featureless,
+                 num_classes=1,
+                 dropout=0.0,
+                 reduce_method='max',
+                 stage='dev'):
+        super().__init__(planes, feature_dim, featureless, num_classes,
+                         dropout, reduce_method, stage)
 
         assert stage == 'dev'
         self.degree = len(planes)
@@ -172,7 +186,9 @@ class SGC(GNN):
         adj.detach_()
         D = adj.sum(dim=2, keepdim=True)
         D.detach_()
-        assert (D > 0).all(), "D should larger than 0, otherwise gradient will be NaN."
+        assert (
+            D >
+            0).all(), "D should larger than 0, otherwise gradient will be NaN."
         for _ in range(self.degree):
             if x.dim() == 3:
                 x = torch.bmm(adj, x) / D

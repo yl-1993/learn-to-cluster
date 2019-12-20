@@ -7,6 +7,7 @@ import json
 import pickle
 import random
 import numpy as np
+import scipy.sparse as sp
 import torch
 
 
@@ -22,25 +23,28 @@ class TextColors:
 
 
 class Timer():
-     def __init__(self, name='task', verbose=True):
+    def __init__(self, name='task', verbose=True):
         self.name = name
         self.verbose = verbose
 
-     def __enter__(self):
+    def __enter__(self):
         self.start = time.time()
         return self
 
-     def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb):
         if self.verbose:
-            print('[Time] {} consumes {:.4f} s'.format(self.name, time.time() - self.start))
+            print('[Time] {} consumes {:.4f} s'.format(
+                self.name,
+                time.time() - self.start))
         return exc_type is None
 
 
-def set_random_seed(seed):
+def set_random_seed(seed, cuda=False):
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
+    if cuda:
+        torch.cuda.manual_seed_all(seed)
 
 
 def l2norm(vec):
@@ -52,6 +56,29 @@ def is_l2norm(features, size):
     rand_i = random.choice(range(size))
     norm_ = np.dot(features[rand_i, :], features[rand_i, :])
     return abs(norm_ - 1) < 1e-6
+
+
+def row_normalize(mx):
+    """Row-normalize sparse matrix"""
+    rowsum = np.array(mx.sum(1))
+    # if rowsum <= 0, keep its previous value
+    rowsum[rowsum <= 0] = 1
+    r_inv = np.power(rowsum, -1).flatten()
+    r_inv[np.isinf(r_inv)] = 0.
+    r_mat_inv = sp.diags(r_inv)
+    mx = r_mat_inv.dot(mx)
+    return mx
+
+
+def is_spmat_eq(a, b):
+    return (a != b).nnz == 0
+
+
+def aggregate(features, adj, times):
+    dtype = features.dtype
+    for i in range(times):
+        features = adj * features
+    return features.astype(dtype)
 
 
 def read_probs(path, inst_num, feat_dim, dtype=np.float32, verbose=False):
@@ -113,6 +140,11 @@ def write_meta(ofn, idx2lb, inst_num=None):
     print('#inst: {}, #class: {}'.format(inst_num, cls_num))
 
 
+def write_feat(ofn, features):
+    print('save features to', ofn)
+    features.tofile(ofn)
+
+
 def dump2npz(ofn, data, force=False):
     if os.path.exists(ofn) and not force:
         return
@@ -133,8 +165,8 @@ def dump2json(ofn, data, force=False):
         elif isinstance(obj, set) or isinstance(obj, np.ndarray):
             return list(obj)
         else:
-            raise TypeError(
-            "Unserializable object {} of type {}".format(obj, type(obj)))
+            raise TypeError("Unserializable object {} of type {}".format(
+                obj, type(obj)))
 
     with open(ofn, 'w') as of:
         json.dump(data, of, default=default)
@@ -208,3 +240,21 @@ def mkdir_if_no_exists(path, subdirs=[''], is_folder=False):
 
 def rm_suffix(s):
     return s[:s.rfind(".")]
+
+
+def rand_argmax(v):
+    assert len(v.squeeze().shape) == 1
+    return np.random.choice(np.flatnonzero(v == v.max()))
+
+
+def create_temp_file_if_exist(path, suffix=''):
+    path_with_suffix = path + suffix
+    if not os.path.exists(path_with_suffix):
+        return path_with_suffix
+    else:
+        i = 0
+        while i < 1000:
+            temp_path = '{}_{}'.format(path, i) + suffix
+            i += 1
+            if not os.path.exists(temp_path):
+                return temp_path

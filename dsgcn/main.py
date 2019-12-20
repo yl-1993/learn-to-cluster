@@ -6,24 +6,32 @@ import argparse
 
 from mmcv import Config
 
-from utils import (create_logger, set_random_seed,
-                    rm_suffix, mkdir_if_no_exists)
+from utils import (create_logger, set_random_seed, rm_suffix,
+                   mkdir_if_no_exists)
 
 from dsgcn.models import build_model
 from dsgcn import build_handler
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Cluster Detection and Segmentation')
+    parser = argparse.ArgumentParser(
+        description='Cluster Detection and Segmentation')
     parser.add_argument('--config', help='train config file path')
     parser.add_argument('--seed', type=int, default=42, help='random seed')
     parser.add_argument('--stage', choices=['det', 'seg'], default='det')
     parser.add_argument('--phase', choices=['test', 'train'], default='test')
     parser.add_argument('--work_dir', help='the dir to save logs and models')
-    parser.add_argument('--load_from', default=None, help='the checkpoint file to load from')
-    parser.add_argument('--resume_from', default=None, help='the checkpoint file to resume from')
-    parser.add_argument('--gpus', type=int, default=1,
-            help='number of gpus(only applicable to non-distributed training)')
+    parser.add_argument('--load_from',
+                        default=None,
+                        help='the checkpoint file to load from')
+    parser.add_argument('--resume_from',
+                        default=None,
+                        help='the checkpoint file to resume from')
+    parser.add_argument(
+        '--gpus',
+        type=int,
+        default=1,
+        help='number of gpus(only applicable to non-distributed training)')
     parser.add_argument('--distributed', action='store_true', default=False)
     parser.add_argument('--save_output', action='store_true', default=False)
     parser.add_argument('--no_cuda', action='store_true', default=False)

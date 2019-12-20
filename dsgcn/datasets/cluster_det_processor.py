@@ -5,7 +5,6 @@ from proposals import compute_iou, get_majority
 
 
 class ClusterDetProcessor(object):
-
     def __init__(self, dataset):
         self.dataset = dataset
         self.dtype = np.float32
@@ -75,7 +74,8 @@ class ClusterDetProcessor(object):
             which is a 0 or 1 representing the foreground and background
         """
         if idx is None or idx > self.dataset.size:
-            raise ValueError('idx({}) is not in the range of {}'.format(idx, self.dataset.size))
+            raise ValueError('idx({}) is not in the range of {}'.format(
+                idx, self.dataset.size))
         fn_node, fn_edge = self.dataset.lst[idx]
         ret = self.build_graph(fn_node, fn_edge)
         assert ret is not None

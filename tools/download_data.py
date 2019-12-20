@@ -3,7 +3,6 @@ import tarfile
 import argparse
 import os.path as osp
 
-
 data2url = {
     'part1':
     'https://drive.google.com/uc?id=1npu8Ma9BZDp4Z18ARkitwP0OozAy__aG',
@@ -26,7 +25,8 @@ if __name__ == '__main__':
     url = data2url[args.data]
     tar_path = args.tar_path
     if osp.exists(tar_path) and not args.force:
-        print('{} already exists. Run with --force to overwrite.'.format(tar_path))
+        print('{} already exists. Run with --force to overwrite.'.format(
+            tar_path))
     else:
         gdown.download(url, tar_path, quiet=False)
     print('untar {}'.format(tar_path))

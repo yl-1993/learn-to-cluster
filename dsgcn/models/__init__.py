@@ -1,8 +1,7 @@
 from .dsgcn import dsgcn
 
-
 __factory__ = {
-     'dsgcn': dsgcn,
+    'dsgcn': dsgcn,
 }
 
 

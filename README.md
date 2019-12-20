@@ -18,7 +18,7 @@
 Install dependencies
 ```bash
 conda install pytorch=0.4.1 cuda90 -c pytorch
-conda install faiss-cpu -c pytorch
+conda install faiss-gpu -c pytorch
 pip install -r requirements.txt
 ```
 
@@ -138,6 +138,7 @@ sh scripts/train_cluster_det.sh
 | MiniBatchKmeans (ncluster=5000, bs=100) | 45.48 | 80.98 | 58.25 |
 | KNN DBSCAN (knn=80, th=0.7, eps=0.7, min=40) | 62.38 | 50.66 | 55.92 |
 | FastHAC (dist=0.72, single) | 92.07 | 57.28 | 70.63 |
+| DaskSpectral (ncluster=8573, affinity='rbf') | 78.75 | 66.59 | 72.16 |
 | CDP (single model, th=0.7)  | 80.19 | 70.47 | 75.02 |
 | GCN-D (0.7, 0.75) | 95.41 | 67.79 | 79.26 |
 | GCN-D (0.7, 0.75) + iter1 (0.4, 2, 16) | 95.52 | 68.81 | 80.00 |
