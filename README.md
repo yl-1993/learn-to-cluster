@@ -144,6 +144,8 @@ sh scripts/train_cluster_det.sh
 | GCN-D (0.7, 0.75) + iter1 (0.4, 2, 16) | 95.52 | 68.81 | 80.00 |
 | GCN-D (0.65, 0.7, 0.75) | 94.64 | 71.53 | 81.48 |
 | GCN-D (0.6, 0.65, 0.7, 0.75) | 94.60 | 72.52 | 82.10 |
+| GCN-D (hnsw, 2_i0, 6_i1) | 94.19 | 79.69 | 86.34 |
+| GCN-D (hnsw, 2_i0, 18_i1) | 94.54 | 81.62 | 87.61 |
 
 Generally, more proposals leads to better results.
 You can control the number of proposals to strike a balance between time and performance.
