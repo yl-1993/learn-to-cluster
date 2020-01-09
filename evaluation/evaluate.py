@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import os
+import inspect
 import argparse
 import numpy as np
 
+import evaluation.metrics as metrics
 from utils import Timer, TextColors
-from evaluation import bcubed, pairwise
 
 
 def _read_meta(fn):
@@ -29,26 +30,28 @@ def evaluate(gt_labels, pred_labels, metric='pairwise'):
     print('#inst: gt({}) vs pred({})'.format(len(gt_labels), len(pred_labels)))
     print('#cls: gt({}) vs pred({})'.format(len(gt_lb_set), len(pred_lb_set)))
 
-    if metric == 'bcubed':
-        func = bcubed
-    elif metric == 'pairwise':
-        func = pairwise
-    else:
-        raise KeyError('Unsupported evaluation metric', args.metric)
+    metric_func = metrics.__dict__[metric]
 
-    with Timer('evaluate with {}{}{}'.format(TextColors.FATAL, metric, TextColors.ENDC)):
-        ave_pre, ave_rec, fscore = func(gt_labels, pred_labels)
-    print('{}ave_pre: {:.4f}, ave_rec: {:.4f}, fscore: {:.4f}{}'.\
-            format(TextColors.OKGREEN, ave_pre, ave_rec, fscore, TextColors.ENDC))
+    with Timer('evaluate with {}{}{}'.format(TextColors.FATAL, metric,
+                                             TextColors.ENDC)):
+        result = metric_func(gt_labels, pred_labels)
+    if isinstance(result, np.float):
+        print('{}{}: {:.4f}{}'.format(TextColors.OKGREEN, metric, result,
+                                      TextColors.ENDC))
+    else:
+        ave_pre, ave_rec, fscore = result
+        print('{}ave_pre: {:.4f}, ave_rec: {:.4f}, fscore: {:.4f}{}'.\
+                format(TextColors.OKGREEN, ave_pre, ave_rec, fscore, TextColors.ENDC))
 
 
 if __name__ == '__main__':
+    metric_funcs = inspect.getmembers(metrics, inspect.isfunction)
+    metric_names = [n for n, _ in metric_funcs]
+
     parser = argparse.ArgumentParser(description='Evaluate Cluster')
     parser.add_argument('--gt_labels', type=str, required=True)
     parser.add_argument('--pred_labels', type=str, required=True)
-    parser.add_argument('--metric',
-                        default='pairwise',
-                        choices=['pairwise', 'bcubed'])
+    parser.add_argument('--metric', default='pairwise', choices=metric_names)
     args = parser.parse_args()
 
     evaluate(args.gt_labels, args.pred_labels, args.metric)
