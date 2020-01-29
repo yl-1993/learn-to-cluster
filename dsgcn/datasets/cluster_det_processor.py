@@ -70,8 +70,8 @@ class ClusterDetProcessor(object):
     def __getitem__(self, idx):
         """ each vertices is a NxD matrix,
             each adj is a NxN matrix,
-            each label is a Nx1 matrix,
-            which is a 0 or 1 representing the foreground and background
+            each label is a floating point number,
+            which indicates the quality of the proposal.
         """
         if idx is None or idx > self.dataset.size:
             raise ValueError('idx({}) is not in the range of {}'.format(
