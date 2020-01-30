@@ -82,14 +82,41 @@ def connected_components_constraint(nodes, max_sz, score_dict=None, th=None):
     return result, remain
 
 
-def graph_clustering_dynamic_th(edges, score, max_sz, step=0.05, max_iter=100):
+def graph_clustering_dynamic_th(edges,
+                                score,
+                                max_sz,
+                                step=0.05,
+                                pool=None,
+                                max_iter=100):
     edges = np.sort(edges, axis=1)
     th = score.min()
 
     # construct graph
     score_dict = {}  # score lookup table
-    for i, e in enumerate(edges):
-        score_dict[e[0], e[1]] = score[i]
+    if pool is None:
+        for i, e in enumerate(edges):
+            score_dict[e[0], e[1]] = score[i]
+    elif pool == 'avg':
+        cnt_dict = {}
+        for i, e in enumerate(edges):
+            if (e[0], e[1]) in score_dict:
+                cnt = cnt_dict[e[0], e[1]]
+                score_dict[e[0], e[1]] = 1. * (cnt * score_dict[e[0], e[1]] +
+                                               score[i]) / (cnt + 1)
+                cnt_dict[e[0], e[1]] += 1
+            else:
+                score_dict[e[0], e[1]] = score[i]
+                cnt_dict[e[0], e[1]] = 1
+        del cnt_dict
+
+    elif pool == 'max':
+        for i, e in enumerate(edges):
+            if (e[0], e[1]) in score_dict:
+                score_dict[e[0], e[1]] = max(score_dict[e[0], e[1]], score[i])
+            else:
+                score_dict[e[0], e[1]] = score[i]
+    else:
+        raise ValueError('Pooling operation not supported')
 
     nodes = np.sort(np.unique(edges.flatten()))
     mapping = -1 * np.ones((nodes.max() + 1), dtype=np.int)
@@ -104,14 +131,14 @@ def graph_clustering_dynamic_th(edges, score, max_sz, step=0.05, max_iter=100):
 
     # iteration
     components = comps[:]
-    Iter = 0
+    _iter = 0
     while remain:
         th = th + (1 - th) * step
         comps, remain = connected_components_constraint(
             remain, max_sz, score_dict, th)
         components.extend(comps)
-        Iter += 1
-        if Iter >= max_iter:
+        _iter += 1
+        if _iter >= max_iter:
             print("\t Force stopping at: th {}, remain {}".format(
                 th, len(remain)))
             components.append(remain)
