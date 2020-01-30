@@ -144,4 +144,5 @@ def graph_clustering_dynamic_th(edges,
             components.append(remain)
             remain = {}
 
+    components = [sorted([n.name for n in c]) for c in components]
     return components
