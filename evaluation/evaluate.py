@@ -22,13 +22,14 @@ def _read_meta(fn):
 
 
 def evaluate(gt_labels, pred_labels, metric='pairwise'):
-    print('[gt_labels] {}'.format(gt_labels))
-    print('[pred_labels] {}'.format(pred_labels))
-    gt_labels, gt_lb_set = _read_meta(gt_labels)
-    pred_labels, pred_lb_set = _read_meta(pred_labels)
+    if isinstance(gt_labels, str) and isinstance(pred_labels, str):
+        print('[gt_labels] {}'.format(gt_labels))
+        print('[pred_labels] {}'.format(pred_labels))
+        gt_labels, gt_lb_set = _read_meta(gt_labels)
+        pred_labels, pred_lb_set = _read_meta(pred_labels)
 
-    print('#inst: gt({}) vs pred({})'.format(len(gt_labels), len(pred_labels)))
-    print('#cls: gt({}) vs pred({})'.format(len(gt_lb_set), len(pred_lb_set)))
+        print('#inst: gt({}) vs pred({})'.format(len(gt_labels), len(pred_labels)))
+        print('#cls: gt({}) vs pred({})'.format(len(gt_lb_set), len(pred_lb_set)))
 
     metric_func = metrics.__dict__[metric]
 
