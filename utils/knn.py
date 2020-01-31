@@ -64,7 +64,7 @@ def knns2ordered_nbrs(knns, sort=True):
         knns = np.array(knns)
     nbrs = knns[:, 0, :].astype(np.int32)
     dists = knns[:, 1, :]
-    if not sort:
+    if sort:
         # sort dists from low to high
         nb_idx = np.argsort(dists, axis=1)
         idxs = np.arange(nb_idx.shape[0]).reshape(-1, 1)
