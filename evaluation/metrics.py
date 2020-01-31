@@ -7,8 +7,9 @@ import numpy as np
 from scipy import sparse as sp
 from sklearn.metrics.cluster import (contingency_matrix,
                                      normalized_mutual_info_score)
+from sklearn.metrics import (precision_score, recall_score)
 
-__all__ = ['pairwise', 'bcubed', 'nmi']
+__all__ = ['pairwise', 'bcubed', 'nmi', 'precision', 'recall', 'accuracy']
 
 
 def _check(gt_labels, pred_labels):
@@ -92,3 +93,15 @@ def bcubed(gt_labels, pred_labels):
 
 def nmi(gt_labels, pred_labels):
     return normalized_mutual_info_score(pred_labels, gt_labels)
+
+
+def precision(gt_labels, pred_labels):
+    return precision_score(gt_labels, pred_labels)
+
+
+def recall(gt_labels, pred_labels):
+    return recall_score(gt_labels, pred_labels)
+
+
+def accuracy(gt_labels, pred_labels):
+    return np.mean(gt_labels == pred_labels)
