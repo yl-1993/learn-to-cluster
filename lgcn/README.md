@@ -37,5 +37,5 @@ If there is better training config, you are welcome to report to us.
 
 ## Reference
 
-Paper: https://arxiv.org/abs/1903.11306
-Code: https://github.com/Zhongdao/gcn_clustering
+- Paper: https://arxiv.org/abs/1903.11306
+- Code: https://github.com/Zhongdao/gcn_clustering
