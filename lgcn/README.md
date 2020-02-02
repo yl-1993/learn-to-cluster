@@ -1,4 +1,4 @@
-# [Linkage-based Face Clustering via GCN](https://arxiv.org/abs/1903.11306)
+# Linkage-based Face Clustering via GCN
 
 ## Main modification:
 
@@ -7,7 +7,8 @@
 - evaluate lgcn under the same setting as dsgcn.
 
 ## Test
-0. Download the model pretrained on ms1m (part0_train) from
+
+Download the model pretrained on ms1m (part0_train) from
 [Google Drive](https://drive.google.com/open?id=181voJn6yZxNALv-km8MGNSYaNW_gb86z) or
 [BaiduYun](https://pan.baidu.com/s/1Qb-UcQ-hVtDRLbGngU1v8A) (passwd: vwet),
 and untar it under the root of this project.
@@ -16,7 +17,7 @@ and untar it under the root of this project.
 tar -zxf pretrained_lgcn.tar.gz
 ```
 
-1. Test
+Test
 
 ```bash
 # Testing takes about 3 hours on 1 TitanX.
@@ -36,4 +37,5 @@ If there is better training config, you are welcome to report to us.
 
 ## Reference
 
-https://github.com/Zhongdao/gcn_clustering
+Paper: https://arxiv.org/abs/1903.11306
+Code: https://github.com/Zhongdao/gcn_clustering
