@@ -63,6 +63,6 @@ def test_cluster_det(model, cfg, logger):
             'tot_inst_num': dataset.inst_num,
             'proposal_folders': cfg.test_data.proposal_folders,
         }
-        print('dump output to {}'.format(opath))
+        print('dump pred_score to {}'.format(opath))
         output_probs = np.concatenate(output_probs).ravel()
         np.savez_compressed(opath, data=output_probs, meta=meta)
