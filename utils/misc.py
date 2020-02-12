@@ -226,6 +226,13 @@ def clusters2labels(clusters):
     return idx2lb
 
 
+def intdict2ndarray(d, default_val=-1):
+    arr = np.zeros(len(d)) + default_val
+    for k, v in d.items():
+        arr[k] = v
+    return arr
+
+
 def mkdir_if_no_exists(path, subdirs=[''], is_folder=False):
     if path == '':
         return

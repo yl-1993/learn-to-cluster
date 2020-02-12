@@ -7,7 +7,8 @@ import numpy as np
 from tqdm import tqdm
 
 from utils import (dump_data, read_meta, write_meta, build_knns,
-                   labels2clusters, clusters2labels, BasicDataset, Timer)
+                   filter_clusters, labels2clusters, clusters2labels,
+                   BasicDataset, Timer)
 from proposals import super_vertex
 
 
@@ -45,14 +46,6 @@ def parse_args():
     args = parser.parse_args()
 
     return args
-
-
-def filter_clusters(clusters, min_size=None, max_size=None):
-    if min_size is not None:
-        clusters = [c for c in clusters if len(c) >= min_size]
-    if max_size is not None:
-        clusters = [c for c in clusters if len(c) <= max_size]
-    return clusters
 
 
 def save_proposals(clusters, knns, ofolder, force=False):

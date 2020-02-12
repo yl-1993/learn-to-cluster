@@ -1,0 +1,27 @@
+model:
+    type: dsgcn
+    kwargs:
+        feature_dim: 256
+        featureless: False
+        reduce_method: max
+        hidden_dims: [512, 64]
+
+workers_per_gpu: 1
+batch_size_per_gpu: 128
+
+log_level: 'INFO'
+log_config:
+    interval: 100
+
+test_data:
+    wo_weight: True
+    feat_path: ./data/features/part1_test.bin
+    proposal_folders:
+        - ./data/cluster_proposals/part1_test/hnsw_k_80_th_0.6_step_0.05_minsz_3_maxsz_300_iter_0/proposals/
+        - ./data/cluster_proposals/part1_test/hnsw_k_80_th_0.7_step_0.05_minsz_3_maxsz_300_iter_0/proposals/
+        - ./data/cluster_proposals/part1_test/hnsw_k_80_th_0.6_step_0.05_minsz_3_maxsz_300_iter_0/hnsw_k_2_th_0.4_step_0.05_minsz_3_maxsz_500_sv_minsz_2_maxsz_8_iter_1/proposals/
+        - ./data/cluster_proposals/part1_test/hnsw_k_80_th_0.6_step_0.05_minsz_3_maxsz_300_iter_0/hnsw_k_3_th_0.4_step_0.05_minsz_3_maxsz_500_sv_minsz_2_maxsz_5_iter_1/proposals/
+        - ./data/cluster_proposals/part1_test/hnsw_k_80_th_0.7_step_0.05_minsz_3_maxsz_300_iter_0/hnsw_k_2_th_0.4_step_0.05_minsz_3_maxsz_500_sv_minsz_2_maxsz_8_iter_1/proposals/
+        - ./data/cluster_proposals/part1_test/hnsw_k_80_th_0.7_step_0.05_minsz_3_maxsz_300_iter_0/hnsw_k_3_th_0.4_step_0.05_minsz_3_maxsz_500_sv_minsz_2_maxsz_5_iter_1/proposals/
+        - ./data/cluster_proposals/part1_test/hnsw_k_80_th_0.75_step_0.05_minsz_3_maxsz_300_iter_0/hnsw_k_2_th_0.4_step_0.05_minsz_3_maxsz_500_sv_minsz_2_maxsz_8_iter_1/proposals/
+        - ./data/cluster_proposals/part1_test/hnsw_k_80_th_0.75_step_0.05_minsz_3_maxsz_300_iter_0/hnsw_k_3_th_0.4_step_0.05_minsz_3_maxsz_500_sv_minsz_2_maxsz_5_iter_1/proposals/

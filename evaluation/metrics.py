@@ -5,7 +5,11 @@ from __future__ import division
 
 import numpy as np
 from scipy import sparse as sp
-from sklearn.metrics.cluster import contingency_matrix
+from sklearn.metrics.cluster import (contingency_matrix,
+                                     normalized_mutual_info_score)
+from sklearn.metrics import (precision_score, recall_score)
+
+__all__ = ['pairwise', 'bcubed', 'nmi', 'precision', 'recall', 'accuracy']
 
 
 def _check(gt_labels, pred_labels):
@@ -36,12 +40,17 @@ def _compute_fscore(pre, rec):
 
 
 def fowlkes_mallows_score(gt_labels, pred_labels, sparse=True):
+    ''' The original function is from `sklearn.metrics.fowlkes_mallows_score`.
+        We output the pairwise precision, pairwise recall and F-measure,
+        instead of calculating the geometry mean of precision and recall.
+    '''
     n_samples, = gt_labels.shape
 
     c = contingency_matrix(gt_labels, pred_labels, sparse=sparse)
     tk = np.dot(c.data, c.data) - n_samples
     pk = np.sum(np.asarray(c.sum(axis=0)).ravel()**2) - n_samples
     qk = np.sum(np.asarray(c.sum(axis=1)).ravel()**2) - n_samples
+
     avg_pre = tk / pk
     avg_rec = tk / qk
     fscore = _compute_fscore(avg_pre, avg_rec)
@@ -80,3 +89,19 @@ def bcubed(gt_labels, pred_labels):
     fscore = _compute_fscore(avg_pre, avg_rec)
 
     return avg_pre, avg_rec, fscore
+
+
+def nmi(gt_labels, pred_labels):
+    return normalized_mutual_info_score(pred_labels, gt_labels)
+
+
+def precision(gt_labels, pred_labels):
+    return precision_score(gt_labels, pred_labels)
+
+
+def recall(gt_labels, pred_labels):
+    return recall_score(gt_labels, pred_labels)
+
+
+def accuracy(gt_labels, pred_labels):
+    return np.mean(gt_labels == pred_labels)
