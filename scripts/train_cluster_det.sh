@@ -1,4 +1,21 @@
-CUDA_VISIBLE_DEVICES=0 PYTHONPATH=. python dsgcn/main.py \
-    --stage det \
+stage=det
+cfg_name=cfg_train_ms1m_4_prpsls
+config=./dsgcn/configs/$cfg_name.py
+
+export CUDA_VISIBLE_DEVICES=0
+export PYTHONPATH=.
+
+# train
+python dsgcn/main.py \
+    --stage $stage \
     --phase train \
-    --config dsgcn/configs/cfg_train_0.7_0.75.yaml
+    --config $config
+
+# test
+load_from=./data/work_dir/$cfg_name/latest.pth
+python dsgcn/main.py \
+    --stage $stage \
+    --phase test \
+    --config $config \
+    --load_from $load_from \
+    --save_output
