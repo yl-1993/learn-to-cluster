@@ -8,6 +8,8 @@ from mmcv.runner import load_checkpoint
 from mmcv.parallel import MMDataParallel
 
 from dsgcn.datasets import build_dataset, build_processor, build_dataloader
+from post_process import deoverlap
+from evaluation import evaluate
 
 
 def test_cluster_det(model, cfg, logger):
@@ -20,7 +22,7 @@ def test_cluster_det(model, cfg, logger):
     processor = build_processor(cfg.stage)
 
     losses = []
-    output_probs = []
+    pred_scores = []
 
     if cfg.gpus == 1:
         data_loader = build_dataloader(dataset,
@@ -48,7 +50,7 @@ def test_cluster_det(model, cfg, logger):
                 if cfg.save_output:
                     output = output.view(-1)
                     prob = output.data.cpu().numpy()
-                    output_probs.append(prob)
+                    pred_scores.append(prob)
     else:
         raise NotImplementedError
 
@@ -56,6 +58,7 @@ def test_cluster_det(model, cfg, logger):
         avg_loss = sum(losses) / len(losses)
         logger.info('[Test] Overall Loss {:.4f}'.format(avg_loss))
 
+    # save predicted scores
     if cfg.save_output:
         fn = os.path.basename(cfg.load_from)
         opath = os.path.join(cfg.work_dir, fn[:fn.rfind('.pth')] + '.npz')
@@ -64,5 +67,16 @@ def test_cluster_det(model, cfg, logger):
             'proposal_folders': cfg.test_data.proposal_folders,
         }
         print('dump pred_score to {}'.format(opath))
-        output_probs = np.concatenate(output_probs).ravel()
-        np.savez_compressed(opath, data=output_probs, meta=meta)
+        pred_scores = np.concatenate(pred_scores).ravel()
+        np.savez_compressed(opath, data=pred_scores, meta=meta)
+
+    # de-overlap
+    proposals = [fn_node for fn_node, _ in dataset.lst]
+    pred_labels = deoverlap(pred_scores, proposals, dataset.inst_num, cfg.th_pos, cfg.th_iou)
+
+    # evaluation
+    if not dataset.ignore_meta:
+        print('==> evaluation')
+        gt_labels = dataset.labels
+        for metric in cfg.metrics:
+            evaluate(gt_labels, pred_labels, metric)
