@@ -8,7 +8,7 @@ from utils import read_meta, read_probs, l2norm, Timer
 class ClusterDataset(object):
     def __init__(self, cfg, is_test=False):
         feat_path = cfg['feat_path']
-        meta_path = cfg.get('meta_path', None)
+        label_path = cfg.get('label_path', None)
         proposal_folders = cfg['proposal_folders']
 
         self.feature_dim = cfg['feature_dim']
@@ -21,18 +21,18 @@ class ClusterDataset(object):
         self.use_mask = cfg.get('use_mask', False)
         self.is_test = is_test
 
-        self._read(feat_path, meta_path, proposal_folders)
+        self._read(feat_path, label_path, proposal_folders)
 
         print('#cluster: {}, #output: {}, feature shape: {}, norm_adj: {}, wo_weight: {}'.\
                 format(self.size, self.num_class, self.features.shape, self.is_norm_adj, self.wo_weight))
 
-    def _read(self, feat_path, meta_path, proposal_folders):
+    def _read(self, feat_path, label_path, proposal_folders):
         fn_node_pattern = '*_node.npz'
         fn_edge_pattern = '*_edge.npz'
 
         with Timer('read meta and feature'):
-            if meta_path is not None:
-                self.lb2idxs, self.idx2lb = read_meta(meta_path)
+            if label_path is not None:
+                self.lb2idxs, self.idx2lb = read_meta(label_path)
                 self.inst_num = len(self.idx2lb)
                 self.ignore_meta = False
             else:
