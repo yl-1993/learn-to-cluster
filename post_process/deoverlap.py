@@ -11,7 +11,12 @@ from utils import load_data, write_meta
 from post_process import nms
 
 
-def deoverlap(probs, proposals, tot_inst_num, th_pos=-1, th_iou=1):
+def deoverlap(probs,
+              proposals,
+              tot_inst_num,
+              th_pos=-1,
+              th_iou=1,
+              pred_label_fn=None):
     print('avg_score(mean: {:.2f}, max: {:.2f}, min: {:.2f})'.format(
         probs.mean(), probs.max(), probs.min()))
 
@@ -46,7 +51,9 @@ def deoverlap(probs, proposals, tot_inst_num, th_pos=-1, th_iou=1):
     print('#inst-coverage: {:.2f}'.format(1. * inst_num / tot_inst_num))
 
     # save to file
-    write_meta(pred_label_fn, idx2lb, inst_num=tot_inst_num)
+    pred_labels = write_meta(pred_label_fn, idx2lb, inst_num=tot_inst_num)
+
+    return pred_labels
 
 
 if __name__ == '__main__':
@@ -86,4 +93,5 @@ if __name__ == '__main__':
             glob.glob(os.path.join(proposal_folder, fn_node_pattern)))
         proposals.extend([fn_node for fn_node in fn_clusters])
 
-    deoverlap(probs, proposals, tot_inst_num, args.th_pos, args.th_iou)
+    deoverlap(probs, proposals, tot_inst_num, args.th_pos, args.th_iou,
+              pred_label_fn)
