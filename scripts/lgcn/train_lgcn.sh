@@ -1,4 +1,4 @@
-config=lgcn/configs/cfg_ms1m.py
+config=lgcn/configs/cfg_train_ms1m.py
 
 export CUDA_VISIBLE_DEVICES=0
 export PYTHONPATH=.

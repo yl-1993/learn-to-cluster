@@ -1,4 +1,4 @@
-config=lgcn/configs/cfg_ms1m.py
+config=lgcn/configs/cfg_test_ms1m.py
 load_from=data/pretrained_models/pretrained_lgcn.pth
 
 export CUDA_VISIBLE_DEVICES=0
