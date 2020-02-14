@@ -38,12 +38,12 @@ class ClusterDataset(object):
                 self.lb2idxs, self.idx2lb = read_meta(label_path)
                 self.labels = intdict2ndarray(self.idx2lb)
                 self.inst_num = len(self.idx2lb)
-                self.ignore_meta = False
+                self.ignore_label = False
             else:
                 self.lb2idxs, self.idx2lb = None, None
                 self.labels = None
                 self.inst_num = -1
-                self.ignore_meta = True
+                self.ignore_label = True
             if not self.featureless:
                 features = read_probs(feat_path, self.inst_num,
                                       self.feature_dim)

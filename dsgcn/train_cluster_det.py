@@ -32,7 +32,7 @@ def train_cluster_det(model, cfg, logger):
         setattr(cfg.train_data, k, v)
 
     dataset = build_dataset(cfg.train_data)
-    assert not dataset.ignore_meta, 'Please specify label_path for training'
+    assert not dataset.ignore_label, 'Please specify label_path for training'
 
     processor = build_processor(cfg.stage)
     data_loaders = [

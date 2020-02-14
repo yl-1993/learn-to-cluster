@@ -44,7 +44,7 @@ def test(model, dataset, cfg, logger):
                 losses += [loss.item()]
                 pred = F.softmax(pred, dim=1)
                 if i % cfg.log_config.interval == 0:
-                    if dataset.ignore_meta:
+                    if dataset.ignore_label:
                         logger.info('[Test] Iter {}/{}'.format(
                             i, len(data_loader)))
                     else:
@@ -67,7 +67,7 @@ def test(model, dataset, cfg, logger):
     else:
         raise NotImplementedError
 
-    if not dataset.ignore_meta:
+    if not dataset.ignore_label:
         avg_loss = sum(losses) / len(losses)
         logger.info('[Test] Overall Loss {:.4f}'.format(avg_loss))
 
@@ -111,7 +111,7 @@ def test_lgcn(model, cfg, logger):
         write_meta(ofn_meta, pred_idx2lb, inst_num=inst_num)
 
     # evaluation
-    if not dataset.ignore_meta:
+    if not dataset.ignore_label:
         print('==> evaluation')
         gt_labels = dataset.labels
         for metric in cfg.metrics:

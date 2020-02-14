@@ -42,7 +42,7 @@ def test_cluster_det(model, cfg, logger):
                 output, loss = model(data, return_loss=True)
                 losses += [loss.item()]
                 if i % cfg.log_config.interval == 0:
-                    if dataset.ignore_meta:
+                    if dataset.ignore_label:
                         logger.info('[Test] Iter {}/{}'.format(
                             i, len(data_loader)))
                     else:
@@ -55,7 +55,7 @@ def test_cluster_det(model, cfg, logger):
     else:
         raise NotImplementedError
 
-    if not dataset.ignore_meta:
+    if not dataset.ignore_label:
         avg_loss = sum(losses) / len(losses)
         logger.info('[Test] Overall Loss {:.4f}'.format(avg_loss))
 
@@ -77,7 +77,7 @@ def test_cluster_det(model, cfg, logger):
                             cfg.th_pos, cfg.th_iou)
 
     # evaluation
-    if not dataset.ignore_meta:
+    if not dataset.ignore_label:
         print('==> evaluation')
         gt_labels = dataset.labels
         for metric in cfg.metrics:

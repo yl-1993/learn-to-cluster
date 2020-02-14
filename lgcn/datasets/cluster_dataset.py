@@ -23,11 +23,11 @@ class ClusterDataset(object):
                 _, idx2lb = read_meta(label_path)
                 self.inst_num = len(idx2lb)
                 self.labels = intdict2ndarray(idx2lb)
-                self.ignore_meta = False
+                self.ignore_label = False
             else:
                 self.labels = None
                 self.inst_num = -1
-                self.ignore_meta = True
+                self.ignore_label = True
             self.features = read_probs(feat_path, self.inst_num,
                                        self.feature_dim)
             if self.is_norm_feat:
@@ -105,7 +105,7 @@ class ClusterDataset(object):
         A_ = np.zeros([max_num_nodes, max_num_nodes], dtype=A.dtype)
         A_[:num_nodes, :num_nodes] = A
 
-        if self.ignore_meta:
+        if self.ignore_label:
             return (feat, A_, center_idx, one_hop_idxs)
 
         labels = self.labels[uniq_nodes]
