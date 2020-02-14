@@ -28,9 +28,10 @@ if __name__ == '__main__':
         os.makedirs(args.output_folder)
 
     cluster_name = args.output_name + '_' if args.output_name != '' else ''
-    pred_label_fn = os.path.join(args.output_folder,
-                        '{}th_iou_{}_pos_{}_pred_labels.txt'.\
-                        format(cluster_name, args.th_iou, args.th_pos))
+    pred_label_fn = os.path.join(
+        args.output_folder,
+        '{}th_iou_{}_pos_{}_pred_labels.txt'.format(cluster_name, args.th_iou,
+                                                    args.th_pos))
 
     if os.path.exists(pred_label_fn) and not args.force:
         print('{} has already existed. Please set force=True to overwrite.'.

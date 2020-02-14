@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import numpy as np
-
 
 def filter_clusters(clusters, min_size=None, max_size=None):
     if min_size is not None:

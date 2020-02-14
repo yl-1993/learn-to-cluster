@@ -4,7 +4,6 @@
 from __future__ import division
 
 import numpy as np
-from scipy import sparse as sp
 from sklearn.metrics.cluster import (contingency_matrix,
                                      normalized_mutual_info_score)
 from sklearn.metrics import (precision_score, recall_score)

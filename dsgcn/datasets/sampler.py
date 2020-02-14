@@ -1,8 +1,8 @@
 import math
-import numpy as np
 import torch
 from torch.utils.data.sampler import Sampler
-from torch.utils.data.distributed import DistributedSampler as _DistributedSampler
+from torch.utils.data.distributed import (DistributedSampler as
+                                          _DistributedSampler)
 
 __all__ = ["DistributedSampler", "DistributedSequentialSampler"]
 

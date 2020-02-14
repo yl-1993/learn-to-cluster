@@ -70,14 +70,13 @@ if __name__ == '__main__':
     assert args.pred_score.endswith('.npz')
     if args.output_name == '':
         pos = args.pred_score.rfind('.npz')
-        pred_label_fn = args.pred_score[:
-                                        pos] + '_th_iou_{}_pos_{}_pred_label.txt'.format(
-                                            args.th_iou, args.th_pos)
+        pred_label_fn = '{}_th_iou_{}_pos_{}_pred_label.txt'.format(
+            args.pred_score[:pos], args.th_iou, args.th_pos)
     else:
         pred_label_fn = args.output_name
 
-    print('th_pos={}, th_iou={}, pred_score={}, pred_label_fn={}'.\
-            format(args.th_pos, args.th_iou, args.pred_score, pred_label_fn))
+    print('th_pos={}, th_iou={}, pred_score={}, pred_label_fn={}'.format(
+        args.th_pos, args.th_iou, args.pred_score, pred_label_fn))
 
     d = np.load(args.pred_score, allow_pickle=True)
     probs = d['data']

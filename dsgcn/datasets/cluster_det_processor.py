@@ -80,6 +80,5 @@ class ClusterDetProcessor(object):
         ret = self.build_graph(fn_node, fn_edge)
         assert ret is not None
         vertices, adj, label = ret
-        return vertices.astype(self.dtype), \
-               adj.astype(self.dtype), \
-               np.array(label, dtype=self.dtype)
+        return vertices.astype(self.dtype), adj.astype(self.dtype), np.array(
+            label, dtype=self.dtype)

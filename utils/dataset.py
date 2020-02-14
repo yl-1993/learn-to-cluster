@@ -30,7 +30,8 @@ class BasicDataset():
             self.cls_num = len(self.lb2idxs)
         else:
             print(
-                'meta file not found: {}.\ninit `lb2idxs` and `idx2lb` as None.'
+                'meta file not found: {}.\n'
+                'init `lb2idxs` and `idx2lb` as None.'
                 .format(self.label_path))
             self.lb2idxs, self.idx2lb = None, None
             self.inst_num, self.cls_num = -1, -1
@@ -44,9 +45,12 @@ class BasicDataset():
             self.features = l2norm(self.features)
 
     def info(self):
-        print("name:{}{}{}\ninst_num:{}\ncls_num:{}\ndim:{}\nfeat_path:{}\nnormalization:{}{}{}\ndtype:{}".\
-                format(TextColors.OKGREEN, self.name, TextColors.ENDC, self.inst_num, self.cls_num, self.dim, \
-                        self.feat_path, TextColors.FATAL, self.normalize, TextColors.ENDC, self.dtype))
+        print('name:{}{}{}\ninst_num:{}\ncls_num:{}\ndim:{}\n'
+              'feat_path:{}\nnormalization:{}{}{}\ndtype:{}'.format(
+                  TextColors.OKGREEN, self.name, TextColors.ENDC,
+                  self.inst_num, self.cls_num, self.dim, self.feat_path,
+                  TextColors.FATAL, self.normalize, TextColors.ENDC,
+                  self.dtype))
 
 
 if __name__ == '__main__':
