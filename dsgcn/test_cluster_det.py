@@ -14,7 +14,8 @@ from evaluation import evaluate
 
 def test_cluster_det(model, cfg, logger):
     if cfg.load_from:
-        load_checkpoint(model, cfg.load_from)
+        logger.info('load pretrained model from: {}'.format(cfg.load_from))
+        load_checkpoint(model, cfg.load_from, strict=True, logger=logger)
 
     for k, v in cfg.model['kwargs'].items():
         setattr(cfg.test_data, k, v)
@@ -72,7 +73,8 @@ def test_cluster_det(model, cfg, logger):
 
     # de-overlap
     proposals = [fn_node for fn_node, _ in dataset.lst]
-    pred_labels = deoverlap(pred_scores, proposals, dataset.inst_num, cfg.th_pos, cfg.th_iou)
+    pred_labels = deoverlap(pred_scores, proposals, dataset.inst_num,
+                            cfg.th_pos, cfg.th_iou)
 
     # evaluation
     if not dataset.ignore_meta:
