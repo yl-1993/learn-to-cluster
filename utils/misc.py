@@ -187,9 +187,10 @@ def dump2pkl(ofn, data, force=False):
         pickle.dump(data, of)
 
 
-def dump_data(ofn, data, force=False):
+def dump_data(ofn, data, force=False, verbose=False):
     if os.path.exists(ofn) and not force:
-        print('{} already exists. Set force=True to overwrite.'.format(ofn))
+        if verbose:
+            print('{} already exists. Set force=True to overwrite.'.format(ofn))
         return
     mkdir_if_no_exists(ofn)
     if ofn.endswith('.json'):

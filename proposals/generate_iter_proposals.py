@@ -4,7 +4,6 @@
 import os
 import argparse
 import numpy as np
-from tqdm import tqdm
 
 from utils import (read_meta, write_meta, build_knns, labels2clusters,
                    clusters2labels, BasicDataset, Timer)
@@ -12,7 +11,8 @@ from proposals import super_vertex, filter_clusters, save_proposals
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Generate Proposals')
+    parser = argparse.ArgumentParser(
+        description='Generate Iterative Proposals')
     parser.add_argument("--name",
                         type=str,
                         default='part1_test',
@@ -32,16 +32,16 @@ def parse_args():
     parser.add_argument("--no_normalize",
                         action='store_true',
                         help="normalize feature by default")
-    parser.add_argument('--knn', default=3, type=int)
+    parser.add_argument('--k', default=3, type=int)
     parser.add_argument('--th_knn', default=0.6, type=float)
     parser.add_argument('--th_step', default=0.05, type=float)
     parser.add_argument('--knn_method',
                         default='faiss',
                         choices=['faiss', 'hnsw'])
-    parser.add_argument('--min_size', default=3, type=int)
-    parser.add_argument('--max_size', default=500, type=int)
-    parser.add_argument('--sv_min_size', default=2, type=int)
-    parser.add_argument('--sv_max_size', default=5, type=int)
+    parser.add_argument('--minsz', default=3, type=int)
+    parser.add_argument('--maxsz', default=500, type=int)
+    parser.add_argument('--sv_minsz', default=2, type=int)
+    parser.add_argument('--sv_maxsz', default=5, type=int)
     parser.add_argument("--sv_labels",
                         type=str,
                         default=None,
@@ -52,6 +52,7 @@ def parse_args():
                         help="super vertex precomputed knn")
     parser.add_argument('--is_rebuild', action='store_true')
     parser.add_argument('--is_save_proposals', action='store_true')
+    parser.add_argument('--force', action='store_true')
     args = parser.parse_args()
 
     return args
@@ -90,23 +91,25 @@ def generate_iter_proposals(oprefix,
                             k=80,
                             th_knn=0.6,
                             th_step=0.05,
-                            min_size=3,
-                            max_size=300,
-                            sv_min_size=2,
-                            sv_max_size=5,
+                            minsz=3,
+                            maxsz=300,
+                            sv_minsz=2,
+                            sv_maxsz=5,
                             sv_labels=None,
                             sv_knn_prefix=None,
                             is_rebuild=False,
-                            is_save_proposals=False):
+                            is_save_proposals=True,
+                            force=False,
+                            **kwargs):
 
-    assert sv_min_size >= 2, "sv_min_size should be larger than 2 to avoid duplicated proposals"
-    print('k={}, th_knn={}, th_step={}, min_size={}, max_size={}, '
-            'sv_min_size={}, sv_max_size={}, is_rebuild={}'.\
-        format(k, th_knn, th_step, min_size, max_size,
-                    sv_min_size, sv_max_size, is_rebuild))
+    assert sv_minsz >= 2, "sv_minsz >= 2 to avoid duplicated proposals"
+    print('k={}, th_knn={}, th_step={}, minsz={}, maxsz={}, '
+          'sv_minsz={}, sv_maxsz={}, is_rebuild={}'.format(
+              k, th_knn, th_step, minsz, maxsz, sv_minsz, sv_maxsz,
+              is_rebuild))
 
     if not os.path.exists(sv_labels):
-        raise FileNotFoundError('{} not found.'.format(pred_pred_labels))
+        raise FileNotFoundError('{} not found.'.format(sv_labels))
 
     if sv_knn_prefix is None:
         sv_knn_prefix = knn_prefix
@@ -118,7 +121,7 @@ def generate_iter_proposals(oprefix,
     sv_lb2idxs, sv_idx2lb = read_meta(sv_labels)
     inst_num = len(sv_idx2lb)
     sv_clusters = labels2clusters(sv_lb2idxs)
-    # sv_clusters = filter_clusters(sv_clusters, min_size)
+    # sv_clusters = filter_clusters(sv_clusters, minsz)
     feats = np.array([feats[c, :].mean(axis=0) for c in sv_clusters])
     print('average feature of super vertices:', feats.shape)
 
@@ -126,19 +129,20 @@ def generate_iter_proposals(oprefix,
     knns = build_knns(knn_prefix, feats, knn_method, k, is_rebuild)
 
     # obtain cluster proposals
-    ofolder = os.path.join(oprefix,
-            '{}_k_{}_th_{}_step_{}_minsz_{}_maxsz_{}_sv_minsz_{}_maxsz_{}_iter_{}'.\
-            format(knn_method, k, th_knn, th_step, min_size, max_size,
-                    sv_min_size, sv_max_size, _iter))
+    ofolder = os.path.join(
+        oprefix,
+        '{}_k_{}_th_{}_step_{}_minsz_{}_maxsz_{}_sv_minsz_{}_maxsz_{}_iter_{}'.
+        format(knn_method, k, th_knn, th_step, minsz, maxsz, sv_minsz,
+               sv_maxsz, _iter))
     ofn_pred_labels = os.path.join(ofolder, 'pred_labels.txt')
     if not os.path.exists(ofolder):
         os.makedirs(ofolder)
     if not os.path.isfile(ofn_pred_labels) or is_rebuild:
         with Timer('build super vertices (iter={})'.format(_iter)):
-            clusters = super_vertex(knns, k, th_knn, th_step, sv_max_size)
-            clusters = filter_clusters(clusters, sv_min_size)
-            clusters = [[x for c in cluster for x in sv_clusters[c]] \
-                                                    for cluster in clusters]
+            clusters = super_vertex(knns, k, th_knn, th_step, sv_maxsz)
+            clusters = filter_clusters(clusters, sv_minsz)
+            clusters = [[x for c in cluster for x in sv_clusters[c]]
+                        for cluster in clusters]
         with Timer('dump clustering to {}'.format(ofn_pred_labels)):
             labels = clusters2labels(clusters)
             write_meta(ofn_pred_labels, labels, inst_num=inst_num)
@@ -146,15 +150,20 @@ def generate_iter_proposals(oprefix,
         print('read clusters from {}'.format(ofn_pred_labels))
         lb2idxs, _ = read_meta(ofn_pred_labels)
         clusters = labels2clusters(lb2idxs)
-    clusters = filter_clusters(clusters, min_size, max_size)
+    clusters = filter_clusters(clusters, minsz, maxsz)
 
     # output cluster proposals
+    ofolder_proposals = os.path.join(ofolder, 'proposals')
     if is_save_proposals:
-        ofolder = os.path.join(ofolder, 'proposals')
-        print('saving cluster proposals to {}'.format(ofolder))
-        if not os.path.exists(ofolder):
-            os.makedirs(ofolder)
-        save_proposals(clusters, knns_inst, ofolder=ofolder, force=True)
+        print('saving cluster proposals to {}'.format(ofolder_proposals))
+        if not os.path.exists(ofolder_proposals):
+            os.makedirs(ofolder_proposals)
+        save_proposals(clusters,
+                       knns_inst,
+                       ofolder=ofolder_proposals,
+                       force=force)
+
+    return ofolder_proposals, ofn_pred_labels
 
 
 if __name__ == '__main__':
@@ -172,14 +181,15 @@ if __name__ == '__main__':
                             ds.features,
                             args.dim,
                             args.knn_method,
-                            args.knn,
+                            args.k,
                             args.th_knn,
                             args.th_step,
-                            args.min_size,
-                            args.max_size,
-                            args.sv_min_size,
-                            args.sv_max_size,
+                            args.minsz,
+                            args.maxsz,
+                            args.sv_minsz,
+                            args.sv_maxsz,
                             sv_labels=args.sv_labels,
                             sv_knn_prefix=args.sv_knn_prefix,
                             is_rebuild=args.is_rebuild,
-                            is_save_proposals=args.is_save_proposals)
+                            is_save_proposals=args.is_save_proposals,
+                            force=args.force)
