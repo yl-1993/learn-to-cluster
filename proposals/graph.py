@@ -47,8 +47,9 @@ def connected_components(nodes, edges):
 
 def connected_components_constraint(nodes, max_sz, score_dict=None, th=None):
     '''
-    only use edges whose scores are above `th`
-    if a component is larger than `max_sz`, all the nodes in this component are added into `remain` and returned for next iteration.
+        1. Edges with scores smaller than `th` will be pruned.
+        2. If a component is larger than `max_sz`, all the nodes
+        in the component are added to `remain` and returned for next iteration.
     '''
     result = []
     remain = set()
@@ -73,11 +74,12 @@ def connected_components_constraint(nodes, max_sz, score_dict=None, th=None):
             group.update(neighbors)
             queue.extend(neighbors)
             if len(group) > max_sz or len(remain.intersection(neighbors)) > 0:
-                # if this group is larger than `max_sz`, add the nodes into `remain`
+                # if this group exceeds `max_sz`, add the nodes into `remain`
                 valid = False
                 remain.update(group)
                 break
-        if valid:  # if this group is smaller than or equal to `max_sz`, finalize it.
+        if valid:
+            # if this group is smaller than or equal to `max_sz`, finalize it.
             result.append(group)
     return result, remain
 
