@@ -9,7 +9,6 @@ th=0.7
 step=0.05
 minsz=3
 maxsz=300
-metric=pairwise
 
 export PYTHONPATH=.
 
@@ -28,7 +27,23 @@ python proposals/generate_basic_proposals.py \
     --is_save_proposals
 
 # evaluate
+gt_labels=$prefix/labels/$name.meta
+pred_labels=$oprefix/$name/$method\_k_$k\_th_$th\_step_$step\_minsz_$minsz\_maxsz_$maxsz\_iter_0/pred_labels.txt
+
+metric=pairwise
 python evaluation/evaluate.py \
     --metric $metric \
-    --gt_labels $prefix/labels/$name.meta \
-    --pred_labels $oprefix/$name/$method\_k_$k\_th_$th\_step_$step\_minsz_$minsz\_maxsz_$maxsz\_iter_0/pred_labels.txt
+    --gt_labels $gt_labels \
+    --pred_labels $pred_labels
+
+metric=bcubed
+python evaluation/evaluate.py \
+    --metric $metric \
+    --gt_labels $gt_labels \
+    --pred_labels $pred_labels
+
+metric=nmi
+python evaluation/evaluate.py \
+    --metric $metric \
+    --gt_labels $gt_labels \
+    --pred_labels $pred_labels
