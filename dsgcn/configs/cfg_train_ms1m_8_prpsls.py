@@ -1,6 +1,7 @@
 # the same result as dsgcn/configs/yaml/cfg_train_8_prpsl.yaml
 
 import os.path as osp
+from functools import partial
 from proposals import generate_proposals
 
 # model
@@ -68,13 +69,13 @@ proposal_path = osp.join(prefix, 'cluster_proposals')
 train_data = dict(wo_weight=False,
                   feat_path=feat_path,
                   label_path=label_path,
-                  proposal_folders=generate_proposals(
-                      params=proposal_params,
-                      prefix=prefix,
-                      oprefix=proposal_path,
-                      name=train_name,
-                      dim=model['kwargs']['feature_dim'],
-                      no_normalize=False))
+                  proposal_folders=partial(generate_proposals,
+                                           params=proposal_params,
+                                           prefix=prefix,
+                                           oprefix=proposal_path,
+                                           name=train_name,
+                                           dim=model['kwargs']['feature_dim'],
+                                           no_normalize=False))
 
 k = 80
 test_thresholds = [0.7, 0.75]
@@ -93,10 +94,10 @@ label_path = osp.join(prefix, 'labels', '{}.meta'.format(test_name))
 test_data = dict(wo_weight=False,
                  feat_path=feat_path,
                  label_path=label_path,
-                 proposal_folders=generate_proposals(
-                     params=proposal_params,
-                     prefix=prefix,
-                     oprefix=proposal_path,
-                     name=test_name,
-                     dim=model['kwargs']['feature_dim'],
-                     no_normalize=False))
+                 proposal_folders=partial(generate_proposals,
+                                          params=proposal_params,
+                                          prefix=prefix,
+                                          oprefix=proposal_path,
+                                          name=test_name,
+                                          dim=model['kwargs']['feature_dim'],
+                                          no_normalize=False))

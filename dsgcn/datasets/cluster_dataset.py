@@ -57,6 +57,8 @@ class ClusterDataset(object):
 
         with Timer('read proposal list'):
             self.lst = []
+            if callable(proposal_folders):
+                proposal_folders = proposal_folders()
             for proposal_folder in proposal_folders:
                 print('read proposals from folder: ', proposal_folder)
                 fn_nodes = sorted(

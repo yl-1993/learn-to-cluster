@@ -1,6 +1,7 @@
 # the same result as dsgcn/configs/yaml/cfg_train_0.7_0.75.yaml
 
 import os.path as osp
+from functools import partial
 from proposals import generate_proposals
 
 # model
@@ -68,7 +69,7 @@ proposal_path = osp.join(prefix, 'cluster_proposals')
 train_data = dict(wo_weight=False,
                   feat_path=feat_path,
                   label_path=label_path,
-                  proposal_folders=generate_proposals(
+                  proposal_folders=partial(generate_proposals,
                       params=proposal_params,
                       prefix=prefix,
                       oprefix=proposal_path,
@@ -92,7 +93,7 @@ label_path = osp.join(prefix, 'labels', '{}.meta'.format(test_name))
 test_data = dict(wo_weight=False,
                  feat_path=feat_path,
                  label_path=label_path,
-                 proposal_folders=generate_proposals(
+                 proposal_folders=partial(generate_proposals,
                      params=proposal_params,
                      prefix=prefix,
                      oprefix=proposal_path,
