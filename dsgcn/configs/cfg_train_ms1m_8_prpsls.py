@@ -1,4 +1,4 @@
-# the same result as dsgcn/configs/yaml/cfg_train_0.7_0.75.yaml
+# the same result as dsgcn/configs/yaml/cfg_train_8_prpsl.yaml
 
 import os.path as osp
 from proposals import generate_proposals
@@ -45,13 +45,13 @@ metrics = ['pairwise', 'bcubed', 'nmi']
 prefix = './data'
 train_name = 'part0_train'
 test_name = 'part1_test'
-k = 80
 knn_method = 'faiss'
 step = 0.05
 minsz = 3
 maxsz = 300
 
-train_thresholds = [0.6, 0.65, 0.7, 0.75]
+k_th_lst = [(30, 0.6), (30, 0.7), (60, 0.6), (60, 0.7), (80, 0.6), (80, 0.65),
+            (80, 0.7), (80, 0.75)]
 proposal_params = [
     dict(
         k=k,
@@ -60,7 +60,7 @@ proposal_params = [
         th_step=step,
         minsz=minsz,
         maxsz=maxsz,
-    ) for th_knn in train_thresholds
+    ) for k, th_knn in k_th_lst
 ]
 feat_path = osp.join(prefix, 'features', '{}.bin'.format(train_name))
 label_path = osp.join(prefix, 'labels', '{}.meta'.format(train_name))
@@ -76,6 +76,7 @@ train_data = dict(wo_weight=False,
                       dim=model['kwargs']['feature_dim'],
                       no_normalize=False))
 
+k = 80
 test_thresholds = [0.7, 0.75]
 proposal_params = [
     dict(
