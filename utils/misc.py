@@ -203,7 +203,7 @@ def dump_data(ofn, data, force=False, verbose=False):
 
 
 def load_npz(fn):
-    return np.load(fn)['data']
+    return np.load(fn, allow_pickle=True)['data']
 
 
 def load_pkl(fn):

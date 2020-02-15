@@ -7,3 +7,4 @@ easydict
 python-igraph
 cairocffi
 fastcluster
+numpy>=1.18.1
