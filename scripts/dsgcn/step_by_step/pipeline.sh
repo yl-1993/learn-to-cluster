@@ -40,11 +40,11 @@ do
 done
 
 
-# test cluster det
+# # test cluster det
 python dsgcn/main.py \
     --stage det \
     --phase test \
-    --config dsgcn/configs/cfg_test_0.7_0.75.yaml \
+    --config dsgcn/configs/yaml/cfg_test_0.7_0.75.yaml \
     --work_dir $work_dir \
     --load_from data/pretrained_models/pretrained_gcn_d.pth.tar \
     --save_output
@@ -59,7 +59,22 @@ python ./post_process/deoverlap.py \
 
 
 # final evaluation
+pred_labels=$work_dir/pretrained_gcn_d_th_iou_1.0_pos_-1.0_pred_label.txt
+
+metric=pairwise
 python evaluation/evaluate.py \
     --metric $metric \
     --gt_labels $gt_labels \
-    --pred_labels $work_dir/pretrained_gcn_d_th_iou_1.0_pos_-1.0_pred_label.txt
+    --pred_labels $pred_labels
+
+metric=bcubed
+python evaluation/evaluate.py \
+    --metric $metric \
+    --gt_labels $gt_labels \
+    --pred_labels $pred_labels
+
+metric=nmi
+python evaluation/evaluate.py \
+    --metric $metric \
+    --gt_labels $gt_labels \
+    --pred_labels $pred_labels
