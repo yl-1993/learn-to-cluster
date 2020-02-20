@@ -1,4 +1,4 @@
-config=./dsgcn/configs/cfg_test_ms1m_2_prpsls.py
+config=./dsgcn/configs/cfg_test_ms1m_8_prpsls.py
 load_from=./data/pretrained_models/pretrained_gcn_d.pth.tar
 
 export CUDA_VISIBLE_DEVICES=0

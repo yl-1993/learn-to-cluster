@@ -1,5 +1,5 @@
 stage=det
-cfg_name=cfg_train_ms1m_4_prpsls
+cfg_name=cfg_train_ms1m_84_prpsls
 config=./dsgcn/configs/$cfg_name.py
 
 export CUDA_VISIBLE_DEVICES=0

@@ -1,7 +1,6 @@
-# the same result as dsgcn/configs/yaml/cfg_train_8_prpsl.yaml
-# On 1 TitanX, it takes around 10.5 hours for training
-# test on 2 proposal params: (pre, rec, fscore) = (96.4, 67.07, 79.1)
-# test on 20 proposal params: (pre, rec, fscore) = (96.38, 72.37, 82.67)
+# On 1 TitanX, it takes around 70 hours for training
+# test on 2 proposal params: (pre, rec, fscore) = (96.63, 66.89, 79.06)
+# test on 20 proposal params: (pre, rec, fscore) = (96.39, 79.57, 87.18)
 
 import os.path as osp
 from functools import partial
@@ -49,22 +48,43 @@ metrics = ['pairwise', 'bcubed', 'nmi']
 prefix = './data'
 train_name = 'part0_train'
 test_name = 'part1_test'
-knn_method = 'faiss'
-step = 0.05
-minsz = 3
-maxsz = 300
+knn_method = 'hnsw'
 
-k_th_lst = [(30, 0.6), (30, 0.7), (60, 0.6), (60, 0.7), (80, 0.6), (80, 0.65),
-            (80, 0.7), (80, 0.75)]
+k_lst_i0 = [30, 60, 80]
+step_i0 = 0.05
+minsz_i0 = 3
+maxsz_i0 = 300
+th_lst_i0 = [0.6, 0.65, 0.7, 0.75]
+
+k_th_lst_i0 = []
+for k in k_lst_i0:
+    for th in th_lst_i0:
+        k_th_lst_i0.append((k, th))
+
+th_i1 = 0.4
+step_i1 = 0.05
+minsz_i1 = 3
+maxsz_i1 = 500
+sv_minsz_i1 = 2
+k_maxsz_lst_i1 = [(2, 8), (2, 12), (2, 16), (3, 5), (3, 10), (4, 4)]
+
 proposal_params = [
-    dict(
-        k=k,
-        knn_method=knn_method,
-        th_knn=th_knn,
-        th_step=step,
-        minsz=minsz,
-        maxsz=maxsz,
-    ) for k, th_knn in k_th_lst
+    dict(k=k_i0,
+         knn_method=knn_method,
+         th_knn=th_i0,
+         th_step=step_i0,
+         minsz=minsz_i0,
+         maxsz=maxsz_i0,
+         iter1_params=[
+             dict(k=k_i1,
+                  knn_method=knn_method,
+                  th_knn=th_i1,
+                  th_step=step_i1,
+                  minsz=minsz_i1,
+                  maxsz=maxsz_i1,
+                  sv_minsz=sv_minsz_i1,
+                  sv_maxsz=sv_maxsz_i1) for k_i1, sv_maxsz_i1 in k_maxsz_lst_i1
+         ]) for k_i0, th_i0 in k_th_lst_i0
 ]
 feat_path = osp.join(prefix, 'features', '{}.bin'.format(train_name))
 label_path = osp.join(prefix, 'labels', '{}.meta'.format(train_name))
@@ -80,21 +100,41 @@ train_data = dict(wo_weight=False,
                                            dim=model['kwargs']['feature_dim'],
                                            no_normalize=False))
 
-k = 80
-test_thresholds = [0.7, 0.75]
+step_i0 = 0.05
+minsz_i0 = 3
+maxsz_i0 = 300
+th_iter0_lst_i0 = [(0.6, True), (0.7, True), (0.75, False)]
+
+th_i1 = 0.4
+step_i1 = 0.05
+minsz_i1 = 3
+maxsz_i1 = 500
+sv_minsz_i1 = 2
+k_maxsz_lst_i1 = [(2, 8), (2, 12), (2, 16), (3, 5), (3, 10), (4, 4)]
+
 proposal_params = [
-    dict(
-        k=k,
-        knn_method=knn_method,
-        th_knn=th_knn,
-        th_step=step,
-        minsz=minsz,
-        maxsz=maxsz,
-    ) for th_knn in test_thresholds
+    dict(k=k,
+         knn_method=knn_method,
+         th_knn=th_i0,
+         th_step=step_i0,
+         minsz=minsz_i0,
+         maxsz=maxsz_i0,
+         iter0=iter0,
+         iter1_params=[
+             dict(k=k_i1,
+                  knn_method=knn_method,
+                  th_knn=th_i1,
+                  th_step=step_i1,
+                  minsz=minsz_i1,
+                  maxsz=maxsz_i1,
+                  sv_minsz=sv_minsz_i1,
+                  sv_maxsz=sv_maxsz_i1) for k_i1, sv_maxsz_i1 in k_maxsz_lst_i1
+         ]) for th_i0, iter0 in th_iter0_lst_i0
 ]
+# use the same proposal params as training
 feat_path = osp.join(prefix, 'features', '{}.bin'.format(test_name))
 label_path = osp.join(prefix, 'labels', '{}.meta'.format(test_name))
-test_data = dict(wo_weight=False,
+test_data = dict(wo_weight=True,
                  feat_path=feat_path,
                  label_path=label_path,
                  proposal_folders=partial(generate_proposals,

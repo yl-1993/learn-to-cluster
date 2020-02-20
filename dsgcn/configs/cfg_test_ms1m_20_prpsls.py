@@ -1,4 +1,6 @@
 # the same result as dsgcn/configs/yaml/cfg_test_hnsw_2_i0_18_i1.yaml
+# On 1 TitanX, it takes around 40min for testing (exclude the proposal generation)
+# test on pretrained model: (pre, rec, fscore) = (94.54, 81.62, 87.61)
 
 import os.path as osp
 from proposals import generate_proposals

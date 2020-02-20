@@ -1,4 +1,7 @@
 # the same result as dsgcn/configs/yaml/cfg_train_0.7_0.75.yaml
+# On 1 TitanX, it takes around 7.5 hours for training
+# test on 2 proposal params: (pre, rec, fscore) = (96.64, 66.8, 79)
+# test on 20 proposal params: (pre, rec, fscore) = (96.59, 72.28, 82.69)
 
 import os.path as osp
 from functools import partial

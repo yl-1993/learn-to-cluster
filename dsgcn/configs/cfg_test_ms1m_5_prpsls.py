@@ -1,6 +1,6 @@
-# the same result as dsgcn/configs/yaml/cfg_test_hnsw_2_i0_6_i1.yaml
-# On 1 TitanX, it takes around 15min for testing (exclude the proposal generation)
-# test on pretrained model: (pre, rec, fscore) = (94.23, 79.69, 86.35)
+# the same result as dsgcn/configs/yaml/cfg_test_0.7_0.75.yaml
+# On 1 TitanX, it takes around 2hr for testing (exclude the proposal generation)
+# test on pretrained model: (pre, rec, fscore) = (94.62, 72.59, 82.15)
 
 import os.path as osp
 from proposals import generate_proposals
@@ -31,46 +31,30 @@ metrics = ['pairwise', 'bcubed', 'nmi']
 
 # data locations
 prefix = './data'
-test_name = 'part1_test'
+test_name = 'part9_test'
 k = 80
-knn_method = 'hnsw'
+knn_method = 'faiss'
 
-step_i0 = 0.05
-minsz_i0 = 3
-maxsz_i0 = 300
-th_iter0_lst_i0 = [(0.6, True), (0.7, True), (0.75, False)]
-
-th_i1 = 0.4
-step_i1 = 0.05
-minsz_i1 = 3
-maxsz_i1 = 500
-sv_minsz_i1 = 2
-k_maxsz_lst_i1 = [(2, 8), (3, 5)]
+step = 0.05
+minsz = 3
+maxsz = 300
+thresholds = [0.55, 0.6, 0.65, 0.7, 0.75]
 
 proposal_params = [
-    dict(k=k,
-         knn_method=knn_method,
-         th_knn=th_i0,
-         th_step=step_i0,
-         minsz=minsz_i0,
-         maxsz=maxsz_i0,
-         iter0=iter0,
-         iter1_params=[
-             dict(k=k_i1,
-                  knn_method=knn_method,
-                  th_knn=th_i1,
-                  th_step=step_i1,
-                  minsz=minsz_i1,
-                  maxsz=maxsz_i1,
-                  sv_minsz=sv_minsz_i1,
-                  sv_maxsz=sv_maxsz_i1) for k_i1, sv_maxsz_i1 in k_maxsz_lst_i1
-         ]) for th_i0, iter0 in th_iter0_lst_i0
+    dict(
+        k=k,
+        knn_method=knn_method,
+        th_knn=th_knn,
+        th_step=step,
+        minsz=minsz,
+        maxsz=maxsz,
+    ) for th_knn in thresholds
 ]
 
 feat_path = osp.join(prefix, 'features', '{}.bin'.format(test_name))
 label_path = osp.join(prefix, 'labels', '{}.meta'.format(test_name))
 proposal_path = osp.join(prefix, 'cluster_proposals')
-test_data = dict(wo_weight=True,
+test_data = dict(wo_weight=False,
                  feat_path=feat_path,
                  label_path=label_path,
                  proposal_folders=generate_proposals(
