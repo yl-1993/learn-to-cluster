@@ -28,7 +28,7 @@ def test_cluster_det(model, cfg, logger):
     if cfg.gpus == 1:
         data_loader = build_dataloader(dataset,
                                        processor,
-                                       cfg.batch_size_per_gpu,
+                                       cfg.test_batch_size_per_gpu,
                                        cfg.workers_per_gpu,
                                        train=False)
 

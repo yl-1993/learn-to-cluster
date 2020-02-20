@@ -25,6 +25,7 @@ lr_config = dict(
 
 iter_size = 1
 batch_size_per_gpu = 32
+test_batch_size_per_gpu = 256
 total_epochs = 30
 workflow = [('train', 1)]
 
