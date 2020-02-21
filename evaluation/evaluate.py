@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 import inspect
 import argparse
 import numpy as np
@@ -28,8 +27,10 @@ def evaluate(gt_labels, pred_labels, metric='pairwise'):
         gt_labels, gt_lb_set = _read_meta(gt_labels)
         pred_labels, pred_lb_set = _read_meta(pred_labels)
 
-        print('#inst: gt({}) vs pred({})'.format(len(gt_labels), len(pred_labels)))
-        print('#cls: gt({}) vs pred({})'.format(len(gt_lb_set), len(pred_lb_set)))
+        print('#inst: gt({}) vs pred({})'.format(len(gt_labels),
+                                                 len(pred_labels)))
+        print('#cls: gt({}) vs pred({})'.format(len(gt_lb_set),
+                                                len(pred_lb_set)))
 
     metric_func = metrics.__dict__[metric]
 
@@ -41,8 +42,8 @@ def evaluate(gt_labels, pred_labels, metric='pairwise'):
                                       TextColors.ENDC))
     else:
         ave_pre, ave_rec, fscore = result
-        print('{}ave_pre: {:.4f}, ave_rec: {:.4f}, fscore: {:.4f}{}'.\
-                format(TextColors.OKGREEN, ave_pre, ave_rec, fscore, TextColors.ENDC))
+        print('{}ave_pre: {:.4f}, ave_rec: {:.4f}, fscore: {:.4f}{}'.format(
+            TextColors.OKGREEN, ave_pre, ave_rec, fscore, TextColors.ENDC))
 
 
 if __name__ == '__main__':

@@ -64,6 +64,9 @@ def main():
     if not hasattr(cfg, 'stage'):
         cfg.stage = args.stage
 
+    if not hasattr(cfg, 'test_batch_size_per_gpu'):
+        cfg.test_batch_size_per_gpu = cfg.batch_size_per_gpu
+
     cfg.load_from = args.load_from
     cfg.resume_from = args.resume_from
 

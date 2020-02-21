@@ -113,31 +113,39 @@ def read_meta(fn_meta, start_pos=0, verbose=True):
 
 
 def write_meta(ofn, idx2lb, inst_num=None):
-    print('save label to', ofn)
     if inst_num is None:
         inst_num = max(idx2lb.keys()) + 1
     cls_num = len(set(idx2lb.values()))
-    with open(ofn, 'w') as of:
-        current_lb = 0
-        discard_lb = 0
-        map2newlb = {}
-        for idx in range(inst_num):
-            if idx in idx2lb:
-                lb = idx2lb[idx]
-                if lb in map2newlb:
-                    new_lb = map2newlb[lb]
-                else:
-                    new_lb = current_lb
-                    map2newlb[lb] = new_lb
-                    current_lb += 1
+
+    idx2newlb = {}
+    current_lb = 0
+    discard_lb = 0
+    map2newlb = {}
+    for idx in range(inst_num):
+        if idx in idx2lb:
+            lb = idx2lb[idx]
+            if lb in map2newlb:
+                newlb = map2newlb[lb]
             else:
-                new_lb = cls_num + discard_lb
-                discard_lb += 1
-            of.write(str(new_lb) + '\n')
+                newlb = current_lb
+                map2newlb[lb] = newlb
+                current_lb += 1
+        else:
+            newlb = cls_num + discard_lb
+            discard_lb += 1
+        idx2newlb[idx] = newlb
     assert current_lb == cls_num, '{} vs {}'.format(current_lb, cls_num)
 
     print('#discard: {}, #lbs: {}'.format(discard_lb, current_lb))
     print('#inst: {}, #class: {}'.format(inst_num, cls_num))
+    if ofn is not None:
+        print('save label to', ofn)
+        with open(ofn, 'w') as of:
+            for idx in range(inst_num):
+                of.write(str(idx2newlb[idx]) + '\n')
+
+    pred_labels = intdict2ndarray(idx2newlb)
+    return pred_labels
 
 
 def write_feat(ofn, features):
@@ -179,9 +187,11 @@ def dump2pkl(ofn, data, force=False):
         pickle.dump(data, of)
 
 
-def dump_data(ofn, data, force=False):
+def dump_data(ofn, data, force=False, verbose=False):
     if os.path.exists(ofn) and not force:
-        print('{} already exists. Set force=True to overwrite.'.format(ofn))
+        if verbose:
+            print(
+                '{} already exists. Set force=True to overwrite.'.format(ofn))
         return
     mkdir_if_no_exists(ofn)
     if ofn.endswith('.json'):
@@ -193,7 +203,7 @@ def dump_data(ofn, data, force=False):
 
 
 def load_npz(fn):
-    return np.load(fn)['data']
+    return np.load(fn, allow_pickle=True)['data']
 
 
 def load_pkl(fn):

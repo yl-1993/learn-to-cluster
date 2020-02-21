@@ -209,8 +209,13 @@ def _build_model(gcn_type):
     return __gcn_type__[gcn_type]
 
 
-def dsgcn(feature_dim, hidden_dims=[], featureless=True, \
-        gcn_type='gcn', reduce_method='max', dropout=0.5, num_classes=1):
+def dsgcn(feature_dim,
+          hidden_dims=[],
+          featureless=True,
+          gcn_type='gcn',
+          reduce_method='max',
+          dropout=0.5,
+          num_classes=1):
     model = _build_model(gcn_type)
     return model(planes=hidden_dims,
                  feature_dim=feature_dim,

@@ -14,7 +14,7 @@ log_config:
     interval: 100
 
 test_data:
-    wo_weight: False
+    wo_weight: True
     feat_path: ./data/features/part1_test.bin
     proposal_folders:
         - ./data/cluster_proposals/part1_test/faiss_k_80_th_0.7_step_0.05_minsz_3_maxsz_300_iter_0/proposals/

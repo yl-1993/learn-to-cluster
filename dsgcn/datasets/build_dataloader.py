@@ -6,7 +6,8 @@ from mmcv.runner import get_dist_info
 from torch.utils.data import DataLoader
 from torch.utils.data.dataloader import default_collate
 
-from dsgcn.datasets.sampler import DistributedSampler, DistributedSequentialSampler
+from dsgcn.datasets.sampler import (DistributedSampler,
+                                    DistributedSequentialSampler)
 
 
 def collate_graphs(batch):
@@ -15,7 +16,6 @@ def collate_graphs(batch):
         feat, adj, lb = zip(*batch)
         sizes = [f.shape[0] for f in feat]
         max_size = max(sizes)
-        dim = feat[0].shape[1]
         lb = torch.from_numpy(np.array(lb))
         # pad to [X, 0]
         pad_feat = [

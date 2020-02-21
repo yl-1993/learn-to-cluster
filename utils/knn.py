@@ -3,9 +3,10 @@
 
 import os
 import math
-import argparse
 import numpy as np
 import multiprocessing as mp
+from tqdm import tqdm
+
 from utils import (load_data, dump_data, mkdir_if_no_exists, Timer)
 from .search import faiss_search_knn
 
@@ -28,8 +29,8 @@ def knns_recall(nbrs, idx2lb, lb2idxs):
                 cnt += 1
             s = set(idxs) & set(n)
             recs += [1. * len(s) / len(idxs)]
-        print('there are {} / {} = {:.3f} isolated anchors.'\
-                .format(cnt, len(nbrs), 1. * cnt / len(nbrs)))
+        print('there are {} / {} = {:.3f} isolated anchors.'.format(
+            cnt, len(nbrs), 1. * cnt / len(nbrs)))
     recall = np.mean(recs)
     return recall
 
@@ -108,8 +109,8 @@ def fast_knns2spmat(knns, k, th_sim=0.7, use_sim=False, fill_value=None):
         knns = np.array(knns)
     nbrs = knns[:, 0, :]
     dists = knns[:, 1, :]
-    assert -eps <= dists.min() <= dists.max() <= 1 + eps, "min: {}, max: {}".format(
-        dists.min(), dists.max())
+    assert -eps <= dists.min() <= dists.max(
+    ) <= 1 + eps, "min: {}, max: {}".format(dists.min(), dists.max())
     if use_sim:
         sims = 1. - dists
     else:
@@ -162,7 +163,12 @@ def knns2sub_spmat(idxs, knns, th_sim=0.7, use_sim=False):
     return spmat
 
 
-def build_knns(knn_prefix, feats, knn_method, k, num_process=None, is_rebuild=False):
+def build_knns(knn_prefix,
+               feats,
+               knn_method,
+               k,
+               num_process=None,
+               is_rebuild=False):
     knn_prefix = os.path.join(knn_prefix, '{}_k_{}'.format(knn_method, k))
     mkdir_if_no_exists(knn_prefix)
     knn_path = knn_prefix + '.npz'
@@ -172,13 +178,19 @@ def build_knns(knn_prefix, feats, knn_method, k, num_process=None, is_rebuild=Fa
             if knn_method == 'hnsw':
                 index = knn_hnsw(feats, k, index_path)
             elif knn_method == 'faiss':
-                index = knn_faiss(feats, k, index_path, omp_num_threads=num_process)
+                index = knn_faiss(feats,
+                                  k,
+                                  index_path,
+                                  omp_num_threads=num_process)
             elif knn_method == 'faiss_gpu':
-                index = knn_faiss_gpu(feats, k, index_path, num_process=num_process)
+                index = knn_faiss_gpu(feats,
+                                      k,
+                                      index_path,
+                                      num_process=num_process)
             else:
-                raise KeyError('Unsupported method({}). \
-                        Only support hnsw and faiss currently'.format(
-                    knn_method))
+                raise KeyError(
+                    'Only support hnsw and faiss currently ({}).'.format(
+                        knn_method))
             knns = index.get_knns()
         with Timer('dump knns to {}'.format(knn_path)):
             dump_data(knn_path, knns, force=True)
@@ -211,8 +223,8 @@ class knn():
         # TODO: optimize the filtering process by numpy
         # nproc = mp.cpu_count()
         nproc = 1
-        with Timer('filter edges by th {} (CPU={})'.\
-                format(th, nproc), self.verbose):
+        with Timer('filter edges by th {} (CPU={})'.format(th, nproc),
+                   self.verbose):
             self.th = th
             self.th_knns = []
             tot = len(self.knns)
@@ -236,8 +248,9 @@ class knn_brute_force(knn):
             nbrs = np.argpartition(-sim, kth=k)[:, :k]
             idxs = np.array([i for i in range(nbrs.shape[0])])
             dists = 1 - sim[idxs.reshape(-1, 1), nbrs]
-            self.knns = [(np.array(nbr, dtype=np.int32), np.array(dist, dtype=np.float32)) \
-                            for nbr, dist in zip(nbrs, dists)]
+            self.knns = [(np.array(nbr, dtype=np.int32),
+                          np.array(dist, dtype=np.float32))
+                         for nbr, dist in zip(nbrs, dists)]
 
 
 class knn_hnsw(knn):
@@ -245,14 +258,17 @@ class knn_hnsw(knn):
         import nmslib
         self.verbose = verbose
         with Timer('[hnsw] build index', verbose):
-            """ higher ef leads to better accuracy, but slower search
-                higher M leads to higher accuracy/run_time at fixed ef, but consumes more memory
-            """
+            ''' higher ef leads to better accuracy, but slower search
+                higher M leads to higher accuracy/run_time at fixed ef,
+                but consumes more memory
+            '''
             # space_params = {
             #     'ef': 100,
             #     'M': 16,
             # }
-            # index = nmslib.init(method='hnsw', space='cosinesimil', space_params=space_params)
+            # index = nmslib.init(method='hnsw',
+            #                     space='cosinesimil',
+            #                     space_params=space_params)
             index = nmslib.init(method='hnsw', space='cosinesimil')
             if index_path != '' and os.path.isfile(index_path):
                 index.loadIndex(index_path)
@@ -327,8 +343,9 @@ class knn_faiss(knn):
                 self.knns = np.load(knn_ofn)['data']
             else:
                 sims, nbrs = index.search(feats, k=k)
-                self.knns = [(np.array(nbr, dtype=np.int32), 1 - np.array(sim, dtype=np.float32)) \
-                                for nbr, sim in zip(nbrs, sims)]
+                self.knns = [(np.array(nbr, dtype=np.int32),
+                              1 - np.array(sim, dtype=np.float32))
+                             for nbr, sim in zip(nbrs, sims)]
 
 
 class knn_faiss_gpu(knn):
@@ -357,8 +374,9 @@ class knn_faiss_gpu(knn):
                                                sort=sort,
                                                verbose=False)
 
-                self.knns = [(np.array(nbr, dtype=np.int32), np.array(dist, dtype=np.float32)) \
-                                for nbr, dist in zip(nbrs, dists)]
+                self.knns = [(np.array(nbr, dtype=np.int32),
+                              np.array(dist, dtype=np.float32))
+                             for nbr, dist in zip(nbrs, dists)]
 
 
 if __name__ == '__main__':

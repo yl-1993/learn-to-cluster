@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import numpy as np
 from proposals.graph import graph_clustering_dynamic_th
 from utils import filter_knns
 

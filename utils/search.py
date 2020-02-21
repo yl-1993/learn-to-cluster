@@ -1,5 +1,4 @@
 import gc
-import numpy as np
 from tqdm import tqdm
 
 import torch
@@ -41,9 +40,17 @@ def precise_dist_share_mem(feat,
     for pi in range(num_process):
         sid = pi * num_per_proc
         eid = min(sid + num_per_proc, num)
-        p = mp.Process(target=bmm, kwargs={'feat':feat, 'nbrs':nbrs,
-            'dist':dist, 'sid':sid, 'eid':eid, 'sort':sort, \
-            'process_unit':process_unit, 'verbose':verbose, })
+        p = mp.Process(target=bmm,
+                       kwargs={
+                           'feat': feat,
+                           'nbrs': nbrs,
+                           'dist': dist,
+                           'sid': sid,
+                           'eid': eid,
+                           'sort': sort,
+                           'process_unit': process_unit,
+                           'verbose': verbose,
+                       })
         p.start()
         processes.append(p)
     for p in processes:

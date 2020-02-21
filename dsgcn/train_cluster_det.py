@@ -30,7 +30,10 @@ def train_cluster_det(model, cfg, logger):
     # prepare data loaders
     for k, v in cfg.model['kwargs'].items():
         setattr(cfg.train_data, k, v)
+
     dataset = build_dataset(cfg.train_data)
+    assert not dataset.ignore_label, 'Please specify label_path for training'
+
     processor = build_processor(cfg.stage)
     data_loaders = [
         build_dataloader(dataset,

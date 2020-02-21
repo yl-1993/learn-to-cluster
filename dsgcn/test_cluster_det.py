@@ -8,11 +8,14 @@ from mmcv.runner import load_checkpoint
 from mmcv.parallel import MMDataParallel
 
 from dsgcn.datasets import build_dataset, build_processor, build_dataloader
+from post_process import deoverlap
+from evaluation import evaluate
 
 
 def test_cluster_det(model, cfg, logger):
     if cfg.load_from:
-        load_checkpoint(model, cfg.load_from)
+        logger.info('load pretrained model from: {}'.format(cfg.load_from))
+        load_checkpoint(model, cfg.load_from, strict=True, logger=logger)
 
     for k, v in cfg.model['kwargs'].items():
         setattr(cfg.test_data, k, v)
@@ -20,12 +23,12 @@ def test_cluster_det(model, cfg, logger):
     processor = build_processor(cfg.stage)
 
     losses = []
-    output_probs = []
+    pred_scores = []
 
     if cfg.gpus == 1:
         data_loader = build_dataloader(dataset,
                                        processor,
-                                       cfg.batch_size_per_gpu,
+                                       cfg.test_batch_size_per_gpu,
                                        cfg.workers_per_gpu,
                                        train=False)
 
@@ -39,7 +42,7 @@ def test_cluster_det(model, cfg, logger):
                 output, loss = model(data, return_loss=True)
                 losses += [loss.item()]
                 if i % cfg.log_config.interval == 0:
-                    if dataset.ignore_meta:
+                    if dataset.ignore_label:
                         logger.info('[Test] Iter {}/{}'.format(
                             i, len(data_loader)))
                     else:
@@ -48,14 +51,15 @@ def test_cluster_det(model, cfg, logger):
                 if cfg.save_output:
                     output = output.view(-1)
                     prob = output.data.cpu().numpy()
-                    output_probs.append(prob)
+                    pred_scores.append(prob)
     else:
         raise NotImplementedError
 
-    if not dataset.ignore_meta:
+    if not dataset.ignore_label:
         avg_loss = sum(losses) / len(losses)
         logger.info('[Test] Overall Loss {:.4f}'.format(avg_loss))
 
+    # save predicted scores
     if cfg.save_output:
         fn = os.path.basename(cfg.load_from)
         opath = os.path.join(cfg.work_dir, fn[:fn.rfind('.pth')] + '.npz')
@@ -63,6 +67,18 @@ def test_cluster_det(model, cfg, logger):
             'tot_inst_num': dataset.inst_num,
             'proposal_folders': cfg.test_data.proposal_folders,
         }
-        print('dump output to {}'.format(opath))
-        output_probs = np.concatenate(output_probs).ravel()
-        np.savez_compressed(opath, data=output_probs, meta=meta)
+        print('dump pred_score to {}'.format(opath))
+        pred_scores = np.concatenate(pred_scores).ravel()
+        np.savez_compressed(opath, data=pred_scores, meta=meta)
+
+    # de-overlap
+    proposals = [fn_node for fn_node, _ in dataset.lst]
+    pred_labels = deoverlap(pred_scores, proposals, dataset.inst_num,
+                            cfg.th_pos, cfg.th_iou)
+
+    # evaluation
+    if not dataset.ignore_label:
+        print('==> evaluation')
+        gt_labels = dataset.labels
+        for metric in cfg.metrics:
+            evaluate(gt_labels, pred_labels, metric)

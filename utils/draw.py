@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+import random
 from igraph import Graph, plot
+
+from utils import load_data
 
 
 def draw_graph(ofolder, idx2lb, g_label, idx, prob):
@@ -38,7 +42,7 @@ def draw_graph(ofolder, idx2lb, g_label, idx, prob):
              ograph_folder, g_label, idx, prob, w_mean, w_min, w_max))
 
 
-def draw_graphs(err, idx2lb, draw_err_num=10):
+def draw_graphs(err, idx2lb, gt_folder, draw_err_num=10):
     for lb in err:
         lst = err[lb]
         random.shuffle(lst)

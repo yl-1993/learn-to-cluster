@@ -23,7 +23,7 @@ class ClusterDetProcessor(object):
         edge = load_data(fn_edge)
         assert len(node) > 1, '#node of {}: {}'.format(fn_node, len(node))
         # take majority as label of the graph
-        if not self.dataset.ignore_meta:
+        if not self.dataset.ignore_label:
             lb2cnt = {}
             for idx in node:
                 if idx not in self.dataset.idx2lb:
@@ -80,6 +80,5 @@ class ClusterDetProcessor(object):
         ret = self.build_graph(fn_node, fn_edge)
         assert ret is not None
         vertices, adj, label = ret
-        return vertices.astype(self.dtype), \
-               adj.astype(self.dtype), \
-               np.array(label, dtype=self.dtype)
+        return vertices.astype(self.dtype), adj.astype(self.dtype), np.array(
+            label, dtype=self.dtype)

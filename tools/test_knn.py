@@ -3,7 +3,6 @@
 
 import os
 import argparse
-import numpy as np
 
 from utils import (BasicDataset, build_knns, knns2spmat, fast_knns2spmat,
                    is_spmat_eq, Timer)

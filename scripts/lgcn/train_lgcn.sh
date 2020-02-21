@@ -1,4 +1,5 @@
-config=lgcn/configs/cfg_ms1m.py
+cfg_name=cfg_train_ms1m
+config=lgcn/configs/$cfg_name.py
 
 export CUDA_VISIBLE_DEVICES=0
 export PYTHONPATH=.
@@ -9,7 +10,7 @@ python lgcn/main.py \
     --phase 'train'
 
 # test
-load_from=data/work_dir/cfg_ms1m/latest.pth
+load_from=data/work_dir/$cfg_name/latest.pth
 python lgcn/main.py \
     --config $config \
     --phase 'test' \

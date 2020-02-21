@@ -67,7 +67,7 @@ You can train your own feature extractor with the list.
 
 
 
-## Pipeline
+## Inference
 
 Fetch code & Create soft link
 ```bash
@@ -76,58 +76,27 @@ cd learn-to-cluster
 ln -s xxx/data data
 ```
 
-Run
+Test cluster detection
 ```bash
-sh scripts/pipeline.sh
+sh scripts/dsgcn/test_cluster_det.sh
 ```
 
-## Step-by-step
-
-The `scripts/pipeline.sh` can be decomposed into following steps:
-
-1. Cluster Proposals
-generate multi-scale proposals with different `k`, `threshold` or `maxsz`.
+*[Optional]* GCN-D Upper Bound
+It yields the performance when accuracy of GCN-D is 100%.
 ```bash
-sh scripts/generate_proposals.sh
-```
-
-2. Cluster Detection
-```bash
-sh scripts/test_cluster_det.sh
-```
-
-3. Deoverlap
-```bash
-sh scripts/deoverlap.sh [pred_score]
-```
-
-4. Evaluation
-```bash
-sh scripts/evaluate.sh [gt_label] [pred_label]
-```
-
-5. *[Optional]* GCN Upper Bound
-It yields the performance when accuracy of GCN is 100%.
-```bash
-sh scripts/gcn_upper_bound.sh
+sh scripts/dsgcn/step_by_step/gcn_d_upper_bound.sh
 ```
 
 ## Train
-We follow the apis of [mmdet](https://github.com/open-mmlab/mmdetection/tree/master/mmdet/apis) to construct our training and testing.
-Checkout `dsgcn/train_cluster_det.py` and [mmdet](https://github.com/open-mmlab/mmdetection/) for more details.
 
-1. Generate proposals on part0_train
-Modify `name` to `part0_train` and generate proposals.
+Train cluster detection
 ```bash
-sh scripts/generate_proposals.sh
+sh scripts/dsgcn/train_cluster_det.sh
 ```
+Users can choose different proposals in `dsgcn/configs` or design your own proposals for training and testing.
 
-2. Train cluster detection (gcn-d)
-Edit `dsgcn/configs/cfg_train_0.7_0.75.yaml` to use approriate proposals.
-Generally, more proposals, better performance.
-```bash
-sh scripts/train_cluster_det.sh
-```
+Generally, more proposals leads to better results.
+You can control the number of proposals to strike a balance between time and performance.
 
 
 ## Results on part1_test
@@ -141,15 +110,13 @@ sh scripts/train_cluster_det.sh
 | [DaskSpectral](https://ml.dask.org/clustering.html#spectral-clustering) (ncluster=8573, affinity='rbf') | 78.75 | 66.59 | 72.16 |
 | [CDP](https://github.com/XiaohangZhan/cdp) (single model, th=0.7)  | 80.19 | 70.47 | 75.02 |
 | [L-GCN](https://github.com/Zhongdao/gcn_clustering) (k_at_hop=[200, 10], active_conn=10, maxsz=300, step=0.6)  | 74.38 | 83.51 | 78.68 |
-| GCN-D (0.7, 0.75) | 95.41 | 67.79 | 79.26 |
-| GCN-D (0.7, 0.75) + iter1 (0.4, 2, 16) | 95.52 | 68.81 | 80.00 |
-| GCN-D (0.65, 0.7, 0.75) | 94.64 | 71.53 | 81.48 |
-| GCN-D (0.6, 0.65, 0.7, 0.75) | 94.60 | 72.52 | 82.10 |
-| GCN-D (hnsw, 2_i0, 6_i1) | 94.19 | 79.69 | 86.34 |
-| GCN-D (hnsw, 2_i0, 18_i1) | 94.54 | 81.62 | 87.61 |
+| GCN-D (2 prpsls) | 95.41 | 67.77 | 79.25 |
+| GCN-D (5 prpsls) | 94.62 | 72.59 | 82.15 |
+| GCN-D (8 prpsls) | 94.23 | 79.69 | 86.35 |
+| GCN-D (20 prplss) | 94.54 | 81.62 | 87.61 |
 
-Generally, more proposals leads to better results.
-You can control the number of proposals to strike a balance between time and performance.
+Note that the `prpsls` in above table indicate the number of parameters for generating proposals, rather than the actual number of proposals.
+For example, `2 prpsls` generates 34578 proposals and `20 prpsls` generates 283552 proposals.
 
 
 ## Benchmarks
@@ -157,11 +124,40 @@ You can control the number of proposals to strike a balance between time and per
 `1, 3, 5, 7, 9` denotes different scales of clustering.
 Details can be found in [Face Clustering Benchmarks](https://github.com/yl-1993/learn-to-cluster/wiki/Face-Clustering-Benchmarks).
 
-| Methods | 1 | 3 | 5 | 7 | 9 |
-| ------- |:-:|:-:|:-:|:-:|:-:|
+| Pairwise F-score | 1 | 3 | 5 | 7 | 9 |
+| ---------------- |:-:|:-:|:-:|:-:|:-:|
 | CDP (single model, th=0.7) | 75.02 | 70.75 | 69.51 | 68.62 | 68.06 |
-| GCN-D (0.7, 0.75) | 79.26 | 75.72 | 73.90 | 72.62 | 71.63 |
-| GCN-D (0.6, 0.65, 0.7, 0.75) | 82.10 | 77.63 | 75.38 | 73.91 | 72.77 |
+| LGCN | 78.68 | 75.83 | 74.29 | 73.7 | 72.99 |
+| GCN-D (2 prpsls) | 79.25 | 75.72 | 73.90 | 72.62 | 71.63 |
+| GCN-D (5 prpsls) | 82.15 | 77.71 | 75.5 | 73.99 | 72.89 |
+| GCN-D (8 prpsls) | 86.35 | 82.41 | 80.32 | 78.98 | 77.87 |
+| GCN-D (20 prpsls) | 87.61 | 83.76 | 81.62 | 80.33 | 79.21 |
+
+| BCubed F-score | 1 | 3 | 5 | 7 | 9 |
+| -------------- |:-:|:-:|:-:|:-:|:-:|
+| CDP (single model, th=0.7) | 78.7 | 75.82 | 74.58 | 73.62 | 72.92 |
+| LGCN | 84.37 | 81.61 | 80.11 | 79.33 | 78.6 |
+| GCN-D (2 prpsls) | 78.89 | 76.05 | 74.65 | 73.57 | 72.77 |
+| GCN-D (5 prpsls) | 82.56 | 78.33 | 76.39 | 75.02 | 74.04 |
+| GCN-D (8 prpsls) | 86.73 | 83.01 | 81.1 | 79.84 | 78.86 |
+| GCN-D (20 prpsls) | 87.76 | 83.99 | 82 | 80.72 | 79.71 |
+
+| NMI | 1 | 3 | 5 | 7 | 9 |
+| --- |:-:|:-:|:-:|:-:|:-:|
+| CDP (single model, th=0.7) | 94.69 | 94.62 | 94.63 | 94.62 | 94.61 |
+| LGCN | 96.12 | 95.78 | 95.63 | 95.57 | 95.49 |
+| GCN-D (2 prpsls) | 94.68 | 94.66 | 94.63 | 94.59 | 94.55 |
+| GCN-D (5 prpsls) | 95.64 | 95.19 | 95.03 | 94.91 | 94.83 |
+| GCN-D (8 prpsls) | 96.75 | 96.29 | 96.08 | 95.95 | 95.85 |
+| GCN-D (20 prpsls) | 97.04 | 96.55 | 96.33 | 96.18 | 96.07 |
+
+## Face Recognition
+
+For training face recognition and feature extraction, you may use any frameworks below, including but not limited to:
+
+[https://github.com/yl-1993/hfsoftmax](https://github.com/yl-1993/hfsoftmax)
+
+[https://github.com/XiaohangZhan/face_recognition_framework](https://github.com/XiaohangZhan/face_recognition_framework)
 
 
 ## Citation
