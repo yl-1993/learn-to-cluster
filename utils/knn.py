@@ -8,7 +8,7 @@ import multiprocessing as mp
 from tqdm import tqdm
 
 from utils import (load_data, dump_data, mkdir_if_no_exists, Timer)
-from .search import faiss_search_knn
+from .faiss_search import faiss_search_knn
 
 __all__ = [
     'knn_brute_force', 'knn_hnsw', 'knn_faiss', 'knn_faiss_gpu', 'knns2spmat',

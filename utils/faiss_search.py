@@ -1,15 +1,13 @@
 import gc
 from tqdm import tqdm
 
-import torch
-import torch.multiprocessing as mp
-
 from .faiss_gpu import faiss_search_approx_knn
 
 __all__ = ['faiss_search_knn']
 
 
 def precise_dist(feat, nbrs, num_process=4, sort=True, verbose=False):
+    import torch
     feat_share = torch.from_numpy(feat).share_memory_()
     nbrs_share = torch.from_numpy(nbrs).share_memory_()
     dist_share = torch.zeros_like(nbrs_share).share_memory_()
@@ -33,6 +31,7 @@ def precise_dist_share_mem(feat,
                            sort=True,
                            process_unit=4000,
                            verbose=False):
+    from torch import multiprocessing as mp
     num, _ = feat.shape
     num_per_proc = int(num / num_process) + 1
 
@@ -65,7 +64,7 @@ def bmm(feat,
         sort=True,
         process_unit=4000,
         verbose=False):
-
+    import torch
     _, cols = dist.shape
     batch_sim = torch.zeros((eid - sid, cols), dtype=torch.float32)
     for s in tqdm(range(sid, eid, process_unit),
@@ -103,7 +102,7 @@ def faiss_search_knn(feat,
                                           verbose=verbose)
 
     if is_precise:
-        print('compute precise dist among k nearest neighbors')
+        print('compute precise dist among k={} nearest neighbors'.format(k))
         dists, nbrs = precise_dist(feat,
                                    nbrs,
                                    num_process=num_process,

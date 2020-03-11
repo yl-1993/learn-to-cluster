@@ -12,19 +12,13 @@ class faiss_index_wrapper():
     def __init__(self,
                  target,
                  nprobe=128,
-                 num_gpu=None,
                  index_factory_str=None,
                  verbose=False,
                  mode='proxy',
                  using_gpu=True):
         self._res_list = []
 
-        found_gpu = len(os.environ['CUDA_VISIBLE_DEVICES'].split(","))
-        if found_gpu == 0:
-            raise RuntimeError(
-                "No GPU found. Please export CUDA_VISIBLE_DEVICES")
-        if num_gpu is None or num_gpu > found_gpu:
-            num_gpu = found_gpu
+        num_gpu = faiss.get_num_gpus()
         print('[faiss gpu] #GPU: {}'.format(num_gpu))
 
         size, dim = target.shape
@@ -48,7 +42,13 @@ class faiss_index_wrapper():
                     res, i, cpu_index, co) if using_gpu else cpu_index
                 index.addIndex(sub_index)
         elif mode == 'shard':
-            raise NotImplementedError
+            co = faiss.GpuMultipleClonerOptions()
+            co.useFloat16 = True
+            co.usePrecomputed = False
+            co.shard = True
+            index = faiss.index_cpu_to_all_gpus(cpu_index,
+                                                co,
+                                                ngpu=num_gpu)
         else:
             raise KeyError("Unknown index mode")
 
@@ -99,12 +99,10 @@ def faiss_search_approx_knn(query,
                             k,
                             nprobe=128,
                             bs=int(1e6),
-                            num_gpu=None,
                             index_factory_str=None,
                             verbose=False):
     index = faiss_index_wrapper(target,
                                 nprobe=nprobe,
-                                num_gpu=num_gpu,
                                 index_factory_str=index_factory_str,
                                 verbose=verbose)
     dists, nbrs = batch_search(index, query, k=k, bs=bs, verbose=verbose)
