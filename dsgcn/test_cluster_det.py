@@ -61,7 +61,10 @@ def test_cluster_det(model, cfg, logger):
 
     # save predicted scores
     if cfg.save_output:
-        fn = os.path.basename(cfg.load_from)
+        if cfg.load_from:
+            fn = os.path.basename(cfg.load_from)
+        else:
+            fn = 'random'
         opath = os.path.join(cfg.work_dir, fn[:fn.rfind('.pth')] + '.npz')
         meta = {
             'tot_inst_num': dataset.inst_num,
