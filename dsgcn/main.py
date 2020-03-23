@@ -27,6 +27,10 @@ def parse_args():
     parser.add_argument('--resume_from',
                         default=None,
                         help='the checkpoint file to resume from')
+    parser.add_argument('--pred_iou_score',
+                        type=str,
+                        default=None,
+                        help='predicted iou for segmentation post-process')
     parser.add_argument(
         '--gpus',
         type=int,
@@ -69,6 +73,8 @@ def main():
 
     cfg.load_from = args.load_from
     cfg.resume_from = args.resume_from
+
+    cfg.pred_iou_score = args.pred_iou_score
 
     cfg.gpus = args.gpus
     cfg.distributed = args.distributed
