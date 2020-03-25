@@ -31,6 +31,10 @@ def parse_args():
                         type=str,
                         default=None,
                         help='predicted iou for segmentation post-process')
+    parser.add_argument('--pred_iop_score',
+                        type=str,
+                        default=None,
+                        help='predicted iop for filtering proposals for seg')
     parser.add_argument(
         '--gpus',
         type=int,
@@ -75,6 +79,7 @@ def main():
     cfg.resume_from = args.resume_from
 
     cfg.pred_iou_score = args.pred_iou_score
+    cfg.pred_iop_score = args.pred_iop_score
 
     cfg.gpus = args.gpus
     cfg.distributed = args.distributed

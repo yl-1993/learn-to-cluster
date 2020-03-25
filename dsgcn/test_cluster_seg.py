@@ -23,6 +23,9 @@ def test_cluster_seg(model, cfg, logger):
 
     for k, v in cfg.model['kwargs'].items():
         setattr(cfg.test_data, k, v)
+
+    setattr(cfg.test_data, 'pred_iop_score', cfg.pred_iop_score)
+
     dataset = build_dataset(cfg.test_data)
     processor = build_processor(cfg.stage)
 
