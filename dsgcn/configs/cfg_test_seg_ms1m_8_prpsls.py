@@ -1,5 +1,7 @@
 # On 1 TitanX, it takes around 5 min for testing (exclude the proposal generation)
-# test on pretrained model: (pre, rec, fscore) = (98.15, 79.16, 87.64)
+# metircs (pre, rec, pairwise fscore)
+# test on pretrained model (gt iop, 0.2-0.8): (98.12, 79.18, 87.64)
+# test on pretrained model (pred iop, 0.1-0.9): (97.93, 78.98, 87.44)
 
 import os.path as osp
 from functools import partial
@@ -83,8 +85,8 @@ test_data = dict(wo_weight=True,
                  use_random_seed=use_random_seed,
                  use_max_degree_seed=False,
                  featureless=featureless,
-                 th_iop_min=0.2,
-                 th_iop_max=0.8,
+                 th_iop_min=0.1,
+                 th_iop_max=0.9,
                  proposal_folders=partial(generate_proposals,
                                           params=proposal_params,
                                           prefix=prefix,
