@@ -31,6 +31,10 @@ or with scripts below:
 python tools/download_data.py
 ```
 
+If you have downloaded the data, you can download the pretrained gcn-d and gcn-s from
+[Google Drive](https://drive.google.com/file/d/1yC2FIAKSSJIgMYvOZy3aT4I3cyatAyQx/view?usp=sharing) or
+[BaiduYun](https://pan.baidu.com/s/1_owuUxPG-sjCoVhjXWCMQw) (passwd: r1dg).
+
 ```
 data
   ├── features
@@ -43,7 +47,9 @@ data
     ├── part0_train/faiss_k_80.npz # 5e4f6c06daf8d29c9b940a851f28a925
     ├── part1_test/faiss_k_80.npz  # d4a7f95b09f80b0167d893f2ca0f5be5
   ├── pretrained_models
-    ├── pretrained_gcn_d.pth.tar   # 213598e70ddbc50f5e3661a6191a8be1
+    ├── pretrained_gcn_d.pth       # 213598e70ddbc50f5e3661a6191a8be1
+    ├── pretrained_gcn_s.pth       # 3251d6e7d4f9178f504b02d8238726f7
+    ├── pretrained_gcn_d_iop.pth   # 314fba47b5156dcc91383ad611d5bd96
 ```
 
 Download entire benchmarks data (including above one) from
@@ -61,10 +67,18 @@ It can save a lot of time to search knn, especially in the large setting.
 [OneDrive](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155095455_link_cuhk_edu_hk/ET7lHxOXSjtDiMsgqzLK9LgBi_QW0WVzgZdv2UBzE1Bgzg?e=jZ7kCS).
 You can train your own feature extractor with the list.
 
+*[Optional]* Download MS-Celeb-1M data from
+[OneDrive](https://mycuhk-my.sharepoint.com/:f:/g/personal/1155095455_link_cuhk_edu_hk/ErY9MmAhmlZMvO9y9SagNOcBISISEdzBfJshn-poD84QPQ?e=PRRpBe).
+We re-align [MS1M-ArcFace](https://www.dropbox.com/s/wpx6tqjf0y5mf6r/faces_ms1m-refine-v2_112x112.zip?dl=0) with our own face alignment model.
+
+*[Optional]* Download Pretrained face recognition model from
+[GoogleDrive](https://drive.google.com/open?id=1eKsh7x-RUIHhIJ1R9AlUjsJdsdbh2qim).
+For using the model to extract features, please check the [code](https://github.com/yl-1993/hfsoftmax/tree/ltc)
+and use [sample data](https://drive.google.com/open?id=1VkZWZmBnaQlTaTNQSQXe-8q8Z8pNuI-D) to have a try.
+
 *[Optional]* Download YTBFace data from
 [GoogleDrive](https://drive.google.com/file/d/1hg3PQTOwyduLVyfgJ7qrN52o9QE35XM4/view?usp=sharing) or
 [OneDrive](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155095455_link_cuhk_edu_hk/EU7mfU9F6C9AtZ8SV7kM0yAB0MLx9rzh4nD4kT5_AHXGxg?e=O6Fik9).
-
 
 
 ## Inference
@@ -79,6 +93,13 @@ ln -s xxx/data data
 Test cluster detection
 ```bash
 sh scripts/dsgcn/test_cluster_det.sh
+```
+
+Test cluster segmentation
+```bash
+# predict iop and then conduct seg
+sh scripts/dsgcn/test_cluster_det_iop.sh
+sh scripts/dsgcn/test_cluster_seg.sh
 ```
 
 *[Optional]* GCN-D Upper Bound
@@ -114,6 +135,10 @@ You can control the number of proposals to strike a balance between time and per
 | GCN-D (5 prpsls) | 94.62 | 72.59 | 82.15 |
 | GCN-D (8 prpsls) | 94.23 | 79.69 | 86.35 |
 | GCN-D (20 prplss) | 94.54 | 81.62 | 87.61 |
+| GCN-D + GCN-S (2 prpsls) | 99.07 | 67.22 | 80.1 |
+| GCN-D + GCN-S (5 prpsls) | 98.84 | 72.01 | 83.31 |
+| GCN-D + GCN-S (8 prpsls) | 97.93 | 78.98 | 87.44 |
+| GCN-D + GCN-S (20 prplss) | 97.91 | 80.86 | 88.57 |
 
 Note that the `prpsls` in above table indicate the number of parameters for generating proposals, rather than the actual number of proposals.
 For example, `2 prpsls` generates 34578 proposals and `20 prpsls` generates 283552 proposals.
@@ -156,7 +181,6 @@ Details can be found in [Face Clustering Benchmarks](https://github.com/yl-1993/
 For training face recognition and feature extraction, you may use any frameworks below, including but not limited to:
 
 [https://github.com/yl-1993/hfsoftmax](https://github.com/yl-1993/hfsoftmax)
-
 [https://github.com/XiaohangZhan/face_recognition_framework](https://github.com/XiaohangZhan/face_recognition_framework)
 
 
