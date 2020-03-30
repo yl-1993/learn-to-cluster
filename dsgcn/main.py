@@ -20,6 +20,7 @@ def parse_args():
     parser.add_argument('--seed', type=int, default=42, help='random seed')
     parser.add_argument('--stage', choices=['det', 'seg'], default='det')
     parser.add_argument('--phase', choices=['test', 'train'], default='test')
+    parser.add_argument('--det_label', choices=['iou', 'iop'], default='iou')
     parser.add_argument('--work_dir', help='the dir to save logs and models')
     parser.add_argument('--load_from',
                         default=None,
@@ -82,6 +83,7 @@ def main():
     cfg.pred_iop_score = args.pred_iop_score
 
     cfg.gpus = args.gpus
+    cfg.det_label = args.det_label
     cfg.distributed = args.distributed
     cfg.save_output = args.save_output
 

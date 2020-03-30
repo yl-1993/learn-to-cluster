@@ -23,6 +23,7 @@ class ClusterDataset(object):
         self.th_iop_min = cfg.get('th_iop_min', None)
         self.th_iop_max = cfg.get('th_iop_max', None)
         self.wo_weight = cfg.get('wo_weight', False)
+        self.det_label = cfg.get('det_label', 'iou')
         self.use_random_seed = cfg.get('use_random_seed', True)
         self.use_max_degree_seed = cfg.get('use_max_degree_seed', False)
         self.pred_iop_score = cfg.get('pred_iop_score', '')

@@ -1,7 +1,7 @@
 import numpy as np
 
 from utils import load_data
-from proposals import compute_iou, get_majority
+from proposals import compute_iou, compute_iop, get_majority
 from .cluster_processor import ClusterProcessor
 
 
@@ -31,13 +31,19 @@ class ClusterDetProcessor(ClusterProcessor):
                 lb2cnt[lb] += 1
             gt_lb, _ = get_majority(lb2cnt)
             gt_node = self.dataset.lb2idxs[gt_lb]
-            iou = compute_iou(node, gt_node)
+            if self.dataset.det_label == 'iou':
+                label = compute_iou(node, gt_node)
+            elif self.dataset.det_label == 'iop':
+                label = compute_iop(node, gt_node)
+            else:
+                raise KeyError('Unknown det_label type: {}'.format(
+                    self.dataset.det_label))
         else:
-            iou = -1.
+            label = -1.
 
         adj, _, _ = self.build_adj(node, edge)
         features = self.build_features(node)
-        return features, adj, iou
+        return features, adj, label
 
     def __getitem__(self, idx):
         ''' each features is a NxD matrix,
