@@ -1,5 +1,5 @@
 # the same result as dsgcn/configs/yaml/cfg_test_0.7_0.75.yaml
-# On 1 TitanX, it takes around 8min for testing (exclude the proposal generation)
+# On 1 TitanX, it takes around 8 min for testing (exclude the proposal generation)
 # test on pretrained model: (pre, rec, fscore) = (95.41, 67.77, 79.25)
 
 import os.path as osp
