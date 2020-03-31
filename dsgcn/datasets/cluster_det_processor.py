@@ -1,24 +1,21 @@
 import numpy as np
 
 from utils import load_data
-from proposals import compute_iou, get_majority
+from proposals import compute_iou, compute_iop, get_majority
+from .cluster_processor import ClusterProcessor
 
 
-class ClusterDetProcessor(object):
+class ClusterDetProcessor(ClusterProcessor):
     def __init__(self, dataset):
-        self.dataset = dataset
-        self.dtype = np.float32
-
-    def __len__(self):
-        return self.dataset.size
+        super().__init__(dataset)
 
     def build_graph(self, fn_node, fn_edge):
-        """ build graph from graph file
+        ''' build graph from graph file
             - nodes: NxD,
                      each row represents the feature of a node
             - adj:   NxN,
                      a symmetric similarity matrix with self-connection
-        """
+        '''
         node = load_data(fn_node)
         edge = load_data(fn_edge)
         assert len(node) > 1, '#node of {}: {}'.format(fn_node, len(node))
@@ -34,51 +31,32 @@ class ClusterDetProcessor(object):
                 lb2cnt[lb] += 1
             gt_lb, _ = get_majority(lb2cnt)
             gt_node = self.dataset.lb2idxs[gt_lb]
-            iou = compute_iou(node, gt_node)
-        else:
-            iou = -1.
-        # compute adj
-        node = list(node)
-        abs2rel = {}
-        for i, n in enumerate(node):
-            abs2rel[n] = i
-        size = len(node)
-        adj = np.eye(size)
-        for e in edge:
-            w = 1.
-            if len(e) == 2:
-                e1, e2 = e
-            elif len(e) == 3:
-                e1, e2, dist = e
-                if not self.dataset.wo_weight:
-                    w = 1. - dist
+            if self.dataset.det_label == 'iou':
+                label = compute_iou(node, gt_node)
+            elif self.dataset.det_label == 'iop':
+                label = compute_iop(node, gt_node)
             else:
-                raise ValueError('Unknown length of e: {}'.format(e))
-            v1 = abs2rel[e1]
-            v2 = abs2rel[e2]
-            adj[v1][v2] = w
-            adj[v2][v1] = w
-        if self.dataset.featureless:
-            vertices = adj.sum(axis=1, keepdims=True)
-            vertices /= vertices.sum(axis=1, keepdims=True)
+                raise KeyError('Unknown det_label type: {}'.format(
+                    self.dataset.det_label))
         else:
-            vertices = self.dataset.features[node, :]
-        if self.dataset.is_norm_adj:
-            adj /= adj.sum(axis=1, keepdims=True)
-        return vertices, adj, iou
+            label = -1.
+
+        adj, _, _ = self.build_adj(node, edge)
+        features = self.build_features(node)
+        return features, adj, label
 
     def __getitem__(self, idx):
-        """ each vertices is a NxD matrix,
+        ''' each features is a NxD matrix,
             each adj is a NxN matrix,
             each label is a floating point number,
             which indicates the quality of the proposal.
-        """
+        '''
         if idx is None or idx > self.dataset.size:
             raise ValueError('idx({}) is not in the range of {}'.format(
                 idx, self.dataset.size))
         fn_node, fn_edge = self.dataset.lst[idx]
         ret = self.build_graph(fn_node, fn_edge)
         assert ret is not None
-        vertices, adj, label = ret
-        return vertices.astype(self.dtype), adj.astype(self.dtype), np.array(
+        features, adj, label = ret
+        return features.astype(self.dtype), adj.astype(self.dtype), np.array(
             label, dtype=self.dtype)

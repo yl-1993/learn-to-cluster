@@ -8,7 +8,6 @@ import pickle
 import random
 import numpy as np
 import scipy.sparse as sp
-import torch
 
 
 class TextColors:
@@ -40,6 +39,7 @@ class Timer():
 
 
 def set_random_seed(seed, cuda=False):
+    import torch
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)

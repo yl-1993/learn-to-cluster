@@ -16,7 +16,6 @@ def collate_graphs(batch):
         feat, adj, lb = zip(*batch)
         sizes = [f.shape[0] for f in feat]
         max_size = max(sizes)
-        lb = torch.from_numpy(np.array(lb))
         # pad to [X, 0]
         pad_feat = [
             F.pad(torch.from_numpy(f), (0, 0, 0, max_size - s), value=0)
@@ -35,7 +34,19 @@ def collate_graphs(batch):
         ]
         pad_feat = default_collate(pad_feat)
         pad_adj = default_collate(pad_adj)
-        return pad_feat, pad_adj, lb
+        lb_sizes = [_lb.size for _lb in lb]
+        lb_max_size = max(lb_sizes)
+        if lb_max_size > 1:
+            # pad to [X, -100]
+            # note that pad_value should be equal to ignore_index in NLLLoss
+            pad_lb = [
+                F.pad(torch.from_numpy(_lb), (0, lb_max_size - s), value=-100)
+                for _lb, s in zip(lb, lb_sizes)
+            ]
+            pad_lb = default_collate(pad_lb)
+        else:
+            pad_lb = torch.from_numpy(np.array(lb))
+        return pad_feat, pad_adj, pad_lb
     else:
         return default_collate(batch)
 

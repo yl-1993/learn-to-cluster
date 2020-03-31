@@ -6,7 +6,7 @@ import argparse
 import numpy as np
 
 from utils import read_meta, load_data
-from proposals.iou import compute_iou, compute_iop, compute_iog
+from proposals.metrics import compute_iou, compute_iop, compute_iog
 
 
 def get_majority(lb2cnt):

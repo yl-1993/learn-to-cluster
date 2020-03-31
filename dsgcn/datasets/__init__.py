@@ -1,9 +1,11 @@
 from .cluster_dataset import ClusterDataset
 from .cluster_det_processor import ClusterDetProcessor
+from .cluster_seg_processor import ClusterSegProcessor
 from .build_dataloader import build_dataloader
 
 __factory__ = {
     'det': ClusterDetProcessor,
+    'seg': ClusterSegProcessor,
 }
 
 

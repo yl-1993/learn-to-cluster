@@ -31,7 +31,7 @@ metrics = ['pairwise', 'bcubed', 'nmi']
 
 # data locations
 prefix = './data'
-test_name = 'part9_test'
+test_name = 'part1_test'
 k = 80
 knn_method = 'faiss'
 

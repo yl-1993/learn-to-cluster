@@ -45,9 +45,8 @@ class GraphConv(nn.Module):
         return output
 
     def __repr__(self):
-        return self.__class__.__name__ + ' (' \
-               + str(self.in_features) + ' -> ' \
-               + str(self.out_features) + ')'
+        return '{} ({} -> {})'.format(self.__class__.__name__,
+                                      self.in_features, self.out_features)
 
 
 class BasicBlock(nn.Module):
@@ -81,20 +80,26 @@ class GNN(nn.Module):
                  num_classes=1,
                  dropout=0.0,
                  reduce_method='max',
-                 stage='dev'):
+                 stage='det',
+                 use_random_seed=False,
+                 **kwargs):
         assert feature_dim > 0
         assert dropout >= 0 and dropout < 1
+        super(GNN, self).__init__()
         if featureless:
             self.inplanes = 1
         else:
             self.inplanes = feature_dim
         self.num_classes = num_classes
         self.reduce_method = reduce_method
-        super(GNN, self).__init__()
-        if stage == 'dev':
+        self.stage = stage
+        if self.stage == 'det':
             self.loss = torch.nn.MSELoss()
-        elif stage == 'seg':
-            self.loss = torch.nn.NLLLoss()
+        elif self.stage == 'seg':
+            self.num_classes = 2
+            if use_random_seed:
+                self.inplanes += 1
+            self.loss = torch.nn.NLLLoss(ignore_index=-100)
         else:
             raise KeyError('Unknown stage: {}'.format(stage))
 
@@ -115,7 +120,11 @@ class GNN(nn.Module):
     def forward(self, data, return_loss=False):
         x = self.extract(data[0], data[1])
         if return_loss:
-            loss = self.loss(x.view(-1), data[2])
+            label = data[2]
+            if self.stage == 'det':
+                loss = self.loss(x.view(-1), label)
+            elif self.stage == 'seg':
+                loss = self.loss(x, label)
             return x, loss
         else:
             return x
@@ -129,12 +138,13 @@ class GCN(GNN):
                  num_classes=1,
                  dropout=0.0,
                  reduce_method='max',
-                 stage='dev'):
+                 stage='det',
+                 **kwargs):
         super().__init__(planes, feature_dim, featureless, num_classes,
-                         dropout, reduce_method, stage)
+                         dropout, reduce_method, stage, **kwargs)
 
         self.layers = self._make_layer(BasicBlock, planes, dropout)
-        self.classifier = nn.Linear(self.inplanes, num_classes)
+        self.classifier = nn.Linear(self.inplanes, self.num_classes)
 
     def _make_layer(self, block, planes, dropout=0.0):
         layers = nn.ModuleList([])
@@ -174,11 +184,12 @@ class SGC(GNN):
                  num_classes=1,
                  dropout=0.0,
                  reduce_method='max',
-                 stage='dev'):
+                 stage='det',
+                 **kwargs):
         super().__init__(planes, feature_dim, featureless, num_classes,
-                         dropout, reduce_method, stage)
+                         dropout, reduce_method, stage, **kwargs)
 
-        assert stage == 'dev'
+        assert stage == 'det'
         self.degree = len(planes)
         self.classifier = nn.Linear(self.inplanes, num_classes)
 
@@ -211,15 +222,19 @@ def _build_model(gcn_type):
 
 def dsgcn(feature_dim,
           hidden_dims=[],
-          featureless=True,
+          featureless=False,
           gcn_type='gcn',
           reduce_method='max',
+          stage='det',
           dropout=0.5,
-          num_classes=1):
+          num_classes=1,
+          **kwargs):
     model = _build_model(gcn_type)
     return model(planes=hidden_dims,
                  feature_dim=feature_dim,
                  featureless=featureless,
                  reduce_method=reduce_method,
+                 stage=stage,
                  dropout=dropout,
-                 num_classes=num_classes)
+                 num_classes=num_classes,
+                 **kwargs)

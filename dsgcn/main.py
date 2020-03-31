@@ -20,6 +20,7 @@ def parse_args():
     parser.add_argument('--seed', type=int, default=42, help='random seed')
     parser.add_argument('--stage', choices=['det', 'seg'], default='det')
     parser.add_argument('--phase', choices=['test', 'train'], default='test')
+    parser.add_argument('--det_label', choices=['iou', 'iop'], default='iou')
     parser.add_argument('--work_dir', help='the dir to save logs and models')
     parser.add_argument('--load_from',
                         default=None,
@@ -27,6 +28,14 @@ def parse_args():
     parser.add_argument('--resume_from',
                         default=None,
                         help='the checkpoint file to resume from')
+    parser.add_argument('--pred_iou_score',
+                        type=str,
+                        default=None,
+                        help='predicted iou for segmentation post-process')
+    parser.add_argument('--pred_iop_score',
+                        type=str,
+                        default=None,
+                        help='predicted iop for filtering proposals for seg')
     parser.add_argument(
         '--gpus',
         type=int,
@@ -70,7 +79,11 @@ def main():
     cfg.load_from = args.load_from
     cfg.resume_from = args.resume_from
 
+    cfg.pred_iou_score = args.pred_iou_score
+    cfg.pred_iop_score = args.pred_iop_score
+
     cfg.gpus = args.gpus
+    cfg.det_label = args.det_label
     cfg.distributed = args.distributed
     cfg.save_output = args.save_output
 

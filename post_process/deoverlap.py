@@ -11,20 +11,24 @@ from utils import load_data, write_meta
 from post_process import nms
 
 
-def deoverlap(probs,
+def deoverlap(scores,
               proposals,
               tot_inst_num,
               th_pos=-1,
               th_iou=1,
-              pred_label_fn=None):
+              pred_label_fn=None,
+              outlier_scores=None,
+              th_outlier=0.5,
+              keep_outlier=False):
     print('avg_score(mean: {:.2f}, max: {:.2f}, min: {:.2f})'.format(
-        probs.mean(), probs.max(), probs.min()))
+        scores.mean(), scores.max(), scores.min()))
 
-    assert len(proposals) == len(probs), '{} vs {}'.format(
-        len(proposals), len(probs))
+    assert len(proposals) == len(scores), '{} vs {}'.format(
+        len(proposals), len(scores))
+    assert (outlier_scores is None) or isinstance(outlier_scores, dict)
 
     pos_lst = []
-    for idx, prob in enumerate(probs):
+    for idx, prob in enumerate(scores):
         if prob < th_pos:
             continue
         pos_lst.append([idx, prob])
@@ -32,9 +36,19 @@ def deoverlap(probs,
 
     # get all clusters
     clusters = []
+    if keep_outlier:
+        o_clusters = []
     for idx, _ in tqdm(pos_lst):
-        cluster = load_data(proposals[idx])
+        fn_node = proposals[idx]
+        cluster = load_data(fn_node)
+        cluster, o_cluster = filter_outlier(cluster, fn_node, outlier_scores, th_outlier)
         clusters.append(cluster)
+        if keep_outlier and len(o_cluster) > 0:
+            o_clusters.append(o_cluster)
+
+    if keep_outlier:
+        print('#outlier_clusters: {}'.format(len(o_clusters)))
+        clusters.extend(o_clusters)
 
     idx2lb, idx2lbs = nms(clusters, th_iou)
 
@@ -54,6 +68,22 @@ def deoverlap(probs,
     pred_labels = write_meta(pred_label_fn, idx2lb, inst_num=tot_inst_num)
 
     return pred_labels
+
+
+def filter_outlier(cluster, fn_node, outlier_scores, th_outlier):
+    if outlier_scores is None or fn_node not in outlier_scores:
+        return cluster, []
+    outlier_prob = outlier_scores[fn_node]
+
+    # `outlier_prob` may have large size due to padding
+    size = len(cluster)
+    if len(outlier_prob) > size:
+        outlier_prob = outlier_prob[:size]
+
+    comp = outlier_prob > th_outlier
+    clean_idxs = np.where(comp)[0]
+    outlier_idxs = np.where(~comp)[0]
+    return cluster[clean_idxs], cluster[outlier_idxs]
 
 
 if __name__ == '__main__':
@@ -79,7 +109,7 @@ if __name__ == '__main__':
         args.th_pos, args.th_iou, args.pred_score, pred_label_fn))
 
     d = np.load(args.pred_score, allow_pickle=True)
-    probs = d['data']
+    scores = d['data']
     meta = d['meta'].item()
     proposal_folders = meta['proposal_folders']
     tot_inst_num = meta['tot_inst_num']
@@ -92,5 +122,5 @@ if __name__ == '__main__':
             glob.glob(os.path.join(proposal_folder, fn_node_pattern)))
         proposals.extend([fn_node for fn_node in fn_clusters])
 
-    deoverlap(probs, proposals, tot_inst_num, args.th_pos, args.th_iou,
+    deoverlap(scores, proposals, tot_inst_num, args.th_pos, args.th_iou,
               pred_label_fn)
