@@ -23,8 +23,8 @@ pip install -r requirements.txt
 ```
 
 Download 1 part testing data from
-[Google Drive](https://drive.google.com/file/d/1npu8Ma9BZDp4Z18ARkitwP0OozAy__aG/view?usp=sharing) or
-[BaiduYun](https://pan.baidu.com/s/1LFuUCCw8aH27BH5IHDexEw) (passwd: yhhe).
+[Google Drive](https://drive.google.com/open?id=14qS_IH-8Qt01nat4wbrY2X73h7dJv5-K) or
+[BaiduYun](https://pan.baidu.com/s/1cN7pD2ZNhw1PENP6TdyH4A) (passwd: sn6s).
 
 or with scripts below:
 ```bash

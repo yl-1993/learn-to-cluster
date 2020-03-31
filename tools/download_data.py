@@ -5,9 +5,9 @@ import os.path as osp
 
 data2url = {
     'part1':
-    'https://drive.google.com/uc?id=1npu8Ma9BZDp4Z18ARkitwP0OozAy__aG',
+    'https://drive.google.com/uc?id=14qS_IH-8Qt01nat4wbrY2X73h7dJv5-K',
     'benchmark':
-    'https://drive.google.com/open?id=10boLBiYq-6wKC_N_71unlMyNrimRjpVa',
+    'https://drive.google.com/uc?id=10boLBiYq-6wKC_N_71unlMyNrimRjpVa',
 }
 
 
@@ -29,6 +29,7 @@ if __name__ == '__main__':
             tar_path))
     else:
         gdown.download(url, tar_path, quiet=False)
+    exit()
     print('untar {}'.format(tar_path))
     tar = tarfile.open(tar_path)
     for member in tar.getmembers():
