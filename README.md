@@ -1,9 +1,11 @@
-# Learning to Cluster Faces on an Affinity Graph (LTC) [![pdf](https://img.shields.io/badge/Arxiv-pdf-orange.svg?style=flat)](https://arxiv.org/abs/1904.02749)
+# Learning to Cluster Faces
+
+This repo provides an official implementation for [1, 2] and a re-implementation of [3].
 
 ## Paper
-[Learning to Cluster Faces on an Affinity Graph](https://arxiv.org/abs/1904.02749), CVPR 2019 (**Oral**) [[Project Page](http://yanglei.me/project/ltc)]
-
-![pipeline](http://yanglei.me/project/ltc/imgs/pipeline.png)
+1. [Learning to Cluster Faces on an Affinity Graph](https://arxiv.org/abs/1904.02749), CVPR 2019 (**Oral**) [[Project Page](http://yanglei.me/project/ltc)]
+2. [Learning to Cluster Faces via Confidence and Connectivity Estimation](https://arxiv.org/abs/2004.00445), CVPR 2020 [[Project Page](http://yanglei.me/project/ltc_v2)]
+3. [Linkage-based Face Clustering via Graph Convolution Network](https://arxiv.org/abs/1903.11306), CVPR 2019
 
 
 ## Requirements
@@ -17,7 +19,6 @@
 
 Install dependencies
 ```bash
-conda install pytorch=0.4.1 cuda90 -c pytorch
 conda install faiss-gpu -c pytorch
 pip install -r requirements.txt
 ```
@@ -81,43 +82,19 @@ and use [sample data](https://drive.google.com/open?id=1VkZWZmBnaQlTaTNQSQXe-8q8
 [OneDrive](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155095455_link_cuhk_edu_hk/EU7mfU9F6C9AtZ8SV7kM0yAB0MLx9rzh4nD4kT5_AHXGxg?e=O6Fik9).
 
 
-## Inference
+## Run
 
-Fetch code & Create soft link
+0. Fetch code & Create soft link
+
 ```bash
 git clone git@github.com:yl-1993/learn-to-cluster.git
 cd learn-to-cluster
 ln -s xxx/data data
 ```
 
-Test cluster detection
-```bash
-sh scripts/dsgcn/test_cluster_det.sh
-```
+1. Run algorithms
 
-Test cluster segmentation
-```bash
-# predict iop and then conduct seg
-sh scripts/dsgcn/test_cluster_det_iop.sh
-sh scripts/dsgcn/test_cluster_seg.sh
-```
-
-*[Optional]* GCN-D Upper Bound
-It yields the performance when accuracy of GCN-D is 100%.
-```bash
-sh scripts/dsgcn/step_by_step/gcn_d_upper_bound.sh
-```
-
-## Train
-
-Train cluster detection
-```bash
-sh scripts/dsgcn/train_cluster_det.sh
-```
-Users can choose different proposals in `dsgcn/configs` or design your own proposals for training and testing.
-
-Generally, more proposals leads to better results.
-You can control the number of proposals to strike a balance between time and performance.
+Follow the instructions in [dsgcn](dsgcn/), [vegcn](vegcn/) and [lgcn](lgcn/) to run algorithms.
 
 
 ## Results on part1_test
@@ -193,5 +170,11 @@ Please cite the following paper if you use this repository in your reseach.
   author={Yang, Lei and Zhan, Xiaohang and Chen, Dapeng and Yan, Junjie and Loy, Chen Change and Lin, Dahua},
   booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
   year={2019}
+}
+@inproceedings{yang2020learning,
+  title={Learning to Cluster Faces via Confidence and Connectivity Estimation},
+  author={Yang, Lei and Chen, Dapeng and Zhan, Xiaohang and Zhao, Rui and Loy, Chen Change and Lin, Dahua},
+  booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  year={2020}
 }
 ```
