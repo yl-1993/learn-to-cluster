@@ -32,6 +32,13 @@ Train cluster detection
 ```bash
 sh scripts/dsgcn/train_cluster_det.sh
 ```
+
+Train cluster segmentation
+```bash
+# seg training uses the ground-truth iop
+sh scripts/dsgcn/train_cluster_seg.sh
+```
+
 Users can choose different proposals in `dsgcn/configs` or design your own proposals for training and testing.
 
 Generally, more proposals leads to better results.
