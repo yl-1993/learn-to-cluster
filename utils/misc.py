@@ -7,7 +7,6 @@ import json
 import pickle
 import random
 import numpy as np
-import scipy.sparse as sp
 
 
 class TextColors:
@@ -56,18 +55,6 @@ def is_l2norm(features, size):
     rand_i = random.choice(range(size))
     norm_ = np.dot(features[rand_i, :], features[rand_i, :])
     return abs(norm_ - 1) < 1e-6
-
-
-def row_normalize(mx):
-    """Row-normalize sparse matrix"""
-    rowsum = np.array(mx.sum(1))
-    # if rowsum <= 0, keep its previous value
-    rowsum[rowsum <= 0] = 1
-    r_inv = np.power(rowsum, -1).flatten()
-    r_inv[np.isinf(r_inv)] = 0.
-    r_mat_inv = sp.diags(r_inv)
-    mx = r_mat_inv.dot(mx)
-    return mx
 
 
 def is_spmat_eq(a, b):
