@@ -230,6 +230,15 @@ def intdict2ndarray(d, default_val=-1):
     return arr
 
 
+def list2dict(labels, ignore_value=-1):
+    idx2lb = {}
+    for idx, lb in enumerate(labels):
+        if lb == ignore_value:
+            continue
+        idx2lb[idx] = lb
+    return idx2lb
+
+
 def mkdir_if_no_exists(path, subdirs=[''], is_folder=False):
     if path == '':
         return
@@ -242,8 +251,11 @@ def mkdir_if_no_exists(path, subdirs=[''], is_folder=False):
             os.makedirs(d)
 
 
-def rm_suffix(s):
-    return s[:s.rfind(".")]
+def rm_suffix(s, suffix=None):
+    if suffix is None:
+        return s[:s.rfind('.')]
+    else:
+        return s[:s.rfind(suffix)]
 
 
 def rand_argmax(v):
