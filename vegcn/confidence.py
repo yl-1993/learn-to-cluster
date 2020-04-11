@@ -5,7 +5,7 @@ import numpy as np
 from tqdm import tqdm
 from itertools import groupby
 
-__all__ = ['confidence', 'confidence_to_peak']
+__all__ = ['confidence', 'confidence_to_peaks']
 
 
 def density(dists, radius=0.3, use_weight=True):
@@ -113,7 +113,7 @@ def s_center(feats, idx2lb, lb2idxs, **kwargs):
 def confidence(metric='s_nbr', **kwargs):
     metric2func = {
         's_nbr': s_nbr,
-        's_nbr_norm': s_nbr_norm,
+        's_nbr_size_norm': s_nbr_size_norm,
         's_avg': s_avg,
         's_center': s_center,
     }
