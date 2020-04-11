@@ -17,8 +17,6 @@ test_data = dict(feat_path=osp.join(prefix, 'features',
                                                               knn)),
                  k=knn,
                  is_norm_feat=True,
-                 is_sort_knns=True,
-                 is_test=True,
                  th_sim=th_sim,
                  conf_metric='s_nbr')
 

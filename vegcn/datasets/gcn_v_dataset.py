@@ -16,7 +16,6 @@ class GCNVDataset(object):
         self.k = cfg['k']
         self.feature_dim = cfg['feature_dim']
         self.is_norm_feat = cfg.get('is_norm_feat', True)
-        self.is_sort_knns = cfg.get('is_sort_knns', True)
 
         self.th_sim = cfg.get('th_sim', 0.)
         self.max_conn = cfg.get('max_conn', 1)
@@ -57,8 +56,8 @@ class GCNVDataset(object):
             # convert knns to (dists, nbrs)
             self.dists, self.nbrs = knns2ordered_nbrs(knns)
 
-        print('feature shape: {}, k: {}, norm_feat: {}, sort_knns: {}'.format(
-            self.features.shape, self.k, self.is_norm_feat, self.is_sort_knns))
+        print('feature shape: {}, k: {}, norm_feat: {}'.format(
+            self.features.shape, self.k, self.is_norm_feat))
 
         if not self.ignore_label:
             with Timer('Prepare ground-truth label'):
