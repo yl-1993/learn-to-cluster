@@ -17,7 +17,7 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='LTC via Confidence and Connectivity Estimation')
     parser.add_argument('--config', help='config file path')
-    parser.add_argument('--seed', type=int, default=1, help='random seed')
+    parser.add_argument('--seed', type=int, default=42, help='random seed')
     parser.add_argument('--phase', choices=['test', 'train'], default='test')
     parser.add_argument('--work_dir', help='the dir to save logs and models')
     parser.add_argument('--load_from',
@@ -76,7 +76,8 @@ def main():
         if not hasattr(cfg, data):
             continue
         cfg[data].eval_interim = cfg.eval_interim
-        if not hasattr(cfg[data], 'knn_graph_path'):
+        if not hasattr(cfg[data], 'knn_graph_path') or not os.path.isfile(
+                cfg[data].knn_graph_path):
             cfg[data].prefix = cfg.prefix
             cfg[data].knn = cfg.knn
             cfg[data].knn_method = cfg.knn_method

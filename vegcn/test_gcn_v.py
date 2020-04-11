@@ -34,8 +34,7 @@ def test(model, dataset, cfg, logger):
         labels = labels.cuda()
 
     model.eval()
-    output, gcn_feat = model(features, adj, output_feat=True)
-    output = output.squeeze()
+    output, gcn_feat = model((features, adj), output_feat=True)
     if not dataset.ignore_label:
         loss = F.mse_loss(output, labels)
         loss_test = float(loss)
@@ -56,13 +55,13 @@ def test_gcn_v(model, cfg, logger):
         data = np.load(ofn_pred)
         pred_confs = data['pred_confs']
         inst_num = data['inst_num']
-        if inst_num != len(dataset):
+        if inst_num != dataset.inst_num:
             logger.warn(
                 'instance number in {} is different from dataset: {} vs {}'.
                 format(ofn_pred, inst_num, len(dataset)))
     else:
         pred_confs, gcn_feat = test(model, dataset, cfg, logger)
-        inst_num = len(dataset)
+        inst_num = dataset.inst_num
 
     logger.info('pred_confs: mean({:.4f}). max({:.4f}), min({:.4f})'.format(
         pred_confs.mean(), pred_confs.max(), pred_confs.min()))
