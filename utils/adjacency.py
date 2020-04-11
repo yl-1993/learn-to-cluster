@@ -24,12 +24,23 @@ def build_symmetric_adj(adj, self_loop=True):
     return adj
 
 
-def sparse_mx_to_torch_sparse_tensor(sparse_mx):
-    import torch
-    """Convert a scipy sparse matrix to a torch sparse tensor."""
+def sparse_mx_to_indices_values(sparse_mx):
     sparse_mx = sparse_mx.tocoo().astype(np.float32)
-    indices = torch.from_numpy(
-        np.vstack((sparse_mx.row, sparse_mx.col)).astype(np.int64))
-    values = torch.from_numpy(sparse_mx.data)
-    shape = torch.Size(sparse_mx.shape)
+    indices = np.vstack((sparse_mx.row, sparse_mx.col)).astype(np.int64)
+    values = sparse_mx.data
+    shape = np.array(sparse_mx.shape)
+    return indices, values, shape
+
+
+def indices_values_to_sparse_tensor(indices, values, shape):
+    import torch
+    indices = torch.from_numpy(indices)
+    values = torch.from_numpy(values)
+    shape = torch.Size(shape)
     return torch.sparse.FloatTensor(indices, values, shape)
+
+
+def sparse_mx_to_torch_sparse_tensor(sparse_mx):
+    """Convert a scipy sparse matrix to a torch sparse tensor."""
+    indices, values, shape = sparse_mx_to_indices_values(sparse_mx)
+    return indices_values_to_sparse_tensor(indices, values, shape)

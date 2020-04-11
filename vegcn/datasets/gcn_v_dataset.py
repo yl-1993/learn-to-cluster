@@ -3,7 +3,8 @@ import numpy as np
 
 from utils import (read_meta, read_probs, l2norm, build_knns,
                    knns2ordered_nbrs, fast_knns2spmat, row_normalize,
-                   build_symmetric_adj, intdict2ndarray, Timer)
+                   build_symmetric_adj, sparse_mx_to_indices_values,
+                   intdict2ndarray, Timer)
 from vegcn.confidence import (confidence, confidence_to_peaks)
 
 
@@ -16,6 +17,7 @@ class GCNVDataset(object):
         self.k = cfg['k']
         self.feature_dim = cfg['feature_dim']
         self.is_norm_feat = cfg.get('is_norm_feat', True)
+        self.is_train = cfg.get('is_train', False)
 
         self.th_sim = cfg.get('th_sim', 0.)
         self.max_conn = cfg.get('max_conn', 1)
@@ -36,13 +38,15 @@ class GCNVDataset(object):
                 self.features = l2norm(self.features)
             if self.inst_num == -1:
                 self.inst_num = self.features.shape[0]
-            self.size = self.inst_num
-            assert self.size == self.features.shape[0]
+            self.size = 1 # take the entire graph as input
 
         with Timer('read knn graph'):
-            if knn_graph_path is not None:
+            if os.path.isfile(knn_graph_path):
                 knns = np.load(knn_graph_path)['data']
             else:
+                if knn_graph_path is not None:
+                    print('knn_graph_path does not exist: {}'.format(
+                        knn_graph_path))
                 knn_prefix = os.path.join(cfg.prefix, 'knns', cfg.name)
                 knns = build_knns(knn_prefix, self.features, cfg.knn_method,
                                   cfg.knn)
@@ -51,7 +55,12 @@ class GCNVDataset(object):
 
             # build symmetric adjacency matrix
             adj = build_symmetric_adj(adj, self_loop=True)
-            self.adj = row_normalize(adj)
+            adj = row_normalize(adj)
+            if self.is_train:
+                adj = sparse_mx_to_indices_values(adj)
+                self.adj_indices, self.adj_values, self.adj_shape = adj
+            else:
+                self.adj = adj
 
             # convert knns to (dists, nbrs)
             self.dists, self.nbrs = knns2ordered_nbrs(knns)
@@ -72,14 +81,14 @@ class GCNVDataset(object):
                         self.dists, self.nbrs, self.labels, self.max_conn)
 
     def __getitem__(self, index):
-        '''
-        return the entire graph for training.
+        ''' return the entire graph for training.
         To accelerate training or cope with larger graph,
         we can sample sub-graphs in this function.
         '''
 
         assert index == 0
-        return self.features, self.adj, self.labels
+        return (self.features, self.adj_indices, self.adj_values,
+                self.adj_shape, self.labels)
 
     def __len__(self):
         return self.size
