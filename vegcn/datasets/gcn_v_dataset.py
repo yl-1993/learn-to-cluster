@@ -17,7 +17,7 @@ class GCNVDataset(object):
         self.k = cfg['k']
         self.feature_dim = cfg['feature_dim']
         self.is_norm_feat = cfg.get('is_norm_feat', True)
-        self.is_train = cfg.get('is_train', False)
+        self.save_decomposed_adj = cfg.get('save_decomposed_adj', False)
 
         self.th_sim = cfg.get('th_sim', 0.)
         self.max_conn = cfg.get('max_conn', 1)
@@ -56,7 +56,7 @@ class GCNVDataset(object):
             # build symmetric adjacency matrix
             adj = build_symmetric_adj(adj, self_loop=True)
             adj = row_normalize(adj)
-            if self.is_train:
+            if self.save_decomposed_adj:
                 adj = sparse_mx_to_indices_values(adj)
                 self.adj_indices, self.adj_values, self.adj_shape = adj
             else:
