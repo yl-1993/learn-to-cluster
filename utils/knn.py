@@ -168,10 +168,18 @@ def build_knns(knn_prefix,
                knn_method,
                k,
                num_process=None,
-               is_rebuild=False):
+               is_rebuild=False,
+               feat_create_time=None):
     knn_prefix = os.path.join(knn_prefix, '{}_k_{}'.format(knn_method, k))
     mkdir_if_no_exists(knn_prefix)
     knn_path = knn_prefix + '.npz'
+    if os.path.isfile(
+            knn_path) and not is_rebuild and feat_create_time is not None:
+        knn_create_time = os.path.getmtime(knn_path)
+        if knn_create_time <= feat_create_time:
+            print('[warn] knn is created before feats ({} vs {})'.format(
+                format_time(knn_create_time), format_time(feat_create_time)))
+            is_rebuild = True
     if not os.path.isfile(knn_path) or is_rebuild:
         index_path = knn_prefix + '.index'
         with Timer('build index'):
@@ -181,7 +189,8 @@ def build_knns(knn_prefix,
                 index = knn_faiss(feats,
                                   k,
                                   index_path,
-                                  omp_num_threads=num_process)
+                                  omp_num_threads=num_process,
+                                  rebuild_index=True)
             elif knn_method == 'faiss_gpu':
                 index = knn_faiss_gpu(feats,
                                       k,
@@ -300,6 +309,7 @@ class knn_faiss(knn):
                  index_key='',
                  nprobe=128,
                  omp_num_threads=None,
+                 rebuild_index=True,
                  verbose=True,
                  **kwargs):
         import faiss
@@ -307,7 +317,8 @@ class knn_faiss(knn):
             faiss.omp_set_num_threads(omp_num_threads)
         self.verbose = verbose
         with Timer('[faiss] build index', verbose):
-            if index_path != '' and os.path.exists(index_path):
+            if index_path != '' and not rebuild_index and os.path.exists(
+                    index_path):
                 print('[faiss] read index from {}'.format(index_path))
                 index = faiss.read_index(index_path)
             else:
