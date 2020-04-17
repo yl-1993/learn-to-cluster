@@ -1,8 +1,9 @@
 from .gcn_v_dataset import GCNVDataset
+from .gcn_e_dataset import GCNEDataset
 
 __factory__ = {
     'gcn_v': GCNVDataset,
-    'gcn_e': None,
+    'gcn_e': GCNEDataset,
 }
 
 
