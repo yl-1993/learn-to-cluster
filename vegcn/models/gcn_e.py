@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import torch
 import torch.nn as nn
 
 from vegcn.models.utils import GraphConv, MeanAggregator
@@ -19,13 +20,26 @@ class GCN_E(nn.Module):
         self.classifier = nn.Sequential(nn.Linear(nhid_half, nhid_half),
                                         nn.PReLU(nhid_half),
                                         nn.Linear(nhid_half, self.nclass))
+        if nclass == 1:
+            self.loss = torch.nn.MSELoss()
+        elif nclass == 2:
+            self.loss = torch.nn.NLLLoss()
+        else:
+            raise ValueError('nclass should be 1 or 2')
 
-    def forward(self, x, adj):
+    def forward(self, data, return_loss=False):
+        x, adj = data[0], data[1]
         x = self.conv1(x, adj)
         x = self.conv2(x, adj)
         x = self.conv3(x, adj)
         x = self.conv4(x, adj)
+        x = x.view(-1, x.shape[-1])
         pred = self.classifier(x)
+
+        if return_loss:
+            label = data[2].view(-1)
+            loss = self.loss(pred, label)
+            return pred, loss
 
         return pred
 
