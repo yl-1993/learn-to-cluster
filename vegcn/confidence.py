@@ -5,7 +5,7 @@ import numpy as np
 from tqdm import tqdm
 from itertools import groupby
 
-__all__ = ['confidence', 'confidence_to_peaks']
+__all__ = ['density', 'confidence', 'confidence_to_peaks']
 
 
 def density(dists, radius=0.3, use_weight=True):

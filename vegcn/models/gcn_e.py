@@ -21,9 +21,9 @@ class GCN_E(nn.Module):
                                         nn.PReLU(nhid_half),
                                         nn.Linear(nhid_half, self.nclass))
         if nclass == 1:
-            self.loss = torch.nn.MSELoss()
+            self.loss = nn.MSELoss()
         elif nclass == 2:
-            self.loss = torch.nn.NLLLoss()
+            self.loss = nn.CrossEntropyLoss()
         else:
             raise ValueError('nclass should be 1 or 2')
 

@@ -31,6 +31,7 @@ def parse_args():
         type=int,
         default=1,
         help='number of gpus(only applicable to non-distributed training)')
+    parser.add_argument('--random_conns', action='store_true', default=False)
     parser.add_argument('--distributed', action='store_true', default=False)
     parser.add_argument('--eval_interim', action='store_true', default=False)
     parser.add_argument('--save_output', action='store_true', default=False)
@@ -68,6 +69,8 @@ def main():
 
     cfg.gpus = args.gpus
     cfg.distributed = args.distributed
+
+    cfg.random_conns = args.random_conns
     cfg.eval_interim = args.eval_interim
     cfg.save_output = args.save_output
     cfg.force = args.force
