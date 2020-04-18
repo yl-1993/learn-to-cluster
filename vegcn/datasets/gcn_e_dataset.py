@@ -1,10 +1,10 @@
-import os
 import numpy as np
+import os.path as osp
 from tqdm import tqdm
 
 from utils import (read_meta, read_probs, l2norm, build_knns,
                    knns2ordered_nbrs, fast_knns2spmat, row_normalize,
-                   build_symmetric_adj, intdict2ndarray, Timer)
+                   build_symmetric_adj, intdict2ndarray, rm_suffix, Timer)
 
 
 class GCNEDataset(object):
@@ -52,7 +52,11 @@ class GCNEDataset(object):
             if knn_graph_path is not None:
                 knns = np.load(knn_graph_path)['data']
             else:
-                knn_prefix = os.path.join(cfg.prefix, 'knns', cfg.name)
+                prefix = osp.dirname(feat_path)
+                name = rm_suffix(osp.basename(feat_path))
+                # find root folder of `features`
+                prefix = osp.dirname(prefix)
+                knn_prefix = osp.join(prefix, 'knns', name)
                 knns = build_knns(knn_prefix, self.features, cfg.knn_method,
                                   cfg.knn)
             assert self.inst_num == len(knns), "{} vs {}".format(
