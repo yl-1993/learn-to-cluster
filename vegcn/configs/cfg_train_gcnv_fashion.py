@@ -16,7 +16,6 @@ train_data = dict(
                             '{}_k_{}.npz'.format(knn_method, knn)),
     k=knn,
     is_norm_feat=True,
-    is_dense_adj=True,
     th_sim=th_sim,
     conf_metric='s_nbr')
 
