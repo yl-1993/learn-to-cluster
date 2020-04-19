@@ -50,15 +50,19 @@ def test_gcn_v(model, cfg, logger):
         setattr(cfg.test_data, k, v)
     dataset = build_dataset(cfg.model['type'], cfg.test_data)
 
-    ofn_pred = osp.join(cfg.work_dir, 'pred_confs.npz')
-    if osp.isfile(ofn_pred) and not cfg.force:
-        data = np.load(ofn_pred)
+    folder = '{}_gcnv_k_{}_th_{}'.format(cfg.test_name, cfg.knn, cfg.th_sim)
+    oprefix = osp.join(cfg.work_dir, folder)
+    oname = osp.basename(rm_suffix(cfg.load_from))
+    opath_pred_confs = osp.join(oprefix, 'pred_confs', '{}.npz'.format(oname))
+
+    if osp.isfile(opath_pred_confs) and not cfg.force:
+        data = np.load(opath_pred_confs)
         pred_confs = data['pred_confs']
         inst_num = data['inst_num']
         if inst_num != dataset.inst_num:
             logger.warn(
                 'instance number in {} is different from dataset: {} vs {}'.
-                format(ofn_pred, inst_num, len(dataset)))
+                format(opath_pred_confs, inst_num, len(dataset)))
     else:
         pred_confs, gcn_feat = test(model, dataset, cfg, logger)
         inst_num = dataset.inst_num
@@ -98,20 +102,18 @@ def test_gcn_v(model, cfg, logger):
                                       inst_num)
 
     if cfg.save_output:
-        logger.info(
-            'save predicted confidences and labels to {}'.format(ofn_pred))
-        if not osp.isfile(ofn_pred) or cfg.force:
-            np.savez_compressed(ofn_pred,
-                                pred_confs=pred_confs,
-                                inst_num=inst_num)
+        logger.info('save predicted confs to {}'.format(opath_pred_confs))
+        mkdir_if_no_exists(opath_pred_confs)
+        np.savez_compressed(opath_pred_confs,
+                            pred_confs=pred_confs,
+                            inst_num=inst_num)
 
         # save clustering results
         idx2lb = list2dict(pred_labels, ignore_value=-1)
 
-        folder = '{}_gcnv_k_{}_th_{}'.format(cfg.test_name, cfg.knn,
-                                             cfg.th_sim)
         opath_pred_labels = osp.join(
             cfg.work_dir, folder, 'tau_{}_pred_labels.txt'.format(cfg.tau_0))
+        logger.info('save predicted labels to {}'.format(opath_pred_labels))
         mkdir_if_no_exists(opath_pred_labels)
         write_meta(opath_pred_labels, idx2lb, inst_num=inst_num)
 
@@ -122,12 +124,8 @@ def test_gcn_v(model, cfg, logger):
             evaluate(dataset.gt_labels, pred_labels, metric)
 
     if cfg.use_gcn_feat:
-        # use top embedding of GCN to rebuild the kNN graph
-        oprefix = osp.join(cfg.work_dir, folder)
-
         # gcn_feat is saved to disk for GCN-E
-        oname = osp.basename(rm_suffix(cfg.load_from))
-        opath_feat = osp.join(oprefix, 'features/{}.bin'.format(oname))
+        opath_feat = osp.join(oprefix, 'features', '{}.bin'.format(oname))
         if not osp.isfile(opath_feat) or cfg.force:
             mkdir_if_no_exists(opath_feat)
             write_feat(opath_feat, gcn_feat)
@@ -140,6 +138,7 @@ def test_gcn_v(model, cfg, logger):
                           normalize=True)
         ds.info()
 
+        # use top embedding of GCN to rebuild the kNN graph
         with Timer('connect to higher confidence with use_gcn_feat'):
             knn_prefix = osp.join(prefix, 'knns', name)
             knns = build_knns(knn_prefix,
