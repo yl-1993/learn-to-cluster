@@ -10,16 +10,16 @@ knn_method = 'faiss'
 th_sim = 0.  # cut edges with similarity smaller than th_sim
 
 # gcn_v configs
-work_dir = 'work_dir'
-ckpt_name = 'latest'
-gcnv_cfg = './vegcn/configs/cfg_train_gcnv_fashion.py'
+_work_dir = 'work_dir'
+ckpt_name = 'pretrained_gcn_v_fashion'
+gcnv_cfg = './vegcn/configs/cfg_test_gcnv_fashion.py'
 gcnv_cfg_name = rm_suffix(osp.basename(gcnv_cfg))
 gcnv_cfg = Config.fromfile(gcnv_cfg)
 
 use_gcn_feat = True
 if use_gcn_feat:
     gcnv_nhid = gcnv_cfg.model.kwargs.nhid
-    gcnv_prefix = '{}/{}/{}/{}_gcnv_k_{}_th_{}'.format(prefix, work_dir,
+    gcnv_prefix = '{}/{}/{}/{}_gcnv_k_{}_th_{}'.format(prefix, _work_dir,
                                                        gcnv_cfg_name,
                                                        test_name, gcnv_cfg.knn,
                                                        gcnv_cfg.th_sim)
@@ -39,7 +39,7 @@ test_data = dict(feat_path=feat_path,
                  label_path=osp.join(prefix, 'labels',
                                      '{}.meta'.format(test_name)),
                  pred_confs='{}/{}/{}/pred_confs.npz'.format(
-                     prefix, work_dir, gcnv_cfg_name),
+                     prefix, _work_dir, gcnv_cfg_name),
                  k=knn,
                  is_norm_feat=True,
                  th_sim=th_sim,
