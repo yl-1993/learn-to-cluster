@@ -1,13 +1,13 @@
 from .test_gcn_v import test_gcn_v
 from .test_gcn_e import test_gcn_e
 from .train_gcn_v import train_gcn_v
-# from .train_gcn_e import train_gcn_e
+from .train_gcn_e import train_gcn_e
 
 __factory__ = {
     'test_gcn_v': test_gcn_v,
     'test_gcn_e': test_gcn_e,
     'train_gcn_v': train_gcn_v,
-    # 'train_gcn_e': train_gcn_e,
+    'train_gcn_e': train_gcn_e,
 }
 
 
