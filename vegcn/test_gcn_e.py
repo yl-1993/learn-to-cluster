@@ -1,6 +1,7 @@
 from __future__ import division
 
 import torch
+import torch.nn.functional as F
 import numpy as np
 import os.path as osp
 
@@ -46,22 +47,15 @@ def test(model, dataset, cfg, logger):
             model.cuda()
 
         model.eval()
-        # for i, (features, adj, labels) in enumerate(data_loader):
         for i, data in enumerate(data_loader):
             with torch.no_grad():
-                # output = model((features, adj), return_loss=False)
                 output, loss = model(data, return_loss=True)
+                output = F.log_softmax(output, dim=-1)
                 if not dataset.ignore_label:
                     labels = data[2].view(-1)
                     if not cfg.regressor:
                         acc = output_accuracy(output, labels)
                         accs += [acc.item()]
-                    # if cfg.regressor:
-                    #     loss = F.mse_loss(output, labels)
-                    # else:
-                    #     loss = F.nll_loss(output, labels)
-                    #     acc = output_accuracy(output, labels)
-                    #     accs += [acc.item()]
                     losses += [loss.item()]
                 if not cfg.regressor:
                     output = output[:, 1]
@@ -80,12 +74,10 @@ def test(model, dataset, cfg, logger):
                     output = output.detach().cpu().numpy()
                     pred = output.argpartition(cfg.max_conn)[:cfg.max_conn]
                 pred_conns.append(pred)
-                # pred = F.softmax(pred, dim=1)
                 if i % cfg.log_config.interval == 0:
                     if dataset.ignore_label:
                         logger.info('[Test] Iter {}/{}'.format(i, size))
                     else:
-                        # acc, p, r = online_evaluate(gtmat, pred)
                         logger.info('[Test] Iter {}/{}: Loss {:.4f}'.format(
                             i, size, loss))
     else:
@@ -133,11 +125,8 @@ def test_gcn_e(model, cfg, logger):
                                       dataset.subset_dists,
                                       dataset.subset_idxs):
                 for _ in range(cfg.max_conn):
-                    # pred_rel_nbr = 0
                     pred_rel_nbr = np.random.choice(np.arange(len(nbr)))
                     pred_abs_nbr = nbr[pred_rel_nbr]
-                    # pred_peaks[idx] = pred_abs_nbr
-                    # pred_dist2peak[idx] = dist[pred_rel_nbr]
                     pred_peaks[idx].append(pred_abs_nbr)
                     pred_dist2peak[idx].append(dist[pred_rel_nbr])
                     pred_conns.append(pred_rel_nbr)
@@ -149,8 +138,6 @@ def test_gcn_e(model, cfg, logger):
                                                     dataset.subset_dists,
                                                     dataset.subset_idxs):
                 pred_abs_nbr = nbr[pred_rel_nbr]
-                # pred_peaks[idx] = pred_abs_nbr
-                # pred_dist2peak[idx] = dist[pred_rel_nbr]
                 pred_peaks[idx].extend(pred_abs_nbr)
                 pred_dist2peak[idx].extend(dist[pred_rel_nbr])
         inst_num = dataset.inst_num
