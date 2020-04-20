@@ -3,6 +3,7 @@
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from vegcn.models.utils import GraphConv, MeanAggregator
 
@@ -23,7 +24,7 @@ class GCN_E(nn.Module):
         if nclass == 1:
             self.loss = nn.MSELoss()
         elif nclass == 2:
-            self.loss = nn.CrossEntropyLoss()
+            self.loss = nn.NLLLoss()
         else:
             raise ValueError('nclass should be 1 or 2')
 
@@ -35,6 +36,7 @@ class GCN_E(nn.Module):
         x = self.conv4(x, adj)
         x = x.view(-1, x.shape[-1])
         pred = self.classifier(x)
+        pred = F.log_softmax(pred, dim=-1)
 
         if return_loss:
             label = data[2].view(-1)

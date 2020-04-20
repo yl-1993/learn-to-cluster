@@ -1,7 +1,6 @@
 from __future__ import division
 
 import torch
-import torch.nn.functional as F
 import numpy as np
 import os.path as osp
 
@@ -50,7 +49,6 @@ def test(model, dataset, cfg, logger):
         for i, data in enumerate(data_loader):
             with torch.no_grad():
                 output, loss = model(data, return_loss=True)
-                output = F.log_softmax(output, dim=-1)
                 if not dataset.ignore_label:
                     labels = data[2].view(-1)
                     if not cfg.regressor:
