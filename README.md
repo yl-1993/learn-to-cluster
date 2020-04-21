@@ -81,7 +81,6 @@ and use [sample data](https://drive.google.com/open?id=1VkZWZmBnaQlTaTNQSQXe-8q8
 [GoogleDrive](https://drive.google.com/file/d/1hg3PQTOwyduLVyfgJ7qrN52o9QE35XM4/view?usp=sharing) or
 [OneDrive](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155095455_link_cuhk_edu_hk/EU7mfU9F6C9AtZ8SV7kM0yAB0MLx9rzh4nD4kT5_AHXGxg?e=O6Fik9).
 
-
 ## Run
 
 0. Fetch code & Create soft link
@@ -97,17 +96,17 @@ ln -s xxx/data data
 Follow the instructions in [dsgcn](dsgcn/), [vegcn](vegcn/) and [lgcn](lgcn/) to run algorithms.
 
 
-## Results on part1_test
+## Results on part1_test (584K)
 
 | Method | Precision | Recall | F-score |
 | ------ |:---------:|:------:|:-------:|
-| Approx Rank Order (knn=80, th=0) | 99.77 | 7.2 | 13.42 |
+| Approx Rank Order (k=80, th=0) | 99.77 | 7.2 | 13.42 |
 | MiniBatchKmeans (ncluster=5000, bs=100) | 45.48 | 80.98 | 58.25 |
-| KNN DBSCAN (knn=80, th=0.7, eps=0.7, min=40) | 62.38 | 50.66 | 55.92 |
+| KNN DBSCAN (k=80, th=0.7, eps=0.7, min=40) | 62.38 | 50.66 | 55.92 |
 | FastHAC (dist=0.72, single) | 92.07 | 57.28 | 70.63 |
 | [DaskSpectral](https://ml.dask.org/clustering.html#spectral-clustering) (ncluster=8573, affinity='rbf') | 78.75 | 66.59 | 72.16 |
 | [CDP](https://github.com/XiaohangZhan/cdp) (single model, th=0.7)  | 80.19 | 70.47 | 75.02 |
-| [L-GCN](https://github.com/Zhongdao/gcn_clustering) (k_at_hop=[200, 10], active_conn=10, maxsz=300, step=0.6)  | 74.38 | 83.51 | 78.68 |
+| [L-GCN](https://github.com/yl-1993/learn-to-cluster/tree/master/lgcn) (k_at_hop=[200, 10], active_conn=10, step=0.6, maxsz=300)  | 74.38 | 83.51 | 78.68 |
 | GCN-D (2 prpsls) | 95.41 | 67.77 | 79.25 |
 | GCN-D (5 prpsls) | 94.62 | 72.59 | 82.15 |
 | GCN-D (8 prpsls) | 94.23 | 79.69 | 86.35 |
@@ -115,13 +114,15 @@ Follow the instructions in [dsgcn](dsgcn/), [vegcn](vegcn/) and [lgcn](lgcn/) to
 | GCN-D + GCN-S (2 prpsls) | 99.07 | 67.22 | 80.1 |
 | GCN-D + GCN-S (5 prpsls) | 98.84 | 72.01 | 83.31 |
 | GCN-D + GCN-S (8 prpsls) | 97.93 | 78.98 | 87.44 |
-| GCN-D + GCN-S (20 prplss) | 97.91 | 80.86 | 88.57 |
+| GCN-D + GCN-S (20 prpsls) | 97.91 | 80.86 | 88.57 |
+| GCN-V | 92.45 | 82.42 | 87.14 |
+| GCN-V + GCN-E | 92.56 | 83.74 | 87.93 |
 
 Note that the `prpsls` in above table indicate the number of parameters for generating proposals, rather than the actual number of proposals.
 For example, `2 prpsls` generates 34578 proposals and `20 prpsls` generates 283552 proposals.
 
 
-## Benchmarks
+## Benchmarks (5.21M)
 
 `1, 3, 5, 7, 9` denotes different scales of clustering.
 Details can be found in [Face Clustering Benchmarks](https://github.com/yl-1993/learn-to-cluster/wiki/Face-Clustering-Benchmarks).
@@ -134,6 +135,8 @@ Details can be found in [Face Clustering Benchmarks](https://github.com/yl-1993/
 | GCN-D (5 prpsls) | 82.15 | 77.71 | 75.5 | 73.99 | 72.89 |
 | GCN-D (8 prpsls) | 86.35 | 82.41 | 80.32 | 78.98 | 77.87 |
 | GCN-D (20 prpsls) | 87.61 | 83.76 | 81.62 | 80.33 | 79.21 |
+| GCN-V | 87.14 | 83.49 | 81.51 | 79.97 | 78.77 |
+| GCN-V + GCN-E | 87.93 | 84.04 | 82.1 | 80.45 | 79.3 |
 
 | BCubed F-score | 1 | 3 | 5 | 7 | 9 |
 | -------------- |:-:|:-:|:-:|:-:|:-:|
@@ -143,6 +146,8 @@ Details can be found in [Face Clustering Benchmarks](https://github.com/yl-1993/
 | GCN-D (5 prpsls) | 82.56 | 78.33 | 76.39 | 75.02 | 74.04 |
 | GCN-D (8 prpsls) | 86.73 | 83.01 | 81.1 | 79.84 | 78.86 |
 | GCN-D (20 prpsls) | 87.76 | 83.99 | 82 | 80.72 | 79.71 |
+| GCN-V | 85.81 | 82.63 | 81.05 | 79.92 | 79.08 |
+| GCN-V + GCN-E | 86.09 | 82.84 | 81.24 | 80.09 | 79.25 |
 
 | NMI | 1 | 3 | 5 | 7 | 9 |
 | --- |:-:|:-:|:-:|:-:|:-:|
@@ -152,12 +157,35 @@ Details can be found in [Face Clustering Benchmarks](https://github.com/yl-1993/
 | GCN-D (5 prpsls) | 95.64 | 95.19 | 95.03 | 94.91 | 94.83 |
 | GCN-D (8 prpsls) | 96.75 | 96.29 | 96.08 | 95.95 | 95.85 |
 | GCN-D (20 prpsls) | 97.04 | 96.55 | 96.33 | 96.18 | 96.07 |
+| GCN-V | 96.37 | 96.01 | 95.83 | 95.69 | 95.6 |
+| GCN-V + GCN-E | 96.41 | 96.03 | 95.85 | 95.71 | 95.62 |
+
+
+## Results on DeepFashion
+
+| Method | Pairwise F-score | BCubed F-score | NMI |
+| ------ |:---------:|:------:|:-------:|
+| Approx Rank Order (k=10, th=0) | 25.04 | 52.77 | 88.71 |
+| BatchKmeans (ncluster=3991) | 32.02 | 53.3 | 88.91 |
+| KNN DBSCAN (k=80, th=0.7, eps=0.7, min=40) | 25.07 | 53.23 | 90.75 |
+| FastHAC (dist=0.4, single) | 22.54 | 48.77 | 90.44 |
+| Meanshift (bandwidth=0.5) | 31.61 | 56.73 | 89.29 |
+| Spectral (ncluster=3991, affinity='rbf') | 29.6 | 47.12 | 86.95 |
+| DaskSpectral (ncluster=3991, affinity='rbf') | 24.25 | 44.11 | 86.21 |
+| CDP (single model, k=2, th=0.5, maxsz=200) | 28.28 | 57.83 | 90.93 |
+| L-GCN (k_at_hop=[5, 5], active_conn=5, step=0.5, maxsz=50)  | 30.7 | 60.13 | 90.67 |
+| GCN-D (2 prpsls) | 29.14 | 59.09 | 89.48 |
+| GCN-D (8 prpsls) | 32.52 | 57.52 | 89.54 |
+| GCN-D (20 prpsls) | 33.25 | 56.83 | 89.36 |
+| GCN-V | 33.59 | 59.41 | 90.88 |
+| GCN-V + GCN-E | 38.47 | 60.06 | 90.5 |
 
 ## Face Recognition
 
 For training face recognition and feature extraction, you may use any frameworks below, including but not limited to:
 
 [https://github.com/yl-1993/hfsoftmax](https://github.com/yl-1993/hfsoftmax)
+
 [https://github.com/XiaohangZhan/face_recognition_framework](https://github.com/XiaohangZhan/face_recognition_framework)
 
 
