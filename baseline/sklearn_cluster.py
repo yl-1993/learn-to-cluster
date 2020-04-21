@@ -81,3 +81,12 @@ def hdbscan(feat, min_samples, **kwargs):
     db = hdbscan.HDBSCAN(min_cluster_size=min_samples)
     labels_ = db.fit_predict(feat)
     return labels_
+
+
+def meanshift(feat, bw, num_process, min_bin_freq, **kwargs):
+    print('#num_process:', num_process)
+    print('min_bin_freq:', min_bin_freq)
+    ms = cluster.MeanShift(bandwidth=bw,
+                           n_jobs=num_process,
+                           min_bin_freq=min_bin_freq).fit(feat)
+    return ms.labels_
