@@ -1,4 +1,4 @@
-cfg_name=cfg_train_ms1m
+cfg_name=cfg_train_lgcn_ms1m
 config=lgcn/configs/$cfg_name.py
 
 export CUDA_VISIBLE_DEVICES=0
