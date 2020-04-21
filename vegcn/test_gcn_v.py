@@ -20,7 +20,7 @@ from evaluation import evaluate, accuracy
 def test(model, dataset, cfg, logger):
     if cfg.load_from:
         logger.info('load from {}'.format(cfg.load_from))
-        load_checkpoint(model, cfg.load_from)
+        load_checkpoint(model, cfg.load_from, strict=True, logger=logger)
 
     features = torch.FloatTensor(dataset.features)
     adj = sparse_mx_to_torch_sparse_tensor(dataset.adj)

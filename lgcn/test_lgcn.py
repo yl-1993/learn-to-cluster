@@ -20,7 +20,7 @@ from evaluation import evaluate
 def test(model, dataset, cfg, logger):
     if cfg.load_from:
         print('load from {}'.format(cfg.load_from))
-        load_checkpoint(model, cfg.load_from)
+        load_checkpoint(model, cfg.load_from, strict=True, logger=logger)
 
     losses = []
     edges = []
