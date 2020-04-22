@@ -53,10 +53,11 @@ def filter_knns(knns, k, th):
                                               1), nbrs[selidx].reshape(-1, 1)))
     scores = simi[selidx]
 
-    # keep uniq pairs
-    pairs = np.sort(pairs, axis=1)
-    pairs, unique_idx = np.unique(pairs, return_index=True, axis=0)
-    scores = scores[unique_idx]
+    if len(pairs) > 0:
+        # keep uniq pairs
+        pairs = np.sort(pairs, axis=1)
+        pairs, unique_idx = np.unique(pairs, return_index=True, axis=0)
+        scores = scores[unique_idx]
     return pairs, scores
 
 

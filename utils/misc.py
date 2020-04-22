@@ -100,6 +100,10 @@ def read_meta(fn_meta, start_pos=0, verbose=True):
 
 
 def write_meta(ofn, idx2lb, inst_num=None):
+    if len(idx2lb) == 0:
+        print('[warn] idx2lb is empty! skip write idx2lb to {}'.format(ofn))
+        return
+
     if inst_num is None:
         inst_num = max(idx2lb.keys()) + 1
     cls_num = len(set(idx2lb.values()))
