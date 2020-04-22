@@ -52,7 +52,7 @@ Follow the instructions in [dsgcn](dsgcn/), [vegcn](vegcn/) and [lgcn](lgcn/) to
 | ------ |:---------:|:------:|:-------:|
 | Approx Rank Order (k=80, th=0) | 99.77 | 7.2 | 13.42 |
 | MiniBatchKmeans (ncluster=5000, bs=100) | 45.48 | 80.98 | 58.25 |
-| KNN DBSCAN (k=80, th=0.7, eps=0.7, min=40) | 62.38 | 50.66 | 55.92 |
+| KNN DBSCAN (k=80, th=0.7, eps=0.25, min=1) | 95.25 | 52.79 | 67.93 |
 | FastHAC (dist=0.72, single) | 92.07 | 57.28 | 70.63 |
 | [DaskSpectral](https://ml.dask.org/clustering.html#spectral-clustering) (ncluster=8573, affinity='rbf') | 78.75 | 66.59 | 72.16 |
 | [CDP](https://github.com/XiaohangZhan/cdp) (single model, th=0.7)  | 80.19 | 70.47 | 75.02 |
@@ -111,13 +111,24 @@ Details can be found in [Face Clustering Benchmarks](https://github.com/yl-1993/
 | GCN-V + GCN-E | 96.41 | 96.03 | 95.85 | 95.71 | 95.62 |
 
 
+## Results on YouTube-Faces
+
+| Method | Pairwise F-score | BCubed F-score | NMI |
+| ------ |:---------:|:------:|:-------:|
+| Approx Rank Order (k=200, th=0) | 76.45 | 75.45 | 94.34 |
+| Kmeans (ncluster=1436) | 67.86 | 75.77 | 93.99 |
+| KNN DBSCAN (k=160, th=0., eps=0.3, min=1) | 91.35 | 89.34 | 97.52 |
+| FastHAC (dist=0.72, single) | 93.07 | 87.98 | 97.19 |
+| GCN-D (4 prpsls) | 94.44 | 91.33 | 97.97 |
+
+
 ## Results on DeepFashion
 
 | Method | Pairwise F-score | BCubed F-score | NMI |
 | ------ |:---------:|:------:|:-------:|
 | Approx Rank Order (k=10, th=0) | 25.04 | 52.77 | 88.71 |
-| BatchKmeans (ncluster=3991) | 32.02 | 53.3 | 88.91 |
-| KNN DBSCAN (k=80, th=0.7, eps=0.7, min=40) | 25.07 | 53.23 | 90.75 |
+| Kmeans (ncluster=3991) | 32.02 | 53.3 | 88.91 |
+| KNN DBSCAN (k=4, th=0., eps=0.1, min=2) | 25.07 | 53.23 | 90.75 |
 | FastHAC (dist=0.4, single) | 22.54 | 48.77 | 90.44 |
 | Meanshift (bandwidth=0.5) | 31.61 | 56.73 | 89.29 |
 | Spectral (ncluster=3991, affinity='rbf') | 29.6 | 47.12 | 86.95 |
