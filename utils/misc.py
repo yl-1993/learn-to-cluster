@@ -7,7 +7,6 @@ import json
 import pickle
 import random
 import numpy as np
-import scipy.sparse as sp
 
 
 class TextColors:
@@ -58,18 +57,6 @@ def is_l2norm(features, size):
     return abs(norm_ - 1) < 1e-6
 
 
-def row_normalize(mx):
-    """Row-normalize sparse matrix"""
-    rowsum = np.array(mx.sum(1))
-    # if rowsum <= 0, keep its previous value
-    rowsum[rowsum <= 0] = 1
-    r_inv = np.power(rowsum, -1).flatten()
-    r_inv[np.isinf(r_inv)] = 0.
-    r_mat_inv = sp.diags(r_inv)
-    mx = r_mat_inv.dot(mx)
-    return mx
-
-
 def is_spmat_eq(a, b):
     return (a != b).nnz == 0
 
@@ -113,6 +100,10 @@ def read_meta(fn_meta, start_pos=0, verbose=True):
 
 
 def write_meta(ofn, idx2lb, inst_num=None):
+    if len(idx2lb) == 0:
+        print('[warn] idx2lb is empty! skip write idx2lb to {}'.format(ofn))
+        return
+
     if inst_num is None:
         inst_num = max(idx2lb.keys()) + 1
     cls_num = len(set(idx2lb.values()))
@@ -243,6 +234,15 @@ def intdict2ndarray(d, default_val=-1):
     return arr
 
 
+def list2dict(labels, ignore_value=-1):
+    idx2lb = {}
+    for idx, lb in enumerate(labels):
+        if lb == ignore_value:
+            continue
+        idx2lb[idx] = lb
+    return idx2lb
+
+
 def mkdir_if_no_exists(path, subdirs=[''], is_folder=False):
     if path == '':
         return
@@ -255,8 +255,11 @@ def mkdir_if_no_exists(path, subdirs=[''], is_folder=False):
             os.makedirs(d)
 
 
-def rm_suffix(s):
-    return s[:s.rfind(".")]
+def rm_suffix(s, suffix=None):
+    if suffix is None:
+        return s[:s.rfind('.')]
+    else:
+        return s[:s.rfind(suffix)]
 
 
 def rand_argmax(v):

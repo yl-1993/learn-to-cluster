@@ -5,9 +5,13 @@ import os.path as osp
 
 data2url = {
     'part1':
-    'https://drive.google.com/uc?id=14qS_IH-8Qt01nat4wbrY2X73h7dJv5-K',
+    'https://drive.google.com/uc?id=16WD4orcF9dqjNPLzST2U3maDh2cpzxAY',
     'benchmark':
     'https://drive.google.com/uc?id=10boLBiYq-6wKC_N_71unlMyNrimRjpVa',
+    'youtube_face':
+    'https://drive.google.com/uc?id=1zrckFOx5fDnvDSK3ZeT2Di6HLaxZPnoG',
+    'deepfashion':
+    'https://drive.google.com/uc?id=15B5Ypj8_U9rhcuvkrkCZQAgV4cfes7aV',
 }
 
 
@@ -25,11 +29,11 @@ if __name__ == '__main__':
     url = data2url[args.data]
     tar_path = args.tar_path
     if osp.exists(tar_path) and not args.force:
-        print('{} already exists. Run with --force to overwrite.'.format(
-            tar_path))
+        print('{} already exists.'
+              'Modify --tar_path or run with --force to overwrite.'.format(
+                  tar_path))
     else:
         gdown.download(url, tar_path, quiet=False)
-    exit()
     print('untar {}'.format(tar_path))
     tar = tarfile.open(tar_path)
     for member in tar.getmembers():

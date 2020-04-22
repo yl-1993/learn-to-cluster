@@ -5,7 +5,7 @@ import os
 import sklearn.cluster as cluster
 import multiprocessing as mp
 
-from utils import knns2spmat, build_knns
+from utils import fast_knns2spmat, build_knns
 
 
 def kmeans(feat, n_clusters, **kwargs):
@@ -68,7 +68,7 @@ def knn_dbscan(feats, eps, min_samples, prefix, name, knn_method, knn, th_sim,
                **kwargs):
     knn_prefix = os.path.join(prefix, 'knns', name)
     knns = build_knns(knn_prefix, feats, knn_method, knn)
-    sparse_affinity = knns2spmat(knns, knn, th_sim)
+    sparse_affinity = fast_knns2spmat(knns, knn, th_sim, use_sim=False)
     db = cluster.DBSCAN(eps=eps,
                         min_samples=min_samples,
                         n_jobs=mp.cpu_count(),
@@ -81,3 +81,12 @@ def hdbscan(feat, min_samples, **kwargs):
     db = hdbscan.HDBSCAN(min_cluster_size=min_samples)
     labels_ = db.fit_predict(feat)
     return labels_
+
+
+def meanshift(feat, bw, num_process, min_bin_freq, **kwargs):
+    print('#num_process:', num_process)
+    print('min_bin_freq:', min_bin_freq)
+    ms = cluster.MeanShift(bandwidth=bw,
+                           n_jobs=num_process,
+                           min_bin_freq=min_bin_freq).fit(feat)
+    return ms.labels_

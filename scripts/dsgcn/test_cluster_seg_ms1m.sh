@@ -1,4 +1,4 @@
-load_from=./data/pretrained_models/pretrained_gcn_s.pth
+load_from=./data/pretrained_models/pretrained_gcn_s_ms1m.pth
 
 config=./dsgcn/configs/cfg_test_seg_ms1m_8_prpsls.py
 pred_iou_score=./data/work_dir/cfg_test_det_ms1m_8_prpsls/pretrained_gcn_d.npz

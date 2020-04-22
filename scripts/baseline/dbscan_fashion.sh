@@ -1,5 +1,5 @@
 prefix=./data
-name=part1_test
+name=deepfashion_test
 
 oprefix=$prefix/baseline_results
 gt_labels=$prefix/labels/$name.meta
@@ -10,12 +10,12 @@ export PYTHONPATH=.
 
 
 method=knn_dbscan
-knn=80
+knn=4
 knn_method=faiss
 th_sim=0.0
-eps=0.25
-min=1
-num_process=16
+eps=0.1
+min=2
+num_process=1
 pred_labels=$oprefix/$name\_$method\_eps_$eps\_min_$min\_$knn_method\_k_$knn\_th_$th_sim/pred_labels.txt
 python tools/baseline_cluster.py \
     --prefix $prefix \
@@ -30,14 +30,10 @@ python tools/baseline_cluster.py \
     --num_process $num_process
 
 # eval
-metric=pairwise
-python evaluation/evaluate.py \
-    --metric $metric \
-    --gt_labels $gt_labels \
-    --pred_labels $pred_labels
-
-metric=bcubed
-python evaluation/evaluate.py \
-    --metric $metric \
-    --gt_labels $gt_labels \
-    --pred_labels $pred_labels
+for metric in pairwise bcubed nmi
+do
+    python evaluation/evaluate.py \
+        --metric $metric \
+        --gt_labels $gt_labels \
+        --pred_labels $pred_labels
+done

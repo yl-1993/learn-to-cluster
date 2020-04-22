@@ -1,17 +1,17 @@
-cfg_name=cfg_train_ms1m
-config=lgcn/configs/$cfg_name.py
+cfg_name=cfg_train_gcnv_fashion
+config=vegcn/configs/$cfg_name.py
 
 export CUDA_VISIBLE_DEVICES=0
 export PYTHONPATH=.
 
 # train
-python lgcn/main.py \
+python vegcn/main.py \
     --config $config \
     --phase 'train'
 
 # test
 load_from=data/work_dir/$cfg_name/latest.pth
-python lgcn/main.py \
+python vegcn/main.py \
     --config $config \
     --phase 'test' \
     --load_from $load_from \

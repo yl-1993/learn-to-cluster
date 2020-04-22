@@ -1,5 +1,5 @@
-config=./dsgcn/configs/cfg_test_det_ms1m_8_prpsls.py
-load_from=./data/pretrained_models/pretrained_gcn_d.pth
+config=./dsgcn/configs/cfg_test_det_ytb_4_prpsls.py
+load_from=./data/pretrained_models/pretrained_gcn_d_ytb.pth
 
 export CUDA_VISIBLE_DEVICES=0
 
