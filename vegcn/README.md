@@ -8,6 +8,8 @@
 
 ## Test
 
+Download the pretrained models in the [model zoo](https://github.com/yl-1993/learn-to-cluster/blob/master/MODEL_ZOO.md).
+
 Test GCN-V
 ```bash
 sh scripts/vegcn/test_gcn_v.sh

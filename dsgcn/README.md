@@ -8,6 +8,8 @@
 
 ## Test
 
+Download the pretrained models in the [model zoo](https://github.com/yl-1993/learn-to-cluster/blob/master/MODEL_ZOO.md).
+
 Test cluster detection
 ```bash
 sh scripts/dsgcn/test_cluster_det.sh

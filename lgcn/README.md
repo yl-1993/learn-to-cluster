@@ -8,14 +8,7 @@
 
 ## Test
 
-Download the model pretrained on ms1m (part0_train) from
-[Google Drive](https://drive.google.com/open?id=181voJn6yZxNALv-km8MGNSYaNW_gb86z) or
-[BaiduYun](https://pan.baidu.com/s/1Qb-UcQ-hVtDRLbGngU1v8A) (passwd: vwet),
-and untar it under the root of this project.
-```bash
-# md5: b9d40d699fddc826b2ac3614ed5fd73f
-tar -zxf pretrained_lgcn.tar.gz
-```
+Download the pretrained models in the [model zoo](https://github.com/yl-1993/learn-to-cluster/blob/master/MODEL_ZOO.md).
 
 Test
 
