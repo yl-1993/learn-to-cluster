@@ -8,6 +8,10 @@ data2url = {
     'https://drive.google.com/uc?id=14qS_IH-8Qt01nat4wbrY2X73h7dJv5-K',
     'benchmark':
     'https://drive.google.com/uc?id=10boLBiYq-6wKC_N_71unlMyNrimRjpVa',
+    'youtube_face':
+    'https://drive.google.com/uc?id=1hg3PQTOwyduLVyfgJ7qrN52o9QE35XM4',
+    'deepfashion':
+    'https://drive.google.com/uc?id=15B5Ypj8_U9rhcuvkrkCZQAgV4cfes7aV',
 }
 
 
@@ -29,7 +33,6 @@ if __name__ == '__main__':
             tar_path))
     else:
         gdown.download(url, tar_path, quiet=False)
-    exit()
     print('untar {}'.format(tar_path))
     tar = tarfile.open(tar_path)
     for member in tar.getmembers():
