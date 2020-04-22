@@ -23,63 +23,13 @@ conda install faiss-gpu -c pytorch
 pip install -r requirements.txt
 ```
 
-Download 1 part testing data from
-[Google Drive](https://drive.google.com/open?id=14qS_IH-8Qt01nat4wbrY2X73h7dJv5-K) or
-[BaiduYun](https://pan.baidu.com/s/1cN7pD2ZNhw1PENP6TdyH4A) (passwd: sn6s).
+## Datasets
+Please refer to [DATASET.md](https://github.com/yl-1993/learn-to-cluster/blob/master/DATASET.md) for data preparation.
 
-or with scripts below:
-```bash
-python tools/download_data.py
-```
 
-If you have downloaded the data, you can download the pretrained gcn-d and gcn-s from
-[Google Drive](https://drive.google.com/file/d/1yC2FIAKSSJIgMYvOZy3aT4I3cyatAyQx/view?usp=sharing) or
-[BaiduYun](https://pan.baidu.com/s/1_owuUxPG-sjCoVhjXWCMQw) (passwd: r1dg).
+## Model zoo
+Pretrained models are available in the [model zoo](https://github.com/yl-1993/learn-to-cluster/blob/master/MODEL_ZOO.md).
 
-```
-data
-  ├── features
-    ├── part0_train.bin            # acbbc780948e7bfaaee093ef9fce2ccb
-    ├── part1_test.bin             # ced42d80046d75ead82ae5c2cdfba621
-  ├── labels
-    ├── part0_train.meta           # 8573, 576494
-    ├── part1_test.meta            # 8573, 584013
-  ├── knns
-    ├── part0_train/faiss_k_80.npz # 5e4f6c06daf8d29c9b940a851f28a925
-    ├── part1_test/faiss_k_80.npz  # d4a7f95b09f80b0167d893f2ca0f5be5
-  ├── pretrained_models
-    ├── pretrained_gcn_d.pth       # 213598e70ddbc50f5e3661a6191a8be1
-    ├── pretrained_gcn_s.pth       # 3251d6e7d4f9178f504b02d8238726f7
-    ├── pretrained_gcn_d_iop.pth   # 314fba47b5156dcc91383ad611d5bd96
-```
-
-Download entire benchmarks data (including above one) from
-[GoogleDrive](https://drive.google.com/file/d/10boLBiYq-6wKC_N_71unlMyNrimRjpVa/view?usp=sharing) or
-[OneDrive](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155095455_link_cuhk_edu_hk/Ef588F6OV4ZMqqN85Nf-Pv8BcDzSo7DgSG042TA2E4-4CQ?e=ev2Wfl).
-The folder structure is the same as the data above.
-
-*[Optional]* Download precomputed knns from
-[OneDrive](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155095455_link_cuhk_edu_hk/ES_cbfT-m_hEqSTdmBSySEIBGN664NsSamq3-9C4b7yQow?e=qMA36g)
-and move it to `data` folder.
-It can save a lot of time to search knn, especially in the large setting.
-
-*[Optional]* Download the splitted image list from
-[GoogleDrive](https://drive.google.com/file/d/1kurPWh6dm3dWQOLqUAeE-fxHrdnjaULB/view?usp=sharing) or
-[OneDrive](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155095455_link_cuhk_edu_hk/ET7lHxOXSjtDiMsgqzLK9LgBi_QW0WVzgZdv2UBzE1Bgzg?e=jZ7kCS).
-You can train your own feature extractor with the list.
-
-*[Optional]* Download MS-Celeb-1M data from
-[OneDrive](https://mycuhk-my.sharepoint.com/:f:/g/personal/1155095455_link_cuhk_edu_hk/ErY9MmAhmlZMvO9y9SagNOcBISISEdzBfJshn-poD84QPQ?e=PRRpBe).
-We re-align [MS1M-ArcFace](https://www.dropbox.com/s/wpx6tqjf0y5mf6r/faces_ms1m-refine-v2_112x112.zip?dl=0) with our own face alignment model.
-
-*[Optional]* Download Pretrained face recognition model from
-[GoogleDrive](https://drive.google.com/open?id=1eKsh7x-RUIHhIJ1R9AlUjsJdsdbh2qim).
-For using the model to extract features, please check the [code](https://github.com/yl-1993/hfsoftmax/tree/ltc)
-and use [sample data](https://drive.google.com/open?id=1VkZWZmBnaQlTaTNQSQXe-8q8Z8pNuI-D) to have a try.
-
-*[Optional]* Download YTBFace data from
-[GoogleDrive](https://drive.google.com/file/d/1hg3PQTOwyduLVyfgJ7qrN52o9QE35XM4/view?usp=sharing) or
-[OneDrive](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155095455_link_cuhk_edu_hk/EU7mfU9F6C9AtZ8SV7kM0yAB0MLx9rzh4nD4kT5_AHXGxg?e=O6Fik9).
 
 ## Run
 
