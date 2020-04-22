@@ -89,7 +89,7 @@ def knns2spmat(knns, k, th_sim=0.7, use_sim=False):
             if 1 - w < th_sim or nbr == -1:
                 continue
             if row_i == nbr:
-                assert abs(dist) < 1e-5
+                assert abs(dist) < eps
                 continue
             row.append(row_i)
             col.append(nbr)
@@ -108,6 +108,17 @@ def fast_knns2spmat(knns, k, th_sim=0.7, use_sim=False, fill_value=None):
     n = len(knns)
     if isinstance(knns, list):
         knns = np.array(knns)
+    if len(knns.shape) == 2:
+        # knns saved by hnsw has different shape
+        n = len(knns)
+        ndarr = np.ones([n, 2, k])
+        ndarr[:, 0, :] = -1  # assign unknown dist to 1 and nbr to -1
+        for i, (nbr, dist) in enumerate(knns):
+            size = len(nbr)
+            assert size == len(dist)
+            ndarr[i, 0, :size] = nbr[:size]
+            ndarr[i, 1, :size] = dist[:size]
+        knns = ndarr
     nbrs = knns[:, 0, :]
     dists = knns[:, 1, :]
     assert -eps <= dists.min() <= dists.max(
