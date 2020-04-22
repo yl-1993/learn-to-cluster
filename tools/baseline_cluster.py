@@ -69,8 +69,9 @@ def get_output_path(args, ofn='pred_labels.txt'):
         'dbscan':
         'eps_{}_min_{}'.format(args.eps, args.min_samples),
         'knn_dbscan':
-        'eps_{}_min_{}_k_{}_th_{}'.format(args.eps, args.min_samples, args.knn,
-                                          args.th_sim),
+        'eps_{}_min_{}_{}_k_{}_th_{}'.format(args.eps, args.min_samples,
+                                             args.knn_method, args.knn,
+                                             args.th_sim),
         'our_dbscan':
         'min_{}_k_{}_th_{}'.format(args.min_samples, args.knn, args.th_sim),
         'hdbscan':
