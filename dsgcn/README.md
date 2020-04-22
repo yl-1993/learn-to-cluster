@@ -12,14 +12,14 @@ Download the pretrained models in the [model zoo](https://github.com/yl-1993/lea
 
 Test cluster detection
 ```bash
-sh scripts/dsgcn/test_cluster_det.sh
+sh scripts/dsgcn/test_cluster_det_ms1m.sh
 ```
 
 Test cluster segmentation
 ```bash
 # predict iop and then conduct seg
-sh scripts/dsgcn/test_cluster_det_iop.sh
-sh scripts/dsgcn/test_cluster_seg.sh
+sh scripts/dsgcn/test_cluster_det_iop_ms1m.sh
+sh scripts/dsgcn/test_cluster_seg_ms1m.sh
 ```
 
 *[Optional]* GCN-D Upper Bound
@@ -32,13 +32,13 @@ sh scripts/dsgcn/step_by_step/gcn_d_upper_bound.sh
 
 Train cluster detection
 ```bash
-sh scripts/dsgcn/train_cluster_det.sh
+sh scripts/dsgcn/train_cluster_det_ms1m.sh
 ```
 
 Train cluster segmentation
 ```bash
 # seg training uses the ground-truth iop
-sh scripts/dsgcn/train_cluster_seg.sh
+sh scripts/dsgcn/train_cluster_seg_ms1m.sh
 ```
 
 Users can choose different proposals in `dsgcn/configs` or design your own proposals for training and testing.

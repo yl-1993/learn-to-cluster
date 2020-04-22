@@ -12,22 +12,22 @@ Download the pretrained models in the [model zoo](https://github.com/yl-1993/lea
 
 Test GCN-V
 ```bash
-sh scripts/vegcn/test_gcn_v.sh
+sh scripts/vegcn/test_gcn_v_ms1m.sh
 ```
 
 Test GCN-E
 ```bash
-sh scripts/vegcn/test_gcn_e.sh
+sh scripts/vegcn/test_gcn_e_ms1m.sh
 ```
 
 ## Train
 
 Train GCN-V
 ```bash
-sh scripts/vegcn/train_gcn_v.sh
+sh scripts/vegcn/train_gcn_v_ms1m.sh
 ```
 
 Train GCN-E
 ```bash
-sh scripts/vegcn/train_gcn_e.sh
+sh scripts/vegcn/train_gcn_e_ms1m.sh
 ```

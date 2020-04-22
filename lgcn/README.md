@@ -14,7 +14,7 @@ Test
 
 ```bash
 # Testing takes about 3 hours on 1 TitanX.
-sh scripts/lgcn/test_ms1m.sh
+sh scripts/lgcn/test_lgcn_ms1m.sh
 ```
 
 ## Train
@@ -23,7 +23,7 @@ We use the training parameters with best performance in our experiments as the d
 
 ```bash
 # Training takes about 27 hours on 1 TitanX.
-sh scripts/lgcn/train_ms1m.sh
+sh scripts/lgcn/train_lgcn_ms1m.sh
 ```
 
 If there is better training config, you are welcome to report to us. 
