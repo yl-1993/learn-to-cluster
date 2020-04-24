@@ -11,7 +11,7 @@ th_sim = 0.  # cut edges with similarity smaller than th_sim
 
 # gcn_v configs
 _work_dir = 'work_dir'
-ckpt_name = 'pretrained_gcn_v'
+ckpt_name = 'pretrained_gcn_v_ms1m'
 gcnv_cfg = './vegcn/configs/cfg_test_gcnv_ms1m.py'
 gcnv_cfg_name = rm_suffix(osp.basename(gcnv_cfg))
 gcnv_cfg = Config.fromfile(gcnv_cfg)
