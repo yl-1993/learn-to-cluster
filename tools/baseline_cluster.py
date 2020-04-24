@@ -6,7 +6,8 @@ import inspect
 import argparse
 
 import baseline
-from utils import (write_meta, mkdir_if_no_exists, BasicDataset, Timer)
+from utils import (write_meta, set_random_seed, mkdir_if_no_exists,
+                   BasicDataset, Timer)
 
 funcs = inspect.getmembers(baseline, inspect.isfunction)
 method_names = [n for n, _ in funcs]
@@ -39,6 +40,7 @@ def parse_args():
                         default=2,
                         type=int,
                         help="KMeans, HAC")
+    parser.add_argument('--seed', type=int, default=42, help='random seed')
     parser.add_argument('--batch_size', default=100, type=int)
     parser.add_argument('--eps', default=0.7, type=float)
     parser.add_argument('--distance', default=0.7, type=float)
@@ -50,6 +52,7 @@ def parse_args():
     parser.add_argument('--min_bin_freq', default=1, type=int)
     parser.add_argument('--knn', default=80, type=int)
     parser.add_argument('--th_sim', default=0.7, type=float)
+    parser.add_argument('--iters', default=20, type=int)
     parser.add_argument('--knn_method',
                         default='faiss',
                         choices=['faiss', 'faiss_gpu', 'hnsw'])
@@ -97,6 +100,9 @@ def get_output_path(args, ofn='pred_labels.txt'):
                                       args.min_conn),
         'meanshift':
         'bw_{}_bin_{}'.format(args.bw, args.min_bin_freq),
+        'chinese_whispers':
+        '{}_k_{}_th_{}_iters_{}'.format(args.knn_method, args.knn, args.th_sim,
+                                        args.iters),
     }
 
     if args.method in method2name:
@@ -117,6 +123,7 @@ def get_output_path(args, ofn='pred_labels.txt'):
 
 if __name__ == '__main__':
     args = parse_args()
+    set_random_seed(args.seed)
 
     cluster_func = baseline.__dict__[args.method]
 

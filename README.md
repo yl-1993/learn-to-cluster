@@ -126,6 +126,7 @@ Details can be found in [Face Clustering Benchmarks](https://github.com/yl-1993/
 
 | Method | Pairwise F-score | BCubed F-score | NMI |
 | ------ |:---------:|:------:|:-------:|
+| Chinese Whispers (k=5, th=0.7, iters=20) | 31.22 | 53.25 | 89.8 |
 | Approx Rank Order (k=10, th=0) | 25.04 | 52.77 | 88.71 |
 | Kmeans (ncluster=3991) | 32.02 | 53.3 | 88.91 |
 | KNN DBSCAN (k=4, th=0., eps=0.1, min=2) | 25.07 | 53.23 | 90.75 |
