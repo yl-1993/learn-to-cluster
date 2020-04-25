@@ -17,12 +17,12 @@ gcnv_cfg_name = rm_suffix(osp.basename(gcnv_cfg))
 gcnv_cfg = Config.fromfile(gcnv_cfg)
 
 use_gcn_feat = True
+gcnv_prefix = '{}/{}/{}/{}_gcnv_k_{}_th_{}'.format(prefix, _work_dir,
+                                                   gcnv_cfg_name, test_name,
+                                                   gcnv_cfg.knn,
+                                                   gcnv_cfg.th_sim)
 if use_gcn_feat:
     gcnv_nhid = gcnv_cfg.model.kwargs.nhid
-    gcnv_prefix = '{}/{}/{}/{}_gcnv_k_{}_th_{}'.format(prefix, _work_dir,
-                                                       gcnv_cfg_name,
-                                                       test_name, gcnv_cfg.knn,
-                                                       gcnv_cfg.th_sim)
     feat_path = osp.join(gcnv_prefix, 'features', '{}.bin'.format(ckpt_name))
 else:
     gcnv_nhid = gcnv_cfg.model.kwargs.feature_dim
@@ -38,8 +38,8 @@ metrics = ['pairwise', 'bcubed', 'nmi']
 test_data = dict(feat_path=feat_path,
                  label_path=osp.join(prefix, 'labels',
                                      '{}.meta'.format(test_name)),
-                 pred_confs='{}/{}/{}/pred_confs.npz'.format(
-                     prefix, _work_dir, gcnv_cfg_name),
+                 pred_confs=osp.join(gcnv_prefix, 'pred_confs',
+                                     '{}.npz'.format(ckpt_name)),
                  k=knn,
                  is_norm_feat=True,
                  th_sim=th_sim,
