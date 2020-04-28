@@ -3,7 +3,8 @@ import random
 import numpy as np
 import networkx as nx
 
-from utils import (build_knns, knns2ordered_nbrs, clusters2labels, Timer)
+from utils import (build_knns, knns2ordered_nbrs, fast_knns2spmat,
+                   clusters2labels, Timer)
 
 
 def chinese_whispers(feats, prefix, name, knn_method, knn, th_sim, iters,
@@ -26,27 +27,21 @@ def chinese_whispers(feats, prefix, name, knn_method, knn, th_sim, iters,
         knn_prefix = os.path.join(prefix, 'knns', name)
         knns = build_knns(knn_prefix, feats, knn_method, knn)
         dists, nbrs = knns2ordered_nbrs(knns, sort=True)
-        sims = 1 - dists
+        spmat = fast_knns2spmat(knns, knn, th_sim, use_sim=True)
 
-        for node_i, (sim, nbr) in enumerate(zip(sims, nbrs)):
-            # initialize 'cluster' to unique value (cluster of itself)
-            node = (node_i, {'cluster': node_i})
-            nodes.append(node)
-
-            edges_i = []
-            for _sim, node_j in zip(sim, nbr):
-                # remove self-loop and prune edge with small similarity
-                if (node_i == node_j) or (_sim <= th_sim):
-                    continue
-                edges_i.append((node_i, node_j, {'weight': _sim}))
-
-            edges = edges + edges_i
+        size = len(feats)
+        nodes = [(n_i, {'cluster': n_i}) for n_i in range(size)]
+        c = spmat.tocoo()
+        edges = [(n_i, n_j, {
+            'weight': s
+        }) for n_i, n_j, s in zip(c.row, c.col, c.data)]
 
         G = nx.Graph()
         G.add_nodes_from(nodes)
         G.add_edges_from(edges)
         node_num = G.number_of_nodes()
         edge_num = G.number_of_edges()
+        assert size == node_num
         print('#nodes: {}, #edges: {}'.format(node_num, edge_num))
 
     with Timer('whisper iteratively (iters={})'.format(iters)):
@@ -58,6 +53,8 @@ def chinese_whispers(feats, prefix, name, knn_method, knn, th_sim, iters,
             for idx in idxs:
                 node = cluster_nodes[idx]
                 nbrs = G[node]
+                if len(nbrs) == 0:
+                    continue
                 cluster2weight = {}
                 for nbr in nbrs:
                     assigned_cluster = G.node[nbr]['cluster']
@@ -67,11 +64,10 @@ def chinese_whispers(feats, prefix, name, knn_method, knn, th_sim, iters,
                     cluster2weight[assigned_cluster] += edge_weight
 
                 # set the class of node to its neighbor with largest weight
-                if len(cluster2weight) > 0:
-                    cluster2weight = sorted(cluster2weight.items(),
-                                            key=lambda kv: kv[1],
-                                            reverse=True)
-                    G.node[node]['cluster'] = cluster2weight[0][0]
+                cluster2weight = sorted(cluster2weight.items(),
+                                        key=lambda kv: kv[1],
+                                        reverse=True)
+                G.node[node]['cluster'] = cluster2weight[0][0]
 
     clusters = {}
     for (node, data) in G.node.items():
