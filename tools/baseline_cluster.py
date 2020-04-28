@@ -103,6 +103,9 @@ def get_output_path(args, ofn='pred_labels.txt'):
         'chinese_whispers':
         '{}_k_{}_th_{}_iters_{}'.format(args.knn_method, args.knn, args.th_sim,
                                         args.iters),
+        'chinese_whispers_fast':
+        '{}_k_{}_th_{}_iters_{}'.format(args.knn_method, args.knn, args.th_sim,
+                                        args.iters),
     }
 
     if args.method in method2name:
