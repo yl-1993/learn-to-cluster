@@ -50,6 +50,7 @@ Follow the instructions in [dsgcn](dsgcn/), [vegcn](vegcn/) and [lgcn](lgcn/) to
 
 | Method | Precision | Recall | F-score |
 | ------ |:---------:|:------:|:-------:|
+| Chinese Whispers (k=80, th=0.6, iters=20) | 55.49 | 52.46 | 53.93 |
 | Approx Rank Order (k=80, th=0) | 99.77 | 7.2 | 13.42 |
 | MiniBatchKmeans (ncluster=5000, bs=100) | 45.48 | 80.98 | 58.25 |
 | KNN DBSCAN (k=80, th=0.7, eps=0.25, min=1) | 95.25 | 52.79 | 67.93 |
@@ -115,6 +116,7 @@ Details can be found in [Face Clustering Benchmarks](https://github.com/yl-1993/
 
 | Method | Pairwise F-score | BCubed F-score | NMI |
 | ------ |:---------:|:------:|:-------:|
+| Chinese Whispers (k=160, th=0.75, iters=20) | 72.9 | 70.55 | 93.25 |
 | Approx Rank Order (k=200, th=0) | 76.45 | 75.45 | 94.34 |
 | Kmeans (ncluster=1436) | 67.86 | 75.77 | 93.99 |
 | KNN DBSCAN (k=160, th=0., eps=0.3, min=1) | 91.35 | 89.34 | 97.52 |
