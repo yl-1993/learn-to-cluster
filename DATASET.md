@@ -43,6 +43,11 @@ To experiment with custom dataset, it is required to provided extracted features
 For training, the number of features should be equal to the number of labels.
 For testing, the F-score will be evaluated if labels are provided, otherwise only clustering results will be generated.
 
+Note that `labels` is only required for training clustering model, but it is not mandatory for clustering unlabeled data.
+Basically, there are two ways to cluster unlabeled data without meta file.
+(1) Do not pass the `label_path` in config file. It will not generate loss and evaluation results.
+(2) Make a pseudo meta label, e.g., setting all labels to -1, but just ignore the loss and the evaluation results.
+
 ###  Supported datasets
 The supported datasets are listed below.
 
