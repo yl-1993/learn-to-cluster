@@ -33,7 +33,7 @@ class ClusterSegProcessor(ClusterProcessor):
         assert len(node) > 1, '#node of {}: {}'.format(fn_node, len(node))
 
         adj, abs2rel, rel2abs = self.build_adj(node, edge)
-        # compute label
+        # compute label & mask
         if self.dataset.use_random_seed:
             ''' except using node with max degree as seed,
                 you can explore more creative designs.
@@ -47,23 +47,30 @@ class ClusterSegProcessor(ClusterProcessor):
             else:
                 center_idx = random.choice(node)
                 rel_center_idx = abs2rel[center_idx]
-            lb = self.dataset.idx2lb[center_idx]
-            gt_node = self.dataset.lb2idxs[lb]
             mask = np.zeros(len(node))
             mask[rel_center_idx] = 1
             mask = mask.reshape(-1, 1)
+            if not self.dataset.ignore_label:
+                lb = self.dataset.idx2lb[center_idx]
+                gt_node = self.dataset.lb2idxs[lb]
         else:
-            lb2cnt = {}
-            for idx in node:
-                if idx not in self.dataset.idx2lb:
-                    continue
-                lb = self.dataset.idx2lb[idx]
-                if lb not in lb2cnt:
-                    lb2cnt[lb] = 0
-                lb2cnt[lb] += 1
-            gt_lb, _ = get_majority(lb2cnt)
-            gt_node = self.dataset.lb2idxs[gt_lb]
-        g_label = self.get_node_lb(node, gt_node)
+            # do not use mask
+            if not self.dataset.ignore_label:
+                lb2cnt = {}
+                for idx in node:
+                    if idx not in self.dataset.idx2lb:
+                        continue
+                    lb = self.dataset.idx2lb[idx]
+                    if lb not in lb2cnt:
+                        lb2cnt[lb] = 0
+                    lb2cnt[lb] += 1
+                gt_lb, _ = get_majority(lb2cnt)
+                gt_node = self.dataset.lb2idxs[gt_lb]
+
+        if not self.dataset.ignore_label:
+            g_label = self.get_node_lb(node, gt_node)
+        else:
+            g_label = np.zeros_like(node)
 
         features = self.build_features(node)
         if self.dataset.use_random_seed:

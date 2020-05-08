@@ -7,7 +7,8 @@ import numpy as np
 from mmcv.runner import load_checkpoint
 from mmcv.parallel import MMDataParallel
 
-from dsgcn.datasets import build_dataset, build_processor, build_dataloader
+from utils import list2dict, write_meta
+from dsgcn.datasets import (build_dataset, build_processor, build_dataloader)
 from post_process import deoverlap
 from evaluation import evaluate
 
@@ -78,6 +79,13 @@ def test_cluster_det(model, cfg, logger):
     proposals = [fn_node for fn_node, _ in dataset.lst]
     pred_labels = deoverlap(pred_scores, proposals, dataset.inst_num,
                             cfg.th_pos, cfg.th_iou)
+
+    # save predicted labels
+    if cfg.save_output:
+        ofn_meta = os.path.join(cfg.work_dir, 'pred_labels.txt')
+        print('save predicted labels to {}'.format(ofn_meta))
+        pred_idx2lb = list2dict(pred_labels, ignore_value=-1)
+        write_meta(ofn_meta, pred_idx2lb, inst_num=dataset.inst_num)
 
     # evaluation
     if not dataset.ignore_label:
