@@ -24,7 +24,6 @@ def chinese_whispers(feats, prefix, name, knn_method, knn, th_sim, iters,
     with Timer('create graph'):
         knn_prefix = os.path.join(prefix, 'knns', name)
         knns = build_knns(knn_prefix, feats, knn_method, knn)
-        dists, nbrs = knns2ordered_nbrs(knns, sort=True)
         spmat = fast_knns2spmat(knns, knn, th_sim, use_sim=True)
 
         size = len(feats)
@@ -54,7 +53,7 @@ def chinese_whispers(feats, prefix, name, knn_method, knn, th_sim, iters,
                     continue
                 cluster2weight = {}
                 for nbr in nbrs:
-                    assigned_cluster = G.node[nbr]['cluster']
+                    assigned_cluster = G.nodes[nbr]['cluster']
                     edge_weight = G[node][nbr]['weight']
                     if assigned_cluster not in cluster2weight:
                         cluster2weight[assigned_cluster] = 0
@@ -64,10 +63,10 @@ def chinese_whispers(feats, prefix, name, knn_method, knn, th_sim, iters,
                 cluster2weight = sorted(cluster2weight.items(),
                                         key=lambda kv: kv[1],
                                         reverse=True)
-                G.node[node]['cluster'] = cluster2weight[0][0]
+                G.nodes[node]['cluster'] = cluster2weight[0][0]
 
     clusters = {}
-    for (node, data) in G.node.items():
+    for (node, data) in G.nodes.items():
         assigned_cluster = data['cluster']
 
         if assigned_cluster not in clusters:
@@ -112,7 +111,6 @@ def chinese_whispers_fast(feats, prefix, name, knn_method, knn, th_sim, iters,
     with Timer('create graph'):
         knn_prefix = os.path.join(prefix, 'knns', name)
         knns = build_knns(knn_prefix, feats, knn_method, knn)
-        dists, nbrs = knns2ordered_nbrs(knns, sort=True)
         spmat = fast_knns2spmat(knns, knn, th_sim, use_sim=True)
         A = build_symmetric_adj(spmat, self_loop=False)
 
