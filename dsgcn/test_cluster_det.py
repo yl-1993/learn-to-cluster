@@ -20,6 +20,8 @@ def test_cluster_det(model, cfg, logger):
 
     for k, v in cfg.model['kwargs'].items():
         setattr(cfg.test_data, k, v)
+    setattr(cfg.test_data, 'det_label', cfg.det_label)
+    
     dataset = build_dataset(cfg.test_data)
     processor = build_processor(cfg.stage)
 
